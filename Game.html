@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Ending "了" Pair PK Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            margin: -30px -30px 30px;
+            padding: 25px;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .wheel-container {
+            flex: 1;
+            min-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .wheel-wrapper {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            margin: 20px 0;
+        }
+        
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            border: 10px solid #ff9f43;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+        
+        .wheel-section {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: bottom right;
+            left: 0;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+        }
+        
+        .pointer {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 60px;
+            background: #ff6b6b;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            z-index: 10;
+        }
+        
+        .spin-btn {
+            background: linear-gradient(135deg, #ff9f43 0%, #feca57 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 7px 20px rgba(255, 159, 67, 0.4);
+            margin-top: 20px;
+        }
+        
+        .spin-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 159, 67, 0.6);
+        }
+        
+        .spin-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .players-container {
+            flex: 1;
+            min-width: 300px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .players-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .players {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .player {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            min-width: 150px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #3498db;
+        }
+        
+        .player.active {
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.6);
+            transform: scale(1.05);
+            transition: all 0.3s;
+        }
+        
+        .player-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .player-score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .add-score-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .add-score-btn:hover {
+            background: #27ae60;
+        }
+        
+        .challenge-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .challenge-title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .challenge {
+            font-size: 1.4rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .correct-answer {
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 15px 0;
+            color: #2c3e50;
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .check-btn {
+            background: linear-gradient(135deg, #2ecc71 0%, #1abc9c 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+        
+        .check-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .next-btn {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.3);
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid #2ecc71;
+            color: #27ae60;
+        }
+        
+        .feedback.incorrect {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid #e74c3c;
+            color: #c0392b;
+        }
+        
+        .rules-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff8e1;
+            border-radius: 10px;
+            border-left: 5px solid #f39c12;
+        }
+        
+        .rules-title {
+            color: #f39c12;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        
+        .rule-item {
+            margin-bottom: 10px;
+            color: #7f8c8d;
+            padding: 5px 0;
+        }
+        
+        @media (max-width: 900px) {
+            .game-area {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .wheel-wrapper {
+                width: 300px;
+                height: 300px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .wheel-wrapper {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .wheel-section {
+                font-size: 0.8rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sentence Ending "了" Pair PK Game</h1>
+        <p class="subtitle">Say the correct sentence and earn points!</p>
+    </header>
+    
+    <div class="container">
+        <div class="game-area">
+            <div class="wheel-container">
+                <div class="wheel-wrapper">
+                    <div class="pointer"></div>
+                    <div class="wheel" id="wheel">
+                        <!-- 6 fixed sections with Chinese text as requested -->
+                        <div class="wheel-section" data-index="0" style="transform: rotate(0deg) skewY(30deg); background-color: #FF6B6B;">
+                            前天晚上+去+哪儿
+                        </div>
+                        <div class="wheel-section" data-index="1" style="transform: rotate(60deg) skewY(30deg); background-color: #4ECDC4;">
+                            昨天中午+吃饺子+affirmative sentence
+                        </div>
+                        <div class="wheel-section" data-index="2" style="transform: rotate(120deg) skewY(30deg); background-color: #FFE66D;">
+                            上周末+参观博物馆+Yes/No question with 了吗
+                        </div>
+                        <div class="wheel-section" data-index="3" style="transform: rotate(180deg) skewY(30deg); background-color: #6A0572;">
+                            前天下午+看电影+Yes/No question with 了没有
+                        </div>
+                        <div class="wheel-section" data-index="4" style="transform: rotate(240deg) skewY(30deg); background-color: #5C80BC;">
+                            昨天早上+买面包+Yes/No question with V没V
+                        </div>
+                        <div class="wheel-section" data-index="5" style="transform: rotate(300deg) skewY(30deg); background-color: #4C9173;">
+                            昨天下午+上中文课+negative sentence
+                        </div>
+                    </div>
+                </div>
+                <button class="spin-btn" id="spinBtn">Spin the Wheel</button>
+            </div>
+            
+            <div class="players-container">
+                <h3 class="players-title">Player Scores</h3>
+                <div class="players">
+                    <div class="player active" id="player1">
+                        <div class="player-name">Player One</div>
+                        <div class="player-score">0</div>
+                        <button class="add-score-btn" data-player="1">Correct! +1 Point</button>
+                    </div>
+                    <div class="player" id="player2">
+                        <div class="player-name">Player Two</div>
+                        <div class="player-score">0</div>
+                        <button class="add-score-btn" data-player="2">Correct! +1 Point</button>
+                    </div>
+                </div>
+                
+                <div class="challenge-section">
+                    <h3 class="challenge-title">Current Challenge</h3>
+                    <div class="challenge" id="challenge">
+                        Click "Spin the Wheel" to start
+                    </div>
+                    
+                    <div class="correct-answer" id="correctAnswer">
+                        <!-- Correct answer will be displayed here -->
+                    </div>
+                    
+                    <div class="buttons">
+                        <button class="check-btn" id="checkBtn">Check Correct Answer</button>
+                        <button class="next-btn" id="nextBtn">Next Turn</button>
+                    </div>
+                    
+                    <div class="feedback" id="feedback">
+                        <p id="feedbackText"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="rules-section">
+            <h3 class="rules-title">Game Rules</h3>
+            <div class="rule-item">1. Click "Spin the Wheel" button, the wheel will randomly select a challenge</div>
+            <div class="rule-item">2. Say the correct sentence based on the wheel prompt</div>
+            <div class="rule-item">3. If correct, click "+1 Point" button to add score</div>
+            <div class="rule-item">4. If unsure, click "Check Correct Answer" button</div>
+            <div class="rule-item">5. Click "Next Turn" button to switch to the other player</div>
+            <div class="rule-item">6. The game ends after 6 rounds, the player with higher score wins</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements
+            const wheel = document.getElementById('wheel');
+            const spinBtn = document.getElementById('spinBtn');
+            const challenge = document.getElementById('challenge');
+            const correctAnswerEl = document.getElementById('correctAnswer');
+            const checkBtn = document.getElementById('checkBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const feedback = document.getElementById('feedback');
+            const feedbackText = document.getElementById('feedbackText');
+            const player1 = document.getElementById('player1');
+            const player2 = document.getElementById('player2');
+            const addScoreBtns = document.querySelectorAll('.add-score-btn');
+            
+            // Player scores
+            const playerScores = [0, 0]; // Index 0 for player 1, index 1 for player 2
+            let currentPlayer = 0; // 0 for player 1, 1 for player 2
+            let currentChallenge = null;
+            let turns = 0;
+            
+            // 6 fixed challenges
+            const challenges = [
+                {
+                    prompt: "前天晚上+去+哪儿",
+                    answer: "前天晚上你去哪儿了？",
+                    english: "Where did you go the night before last?"
+                },
+                {
+                    prompt: "昨天中午+吃饺子+affirmative sentence",
+                    answer: "昨天中午我吃饺子了。",
+                    english: "I ate dumplings yesterday at noon."
+                },
+                {
+                    prompt: "上周末+参观博物馆+Yes/No question with 了吗",
+                    answer: "上周末你参观博物馆了吗？",
+                    english: "Did you visit the museum last weekend?"
+                },
+                {
+                    prompt: "前天下午+看电影+Yes/No question with 了没有",
+                    answer: "前天下午你看电影了没有？",
+                    english: "Did you watch a movie the afternoon before last?"
+                },
+                {
+                    prompt: "昨天早上+买面包+Yes/No question with V没V",
+                    answer: "昨天早上你买没买面包？",
+                    english: "Did you buy bread yesterday morning?"
+                },
+                {
+                    prompt: "昨天下午+上中文课+negative sentence",
+                    answer: "昨天下午我没上中文课。",
+                    english: "I didn't attend Chinese class yesterday afternoon."
+                }
+            ];
+            
+            // Spin the wheel
+            function spinWheel() {
+                // Random rotation (at least 5 full circles)
+                const degrees = 1800 + Math.floor(Math.random() * 360);
+                wheel.style.transform = `rotate(${degrees}deg)`;
+                
+                // Disable spin button
+                spinBtn.disabled = true;
+                
+                // After spinning, select a challenge
+                setTimeout(() => {
+                    // Calculate selected challenge index (0-5)
+                    const normalizedDegrees = degrees % 360;
+                    const sectionIndex = Math.floor(normalizedDegrees / 60) % 6;
+                    
+                    currentChallenge = challenges[sectionIndex];
+                    
+                    // Display challenge
+                    challenge.innerHTML = currentChallenge.prompt;
+                    
+                    // Reset correct answer display
+                    correctAnswerEl.style.display = 'none';
+                    feedback.style.display = 'none';
+                    
+                    // Enable check answer button
+                    checkBtn.disabled = false;
+                    
+                    // Show current player
+                    updatePlayerDisplay();
+                    
+                    // Enable add score buttons
+                    addScoreBtns.forEach(btn => btn.disabled = false);
+                }, 4000);
+            }
+            
+            // Update player display
+            function updatePlayerDisplay() {
+                // Remove all active states
+                player1.classList.remove('active');
+                player2.classList.remove('active');
+                
+                // Add active state to current player
+                if (currentPlayer === 0) {
+                    player1.classList.add('active');
+                } else {
+                    player2.classList.add('active');
+                }
+                
+                // Update score display
+                document.querySelector('#player1 .player-score').textContent = playerScores[0];
+                document.querySelector('#player2 .player-score').textContent = playerScores[1];
+            }
+            
+            // Show correct answer
+            function showAnswer() {
+                correctAnswerEl.innerHTML = `<strong>Correct Answer:</strong> ${currentChallenge.answer}<br>
+                                            <strong>English:</strong> ${currentChallenge.english}`;
+                correctAnswerEl.style.display = 'block';
+                checkBtn.disabled = true;
+            }
+            
+            // Next turn
+            function nextTurn() {
+                // Switch to next player
+                currentPlayer = (currentPlayer + 1) % 2;
+                
+                // Increase turn count
+                turns++;
+                
+                // Reset interface
+                correctAnswerEl.style.display = 'none';
+                feedback.style.display = 'none';
+                challenge.innerHTML = 'Click "Spin the Wheel" to start';
+                spinBtn.disabled = false;
+                
+                // Update player display
+                updatePlayerDisplay();
+                
+                // Check if game is over
+                if (turns >= 6) { // 6 rounds total
+                    if (playerScores[0] > playerScores[1]) {
+                        feedbackText.textContent = 'Game Over! Player One Wins!';
+                    } else if (playerScores[1] > playerScores[0]) {
+                        feedbackText.textContent = 'Game Over! Player Two Wins!';
+                    } else {
+                        feedbackText.textContent = 'Game Over! It\'s a Tie!';
+                    }
+                    
+                    feedback.className = 'feedback correct';
+                    feedback.style.display = 'block';
+                    
+                    // Disable buttons
+                    spinBtn.disabled = true;
+                    checkBtn.disabled = true;
+                    nextBtn.disabled = true;
+                    addScoreBtns.forEach(btn => btn.disabled = true);
+                }
+            }
+            
+            // Add score
+            function addScore(playerIndex) {
+                playerScores[playerIndex]++;
+                updatePlayerDisplay();
+                
+                // Show feedback
+                feedbackText.textContent = `Player ${playerIndex + 1} scores! Current score: ${playerScores[playerIndex]}`;
+                feedback.className = 'feedback correct';
+                feedback.style.display = 'block';
+                
+                // Disable add score buttons
+                addScoreBtns.forEach(btn => btn.disabled = true);
+            }
+            
+            // Event listeners
+            spinBtn.addEventListener('click', spinWheel);
+            checkBtn.addEventListener('click', showAnswer);
+            nextBtn.addEventListener('click', nextTurn);
+            
+            // Add event listeners to add score buttons
+            addScoreBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const playerIndex = parseInt(this.getAttribute('data-player')) - 1;
+                    addScore(playerIndex);
+                });
+            });
+            
+            // Initialize player display
+            updatePlayerDisplay();
+        });
+    </script>
+</body>
+</html>
