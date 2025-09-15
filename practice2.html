@@ -43,10 +43,7 @@
             font-size: 16px;
             transition: all 0.3s;
         }
-        button:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-        }
+        button:hover { background-color: #2980b9; transform: translateY(-2px); }
         .case-btn { background-color: #e74c3c; }
         .case-btn:hover { background-color: #c0392b; }
         .detective-btn { background-color: #2ecc71; }
@@ -84,29 +81,27 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
-        .chinese-text {
-            font-family: 'Microsoft YaHei', sans-serif;
-            color: #f1c40f;
-        }
+        .chinese-text { font-family: 'Microsoft YaHei', sans-serif; color: #f1c40f; }
         .language-points {
             background-color: #1e2a38;
             padding: 15px;
             border-radius: 8px;
             margin-top: 20px;
         }
+        .button-row { text-align: center; margin-top: 16px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>"了"字破案剧</h1>
-        
+
         <div class="instructions">
             <h3>Game Instructions</h3>
             <p>This is a multiplayer game to practice using "<span class="chinese-text">了</span>" to indicate completed actions. <strong>One person plays the Suspect</strong>, other players play <strong>Detectives</strong>.</p>
             <p>The Detectives need to analyze the suspect's statements to find the real criminal.</p>
             <p>The Suspect must <strong>answer truthfully verbally</strong> to the Detectives' questions, no lying allowed.</p>
         </div>
-        
+
         <!-- Case Selection -->
         <div class="section" id="caseSelection">
             <h2>Select a Case</h2>
@@ -116,7 +111,7 @@
                 <button class="case-btn" onclick="selectCase(3)">Case 3: Library Vandalism</button>
             </div>
         </div>
-        
+
         <!-- Role Selection -->
         <div class="section hidden" id="roleSelection">
             <h2>Select Your Role</h2>
@@ -125,35 +120,46 @@
                 <button class="suspect-btn" onclick="selectRole('suspect')">Play as Suspect</button>
             </div>
         </div>
-        
+
         <!-- Detective Information -->
         <div class="section hidden" id="detectiveInfo">
             <h2 class="case-title">Detective View - <span id="caseTitle"></span></h2>
             <p>Below are the activity statements of four suspects, one of them is the criminal:</p>
             <div class="suspect-container" id="suspectStatements"></div>
+
             <div class="instructions">
                 <p>Please carefully analyze each suspect's statements to find inconsistencies.</p>
                 <p>You can ask the suspect questions using "<span class="chinese-text">了</span>" sentences, for example: "<span class="chinese-text">你昨天吃了什么？</span>" or "<span class="chinese-text">你昨天买了什么？</span>"</p>
                 <p>The Suspect will <strong>answer verbally</strong>, please listen carefully to their responses.</p>
             </div>
+
             <div style="text-align: center; margin-top: 20px;">
                 <button onclick="makeAccusation()">Identify the Criminal</button>
             </div>
         </div>
-        
+
         <!-- Suspect Information -->
         <div class="section hidden" id="suspectInfo">
             <h2 class="case-title">Suspect View - <span id="suspectCaseTitle"></span></h2>
             <p>This is your activity statement:</p>
             <div id="myStatement"></div>
-            <p id="criminalNote" class="criminal-note hidden">Note: You are the criminal! Please answer the Detectives' questions truthfully, but do not voluntarily reveal criminal information.</p>
+
+            <p id="criminalNote" class="criminal-note hidden">
+                Note: You are the criminal! Please answer the Detectives' questions truthfully, but do not voluntarily reveal criminal information.
+            </p>
+
             <div class="instructions">
                 <p>The Detectives will ask you questions using "<span class="chinese-text">了</span>" sentences. Please <strong>answer truthfully verbally</strong> based on your activity statement.</p>
                 <p>For example, if a Detective asks: "<span class="chinese-text">你昨天吃了什么？</span>", you can answer: "<span class="chinese-text">我吃了三个包子。</span>"</p>
                 <p>You don't need to perform any operations on the screen, just answer verbally.</p>
             </div>
+
+            <!-- Only one button -->
+            <div class="button-row">
+                <button onclick="resetGame()">Play Again</button>
+            </div>
         </div>
-        
+
         <!-- Game Result -->
         <div class="section hidden" id="gameResult">
             <h2>Case Result</h2>
@@ -165,21 +171,15 @@
     </div>
 
     <script>
-        // Game data
+        // Game data (CRIMINALS & SPECIFIC STATEMENTS HARD-FIXED)
         const cases = {
             1: {
                 title: "Restaurant Theft",
                 description: "Yesterday at 5 PM, the restaurant cash register was stolen, with 2000 RMB missing.",
-                criminal: 2, // The second suspect is the criminal
+                criminal: 2, // fixed
                 suspects: {
-                    1: {
-                        statements: [
-                            "我昨天在饭馆吃午饭了。",
-                            "我昨天吃了三个包子。",
-                            "我昨天喝了两瓶啤酒。"
-                        ]
-                    },
-                    2: {
+                    1: { statements: ["我昨天在饭馆吃午饭了。", "我昨天吃了三个包子。", "我昨天喝了两瓶啤酒。"] },
+                    2: { // fixed statements for Suspect 2
                         statements: [
                             "我昨天在饭馆吃午饭了。",
                             "我昨天吃了三个包子。",
@@ -187,202 +187,147 @@
                         ],
                         isCriminal: true
                     },
-                    3: {
-                        statements: [
-                            "我昨天在饭馆吃晚饭了。",
-                            "我昨天吃了三个包子。",
-                            "我昨天喝了两瓶啤酒。"
-                        ]
-                    },
-                    4: {
-                        statements: [
-                            "我昨天在饭馆吃午饭了。",
-                            "我昨天吃了三个面包。",
-                            "我昨天喝了两瓶啤酒。"
-                        ]
-                    }
+                    3: { statements: ["我昨天在饭馆吃晚饭了。", "我昨天吃了三个包子。", "我昨天喝了两瓶啤酒。"] },
+                    4: { statements: ["我昨天在饭馆吃午饭了。", "我昨天吃了三个面包。", "我昨天喝了两瓶啤酒。"] }
                 }
             },
             2: {
                 title: "Mall Theft",
                 description: "Yesterday at 3 PM, the mall jewelry counter was robbed, with a diamond necklace missing.",
-                criminal: 3, // The third suspect is the criminal
+                criminal: 4, // fixed
                 suspects: {
-                    1: {
+                    1: { statements: ["我昨天买了一条牛仔裤。", "我昨天买了一件黑色的毛衣。", "我昨天买了一双皮鞋。"] },
+                    2: { statements: ["我昨天买了一条牛仔裤。", "我昨天买了一件白色的毛衣。", "我昨天买了一双皮鞋。"] },
+                    3: { statements: ["我昨天买了两条牛仔裤。", "我昨天买了一件黑色的毛衣。", "我昨天买了一双皮鞋。"] },
+                    4: { // fixed statements for Suspect 4
                         statements: [
-                            "我昨天买了一条牛仔裤。",
-                            "我昨天买了一件黑色的毛衣。",
-                            "我昨天买了一双皮鞋。"
-                        ]
-                    },
-                    2: {
-                        statements: [
-                            "我昨天买了一条牛仔裤。",
-                            "我昨天买了一件白色的毛衣。",
-                            "我昨天买了一双皮鞋。"
-                        ]
-                    },
-                    3: {
-                        statements: [
-                            "我昨天买了两条牛仔裤。",
-                            "我昨天买了一件黑色的毛衣。",
-                            "我昨天买了一双皮鞋。"
-                        ],
-                        isCriminal: true
-                    },
-                    4: {
-                        statements: [
-                            "我昨天买了一条牛仔裤。",
+                            "我昨天买了一条的牛仔裤。",
                             "我昨天买了一件黑色的毛衣。",
                             "我昨天买了一双运动鞋。"
-                        ]
+                        ],
+                        isCriminal: true
                     }
                 }
             },
             3: {
                 title: "Library Vandalism",
                 description: "Yesterday at 6 PM, several books in the library's rare books section were deliberately damaged.",
-                criminal: 4, // The fourth suspect is the criminal
+                criminal: 1, // fixed
                 suspects: {
-                    1: {
+                    1: { // fixed statements for Suspect 1
                         statements: [
                             "我昨天去图书馆做作业了。",
                             "昨天我上了一节汉语课。",
                             "我昨天去图书馆借了三本书。"
-                        ]
-                    },
-                    2: {
-                        statements: [
-                            "我昨天去图书馆做作业了。",
-                            "昨天我上了两节汉语课。",
-                            "我昨天去图书馆借了三本书。"
-                        ]
-                    },
-                    3: {
-                        statements: [
-                            "我昨天去图书馆做作业了。",
-                            "昨天我上了两节汉语课。",
-                            "我昨天去图书馆借了两本书。"
-                        ]
-                    },
-                    4: {
-                        statements: [
-                            "我昨天去咖啡厅做作业了。",
-                            "昨天我上了两节汉语课。",
-                            "我昨天去图书馆借了三本书。"
                         ],
                         isCriminal: true
-                    }
+                    },
+                    2: { statements: ["我昨天去图书馆做作业了。", "昨天我上了两节汉语课。", "我昨天去图书馆借了三本书。"] },
+                    3: { statements: ["我昨天去图书馆做作业了。", "昨天我上了两节汉语课。", "我昨天去图书馆借了两本书。"] },
+                    4: { statements: ["我昨天去咖啡厅做作业了。", "昨天我上了两节汉语课。", "我昨天去图书馆借了三本书。"] }
                 }
             }
         };
 
-        // NEW: fixed suspect assignment per case
-        const fixedSuspectByCase = {
-            1: 2, // Case 1 -> Suspect 2
-            2: 4, // Case 2 -> Suspect 4
-            3: 1  // Case 3 -> Suspect 1
-        };
-        
+        // Fixed suspect role for the person who chooses "Suspect"
+        const fixedSuspectByCase = { 1: 2, 2: 4, 3: 1 };
+
         let currentCase = null;
-        let currentCaseId = null; // NEW: track which case is selected
+        let currentCaseId = null;
         let currentRole = null;
         let currentSuspect = null;
-        
+
         // Select case
         function selectCase(caseId) {
-            currentCaseId = caseId;            // NEW
+            currentCaseId = caseId;
             currentCase = cases[caseId];
             document.getElementById('caseSelection').classList.add('hidden');
             document.getElementById('roleSelection').classList.remove('hidden');
         }
-        
+
         // Select role
         function selectRole(role) {
             currentRole = role;
             document.getElementById('roleSelection').classList.add('hidden');
-            
+
             if (role === 'detective') {
                 showDetectiveInfo();
             } else {
-                // NEW: assign suspect deterministically based on the selected case
+                // Fixed suspect per case (no random)
                 currentSuspect = fixedSuspectByCase[currentCaseId];
                 showSuspectInfo();
             }
         }
-        
-        // Show detective information
+
+        // Detective info in fixed order 1→2→3→4
         function showDetectiveInfo() {
             document.getElementById('caseTitle').textContent = currentCase.title;
-            
+
             const statementsDiv = document.getElementById('suspectStatements');
             statementsDiv.innerHTML = '';
-            
-            for (const [id, suspect] of Object.entries(currentCase.suspects)) {
+
+            [1, 2, 3, 4].forEach(id => {
+                const suspect = currentCase.suspects[id];
                 const suspectDiv = document.createElement('div');
                 suspectDiv.className = 'statement';
                 suspectDiv.innerHTML = `<h3>Suspect ${id}</h3>`;
-                
+
                 const list = document.createElement('ul');
                 suspect.statements.forEach(stmt => {
                     const item = document.createElement('li');
                     item.innerHTML = `<span class="chinese-text">${stmt}</span>`;
                     list.appendChild(item);
                 });
-                
+
                 suspectDiv.appendChild(list);
                 statementsDiv.appendChild(suspectDiv);
-            }
-            
+            });
+
             document.getElementById('detectiveInfo').classList.remove('hidden');
         }
-        
-        // Show suspect information
+
+        // Suspect info
         function showSuspectInfo() {
             document.getElementById('suspectCaseTitle').textContent = currentCase.title;
-            
+
             const myStatementDiv = document.getElementById('myStatement');
             myStatementDiv.innerHTML = '';
-            
+
             const list = document.createElement('ul');
             currentCase.suspects[currentSuspect].statements.forEach(stmt => {
                 const item = document.createElement('li');
                 item.innerHTML = `<span class="chinese-text">${stmt}</span>`;
                 list.appendChild(item);
             });
-            
             myStatementDiv.appendChild(list);
-            
-            // If criminal, show note
+
             if (currentSuspect === currentCase.criminal) {
                 document.getElementById('criminalNote').classList.remove('hidden');
             } else {
                 document.getElementById('criminalNote').classList.add('hidden');
             }
-            
+
             document.getElementById('suspectInfo').classList.remove('hidden');
         }
-        
+
         // Detective identifies criminal
         function makeAccusation() {
             const suspectNumber = prompt("Based on the statements, who do you think is the criminal? Please enter suspect number (1, 2, 3 or 4):");
-            
+
             if (suspectNumber && parseInt(suspectNumber, 10) === currentCase.criminal) {
                 showResult(true, `Congratulations! You successfully identified suspect ${currentCase.criminal} as the criminal.`);
             } else {
                 showResult(false, `Unfortunately, that's incorrect. The real criminal is suspect ${currentCase.criminal}.`);
             }
         }
-        
-        // Show game result
+
+        // Result page
         function showResult(isSuccess, message) {
             document.getElementById('detectiveInfo').classList.add('hidden');
             document.getElementById('suspectInfo').classList.add('hidden');
-            
+
             const resultText = document.getElementById('resultText');
             resultText.innerHTML = `<p>${message}</p>`;
-            
-            // Language learning points
             resultText.innerHTML += `
                 <div class="language-points">
                     <h3>Language Learning Points:</h3>
@@ -391,26 +336,29 @@
                         <li>"<span class="chinese-text">了</span>" can also be used between a verb and its object. There is usually a modifier before the object of the verb, such as a numeral classifier, an adjective or a pronoun.</li>
                         <li>Examples:
                             <ul>
-                                <li><span class="chinese-text">我吃了三个包子</span> (I ate three buns)</li>
-                                <li><span class="chinese-text">我买了一条牛仔裤</span> (I bought a pair of jeans)</li>
-                                <li><span class="chinese-text">我喝了两瓶啤酒</span> (I drank two bottles of beer)</li>
+                                <li><span class="chinese-text">我吃了三个包子</span></li>
+                                <li><span class="chinese-text">我买了一条牛仔裤</span></li>
+                                <li><span class="chinese-text">我喝了两瓶啤酒</span></li>
                             </ul>
                         </li>
                     </ul>
                 </div>
             `;
-            
             document.getElementById('gameResult').classList.remove('hidden');
         }
-        
-        // Reset game
+
+        // Reset everything
         function resetGame() {
             currentCase = null;
-            currentCaseId = null; // NEW
+            currentCaseId = null;
             currentRole = null;
             currentSuspect = null;
-            
+
             document.getElementById('gameResult').classList.add('hidden');
+            document.getElementById('suspectInfo').classList.add('hidden');
+            document.getElementById('detectiveInfo').classList.add('hidden');
+            document.getElementById('roleSelection').classList.add('hidden');
+
             document.getElementById('caseSelection').classList.remove('hidden');
             document.getElementById('criminalNote').classList.add('hidden');
         }
