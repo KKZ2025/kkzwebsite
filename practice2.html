@@ -47,27 +47,13 @@
             background-color: #2980b9;
             transform: translateY(-2px);
         }
-        .case-btn {
-            background-color: #e74c3c;
-        }
-        .case-btn:hover {
-            background-color: #c0392b;
-        }
-        .detective-btn {
-            background-color: #2ecc71;
-        }
-        .detective-btn:hover {
-            background-color: #27ae60;
-        }
-        .suspect-btn {
-            background-color: #f39c12;
-        }
-        .suspect-btn:hover {
-            background-color: #d35400;
-        }
-        .hidden {
-            display: none;
-        }
+        .case-btn { background-color: #e74c3c; }
+        .case-btn:hover { background-color: #c0392b; }
+        .detective-btn { background-color: #2ecc71; }
+        .detective-btn:hover { background-color: #27ae60; }
+        .suspect-btn { background-color: #f39c12; }
+        .suspect-btn:hover { background-color: #d35400; }
+        .hidden { display: none; }
         .statement {
             background-color: #415b76;
             padding: 15px;
@@ -144,15 +130,12 @@
         <div class="section hidden" id="detectiveInfo">
             <h2 class="case-title">Detective View - <span id="caseTitle"></span></h2>
             <p>Below are the activity statements of four suspects, one of them is the criminal:</p>
-            
             <div class="suspect-container" id="suspectStatements"></div>
-            
             <div class="instructions">
                 <p>Please carefully analyze each suspect's statements to find inconsistencies.</p>
                 <p>You can ask the suspect questions using "<span class="chinese-text">了</span>" sentences, for example: "<span class="chinese-text">你昨天吃了什么？</span>" or "<span class="chinese-text">你昨天买了什么？</span>"</p>
                 <p>The Suspect will <strong>answer verbally</strong>, please listen carefully to their responses.</p>
             </div>
-            
             <div style="text-align: center; margin-top: 20px;">
                 <button onclick="makeAccusation()">Identify the Criminal</button>
             </div>
@@ -163,9 +146,7 @@
             <h2 class="case-title">Suspect View - <span id="suspectCaseTitle"></span></h2>
             <p>This is your activity statement:</p>
             <div id="myStatement"></div>
-            
             <p id="criminalNote" class="criminal-note hidden">Note: You are the criminal! Please answer the Detectives' questions truthfully, but do not voluntarily reveal criminal information.</p>
-            
             <div class="instructions">
                 <p>The Detectives will ask you questions using "<span class="chinese-text">了</span>" sentences. Please <strong>answer truthfully verbally</strong> based on your activity statement.</p>
                 <p>For example, if a Detective asks: "<span class="chinese-text">你昨天吃了什么？</span>", you can answer: "<span class="chinese-text">我吃了三个包子。</span>"</p>
@@ -295,13 +276,22 @@
                 }
             }
         };
+
+        // NEW: fixed suspect assignment per case
+        const fixedSuspectByCase = {
+            1: 2, // Case 1 -> Suspect 2
+            2: 4, // Case 2 -> Suspect 4
+            3: 1  // Case 3 -> Suspect 1
+        };
         
         let currentCase = null;
+        let currentCaseId = null; // NEW: track which case is selected
         let currentRole = null;
         let currentSuspect = null;
         
         // Select case
         function selectCase(caseId) {
+            currentCaseId = caseId;            // NEW
             currentCase = cases[caseId];
             document.getElementById('caseSelection').classList.add('hidden');
             document.getElementById('roleSelection').classList.remove('hidden');
@@ -315,10 +305,8 @@
             if (role === 'detective') {
                 showDetectiveInfo();
             } else {
-                // Randomly assign suspect identity
-                const suspectIds = Object.keys(currentCase.suspects);
-                const randomIndex = Math.floor(Math.random() * suspectIds.length);
-                currentSuspect = parseInt(suspectIds[randomIndex]);
+                // NEW: assign suspect deterministically based on the selected case
+                currentSuspect = fixedSuspectByCase[currentCaseId];
                 showSuspectInfo();
             }
         }
@@ -368,6 +356,8 @@
             // If criminal, show note
             if (currentSuspect === currentCase.criminal) {
                 document.getElementById('criminalNote').classList.remove('hidden');
+            } else {
+                document.getElementById('criminalNote').classList.add('hidden');
             }
             
             document.getElementById('suspectInfo').classList.remove('hidden');
@@ -377,7 +367,7 @@
         function makeAccusation() {
             const suspectNumber = prompt("Based on the statements, who do you think is the criminal? Please enter suspect number (1, 2, 3 or 4):");
             
-            if (suspectNumber && parseInt(suspectNumber) === currentCase.criminal) {
+            if (suspectNumber && parseInt(suspectNumber, 10) === currentCase.criminal) {
                 showResult(true, `Congratulations! You successfully identified suspect ${currentCase.criminal} as the criminal.`);
             } else {
                 showResult(false, `Unfortunately, that's incorrect. The real criminal is suspect ${currentCase.criminal}.`);
@@ -392,7 +382,7 @@
             const resultText = document.getElementById('resultText');
             resultText.innerHTML = `<p>${message}</p>`;
             
-            // Show language learning points
+            // Language learning points
             resultText.innerHTML += `
                 <div class="language-points">
                     <h3>Language Learning Points:</h3>
@@ -416,6 +406,7 @@
         // Reset game
         function resetGame() {
             currentCase = null;
+            currentCaseId = null; // NEW
             currentRole = null;
             currentSuspect = null;
             
