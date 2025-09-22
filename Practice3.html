@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detective Game – Who Came Back Last?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                        dark: '#1F2937',
+                        light: '#F8FAFC'
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+            .page {
+                display: none;
+            }
+            .page.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-blue-50 min-h-screen">
+    <!-- Homepage -->
+    <div id="home-page" class="page active container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-primary mb-4">Detective Game – Who Came Back Last?</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto text-lg">This is a four-player speaking game! One of you will be the Detective, and the other three will play as Students A, B, and C. The Detective’s mission: find out who returned to the dormitory last.</p>
+        </header>
+
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h2 class="text-2xl font-semibold mb-4 text-center text-primary">Game Rules</h2>
+                <ul class="list-disc pl-5 space-y-2 text-gray-700">
+                    <li>Choose your roles: 1 Detective + 3 Students (A, B, C)</li>
+                    <li>Everyone’s afternoon activities start at 1:00 PM</li>
+                    <li>The Detective asks questions to figure out who came back last</li>
+                    <li>The Detective is not allowed to ask: “What time did you return to the dormitory?”</li>
+                    <li>Students must answer honestly, based on their given schedule</li>
+                </ul>
+                <p class="mt-6 text-lg font-medium text-center">Ready? Pick your role and let the mystery begin!</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Detective Role -->
+                <div class="bg-white rounded-xl shadow-md p-6 card-hover cursor-pointer" onclick="showPage('detective-page')">
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mr-4">
+                            <i class="fa fa-search text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Detective</h3>
+                    </div>
+                    <p class="text-gray-600">Ask questions, take notes, analyze information, and finally determine who was the last to return to the dormitory.</p>
+                </div>
+
+                <!-- Student A Role -->
+                <div class="bg-white rounded-xl shadow-md p-6 card-hover cursor-pointer" onclick="showPage('studentA-page')">
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mr-4">
+                            <i class="fa fa-user text-2xl text-secondary"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Student A</h3>
+                    </div>
+                    <p class="text-gray-600">Answer the detective's questions truthfully based on your afternoon schedule.</p>
+                </div>
+
+                <!-- Student B Role -->
+                <div class="bg-white rounded-xl shadow-md p-6 card-hover cursor-pointer" onclick="showPage('studentB-page')">
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mr-4">
+                            <i class="fa fa-user text-2xl text-secondary"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Student B</h3>
+                    </div>
+                    <p class="text-gray-600">Answer the detective's questions truthfully based on your afternoon schedule.</p>
+                </div>
+
+                <!-- Student C Role -->
+                <div class="bg-white rounded-xl shadow-md p-6 card-hover cursor-pointer" onclick="showPage('studentC-page')">
+                    <div class="flex items-center mb-4">
+                        <div class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mr-4">
+                            <i class="fa fa-user text-2xl text-secondary"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Student C</h3>
+                    </div>
+                    <p class="text-gray-600">Answer the detective's questions truthfully based on your afternoon schedule.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detective Page -->
+    <div id="detective-page" class="page container mx-auto px-4 py-8">
+        <header class="mb-8">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl md:text-3xl font-bold text-primary">Detective's Notes</h1>
+                <button onclick="showPage('home-page')" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition">
+                    <i class="fa fa-home mr-1"></i> Return to Homepage
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <!-- Notes Area -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fa fa-book text-accent mr-2"></i> Investigation Notes
+                </h2>
+                <p class="text-gray-600 mb-4">Example questions you can ask (时量补语练习):</p>
+                <div class="bg-gray-50 p-4 rounded-lg mb-4 border-l-4 border-primary">
+                    <p class="mb-2">你昨天做了什么？(What did you do yesterday?)</p>
+                    <p class="mb-2">你上中文课上了多长时间？(How long did you have Chinese class?)</p>
+                    <p>你上了多长时间的中文课？(How long did you have Chinese class?)</p>
+                </div>
+                <p class="text-gray-600 mb-4">Record your questions and the students' answers:</p>
+                <textarea id="detective-notes" class="w-full h-64 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition" placeholder="Record your investigation notes here..."></textarea>
+                <button onclick="saveNotes()" class="mt-4 bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition">
+                    <i class="fa fa-save mr-1"></i> Save Notes
+                </button>
+                <p id="save-message" class="mt-2 text-green-600 hidden">Notes saved!</p>
+            </div>
+
+            <!-- Voting Area -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fa fa-gavel text-accent mr-2"></i> Final Decision
+                </h2>
+                <p class="text-gray-600 mb-6">Based on your investigation, who was the last to return to the dormitory?</p>
+                
+                <div class="space-y-4">
+                    <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" name="suspect" value="A" class="w-5 h-5 text-primary">
+                        <span class="ml-3">Student A</span>
+                    </label>
+                    
+                    <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" name="suspect" value="B" class="w-5 h-5 text-primary">
+                        <span class="ml-3">Student B</span>
+                    </label>
+                    
+                    <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                        <input type="radio" name="suspect" value="C" class="w-5 h-5 text-primary">
+                        <span class="ml-3">Student C</span>
+                    </label>
+                </div>
+                
+                <button onclick="submitVote()" class="mt-6 w-full bg-accent hover:bg-accent/90 text-white px-4 py-3 rounded-lg transition text-lg font-medium">
+                    Submit Decision
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student A Page -->
+    <div id="studentA-page" class="page container mx-auto px-4 py-8">
+        <header class="mb-8">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl md:text-3xl font-bold text-secondary">Student A's Schedule</h1>
+                <button onclick="showPage('home-page')" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition">
+                    <i class="fa fa-home mr-1"></i> Return to Homepage
+                </button>
+            </div>
+        </header>
+
+        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6 md:p-8">
+            <div class="flex items-center mb-6">
+                <div class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mr-4">
+                    <i class="fa fa-user text-2xl text-secondary"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold">Student A</h2>
+                    <p class="text-gray-500">Your afternoon schedule (use these examples when answering questions):</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg mb-6 border-l-4 border-secondary">
+                <p class="mb-2">我上中文课上了两个小时。(I had Chinese class for two hours.)</p>
+                <p>我上了两个小时的中文课。(I had two hours of Chinese class.)</p>
+            </div>
+
+            <div class="space-y-6 mt-8">
+                <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-primary">
+                    <h3 class="font-semibold text-lg">1:00-3:00 PM</h3>
+                    <p>上英文课</p>
+                </div>
+                
+                <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-primary">
+                    <h3 class="font-semibold text-lg">3:00-5:00 PM</h3>
+                    <p>上中文课</p>
+                </div>
+                
+                <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-primary">
+                    <h3 class="font-semibold text-lg">5:00-5:30 PM</h3>
+                    <p>吃晚饭</p>
+                </div>
+                
+                <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+                    <p class="italic">"我吃了晚饭就回宿舍了。"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student B Page -->
+    <div id="studentB-page" class="page container mx-auto px-4 py-8">
+        <header class="mb-8">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl md:text-3xl font-bold text-secondary">Student B's Schedule</h1>
+                <button onclick="showPage('home-page')" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition">
+                    <i class="fa fa-home mr-1"></i> Return to Homepage
+                </button>
+            </div>
+        </header>
+
+        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6 md:p-8">
+            <div class="flex items-center mb-6">
+                <div class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mr-4">
+                    <i class="fa fa-user text-2xl text-secondary"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold">Student B</h2>
+                    <p class="text-gray-500">Your afternoon schedule (use these examples when answering questions):</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg mb-6 border-l-4 border-secondary">
+                <p class="mb-2">我上中文课上了两个小时。(I had Chinese class for two hours.)</p>
+                <p>我上了两个小时的中文课。(I had two hours of Chinese class.)</p>
+            </div>
+
+            <div class="space-y-6 mt-8">
+                <div class="p-4 bg-green-50 rounded-lg border-l-4 border-secondary">
+                    <h3 class="font-semibold text-lg">1:00-3:00 PM</h3>
+                    <p>上中文课</p>
+                </div>
+                
+                <div class="p-4 bg-green-50 rounded-lg border-l-4 border-secondary">
+                    <h3 class="font-semibold text-lg">3:00-4:30 PM</h3>
+                    <p>打篮球</p>
+                </div>
+                
+                <div class="p-4 bg-green-50 rounded-lg border-l-4 border-secondary">
+                    <h3 class="font-semibold text-lg">4:30-5:00 PM</h3>
+                    <p>做作业</p>
+                </div>
+                
+                <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+                    <p class="italic">"我做了作业就回宿舍了。"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student C Page -->
+    <div id="studentC-page" class="page container mx-auto px-4 py-8">
+        <header class="mb-8">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl md:text-3xl font-bold text-secondary">Student C's Schedule</h1>
+                <button onclick="showPage('home-page')" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition">
+                    <i class="fa fa-home mr-1"></i> Return to Homepage
+                </button>
+            </div>
+        </header>
+
+        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6 md:p-8">
+            <div class="flex items-center mb-6">
+                <div class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mr-4">
+                    <i class="fa fa-user text-2xl text-secondary"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold">Student C</h2>
+                    <p class="text-gray-500">Your afternoon schedule (use these examples when answering questions):</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg mb-6 border-l-4 border-secondary">
+                <p class="mb-2">我上中文课上了两个小时。(I had Chinese class for two hours.)</p>
+                <p>我上了两个小时的中文课。(I had two hours of Chinese class.)</p>
+            </div>
+
+            <div class="space-y-6 mt-8">
+                <div class="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
+                    <h3 class="font-semibold text-lg">1:00-1:30 PM</h3>
+                    <p>喝咖啡</p>
+                </div>
+                
+                <div class="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
+                    <h3 class="font-semibold text-lg">1:30-3:00 PM</h3>
+                    <p>跟朋友聊天</p>
+                </div>
+                
+                <div class="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
+                    <h3 class="font-semibold text-lg">3:00-5:00 PM</h3>
+                    <p>上中文课</p>
+                </div>
+                
+                <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+                    <p class="italic">"我下了课就回宿舍了。"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="result-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 md:p-8 max-w-md w-full mx-4 transform transition-all">
+            <h2 id="result-title" class="text-2xl font-bold mb-4 text-center"></h2>
+            <p id="result-message" class="text-gray-600 mb-6 text-center"></p>
+            <div class="text-center">
+                <button onclick="closeResultModal()" class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Page switching function
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            // Show target page
+            document.getElementById(pageId).classList.add('active');
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // Save notes function
+        function saveNotes() {
+            const notes = document.getElementById('detective-notes').value;
+            localStorage.setItem('detectiveNotes', notes);
+            
+            // Show save success message
+            const saveMessage = document.getElementById('save-message');
+            saveMessage.classList.remove('hidden');
+            setTimeout(() => {
+                saveMessage.classList.add('hidden');
+            }, 2000);
+        }
+
+        // Load saved notes
+        function loadNotes() {
+            const savedNotes = localStorage.getItem('detectiveNotes');
+            if (savedNotes) {
+                document.getElementById('detective-notes').value = savedNotes;
+            }
+        }
+
+        // Submit vote
+        function submitVote() {
+            const selected = document.querySelector('input[name="suspect"]:checked');
+            if (!selected) {
+                alert('Please select a suspect before submitting');
+                return;
+            }
+            
+            const resultTitle = document.getElementById('result-title');
+            const resultMessage = document.getElementById('result-message');
+            
+            // Determine if the vote is correct (correct answer is Student A)
+            if (selected.value === 'A') {
+                resultTitle.textContent = 'Congratulations, you are correct!';
+                resultTitle.className = 'text-2xl font-bold mb-4 text-center text-green-600';
+                resultMessage.textContent = 'Student A was the last to return to the dormitory. Because Students B and C finished all activities before 5:00 PM, while Student A finished dinner at 5:30 PM, making him the last to return.';
+            } else {
+                resultTitle.textContent = 'Unfortunately, that is incorrect';
+                resultTitle.className = 'text-2xl font-bold mb-4 text-center text-red-600';
+                resultMessage.textContent = 'The correct answer is Student A. Because Students B and C finished all activities before 5:00 PM, while Student A finished dinner at 5:30 PM, making him the last to return.';
+            }
+            
+            // Show result modal
+            document.getElementById('result-modal').classList.remove('hidden');
+        }
+
+        // Close result modal
+        function closeResultModal() {
+            document.getElementById('result-modal').classList.add('hidden');
+        }
+
+        // Load saved notes when page loads
+        window.addEventListener('load', loadNotes);
+    </script>
+</body>
+</html>
+    
