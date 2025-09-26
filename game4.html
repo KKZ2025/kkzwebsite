@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approximate Numbers Bingo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Arial", sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: relative;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: #ecf0f1;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+        .player-turn {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .player1-color {
+            color: #e74c3c;
+        }
+        .player2-color {
+            color: #3498db;
+        }
+        .bingo-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .bingo-cell {
+            aspect-ratio: 1;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .bingo-cell:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bingo-cell.player1 {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .bingo-cell.player2 {
+            background-color: #3498db;
+            color: white;
+        }
+        .bingo-cell.cooldown {
+            background-color: #95a5a6;
+            color: white;
+            cursor: not-allowed;
+            position: relative;
+        }
+        .bingo-cell.cooldown::after {
+            content: "On cooldown";
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .question {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .answer {
+            font-size: 13px;
+            color: #27ae60;
+            display: none;
+        }
+        .bingo-cell.show-answer .answer {
+            display: block;
+        }
+        .bingo-cell.show-answer .question {
+            margin-bottom: 10px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        #new-game {
+            background-color: #2ecc71;
+            color: white;
+        }
+        #new-game:hover {
+            background-color: #27ae60;
+        }
+        #show-all {
+            background-color: #f39c12;
+            color: white;
+        }
+        #show-all:hover {
+            background-color: #d35400;
+        }
+        .win-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            z-index: 100;
+        }
+        .win-message h2 {
+            margin-top: 0;
+        }
+        .win-message button {
+            margin-top: 15px;
+        }
+        
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            width: 90%;
+            max-width: 500px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: none;
+        }
+        .modal.active {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .modal-question {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .modal-answer {
+            font-size: 16px;
+            color: #27ae60;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        .modal.active .modal-answer.show {
+            display: block;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .modal-buttons button {
+            flex: 1;
+            min-width: 120px;
+        }
+        #show-answer {
+            background-color: #3498db;
+            color: white;
+        }
+        #show-answer:hover {
+            background-color: #2980b9;
+        }
+        #correct {
+            background-color: #2ecc71;
+            color: white;
+        }
+        #correct:hover {
+            background-color: #27ae60;
+        }
+        #wrong {
+            background-color: #e74c3c;
+            color: white;
+        }
+        #wrong:hover {
+            background-color: #c0392b;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        .overlay.active {
+            display: block;
+        }
+        @media (max-width: 600px) {
+            .bingo-cell {
+                padding: 5px;
+            }
+            .question {
+                font-size: 12px;
+            }
+            .answer {
+                font-size: 11px;
+            }
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Approximate Numbers Bingo</h1>
+        <p class="subtitle">Two-player game - Get 4 in a row, column or diagonal to win</p>
+        
+        <div class="game-info">
+            <div class="player-turn">
+                Current Player: <span id="current-player" class="player1-color">Player 1</span>
+            </div>
+            <div class="game-status">
+                Status: <span id="game-status">In Progress</span>
+            </div>
+        </div>
+        
+        <div class="bingo-grid" id="bingo-grid">
+            <!-- Cells will be generated dynamically with JavaScript -->
+        </div>
+        
+        <div class="controls">
+            <button id="new-game">New Game</button>
+            <button id="show-all">Show All Answers</button>
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div class="overlay" id="overlay"></div>
+    <div class="modal" id="modal">
+        <div class="modal-question" id="modal-question"></div>
+        <div class="modal-answer" id="modal-answer"></div>
+        <div class="modal-buttons">
+            <button id="show-answer">Show Answer</button>
+            <button id="correct">Correct</button>
+            <button id="wrong">Wrong</button>
+        </div>
+    </div>
+    
+    <div class="win-message" id="win-message">
+        <h2 id="winner-text">Player 1 Wins!</h2>
+        <p>Congratulations!</p>
+        <button id="play-again">Play Again</button>
+    </div>
+
+    <script>
+        // Game data - questions and answers
+        const questions = [
+            { question: "30块——40块", answer: "三十多块 or 三十几块" },
+            { question: "10件——20件", answer: "十多件 or 十几件" },
+            { question: "5块——6块", answer: "五块多" },
+            { question: "Several hundreds of students", answer: "几百个学生" },
+            { question: "Several pairs of shoes", answer: "几双鞋子" },
+            { question: "Dozens of friends", answer: "几十个朋友" },
+            { question: "More than 1200 years", answer: "一千两百多年" },
+            { question: "More than 2 months", answer: "两个多月" },
+            { question: "More than 100 meters", answer: "一百多米" },  // Updated answer
+            { question: "3岁——4岁", answer: "三岁多" },
+            { question: "20岁——30岁", answer: "二十多岁 or 二十几岁" },
+            { question: "31个 or 32个", answer: "三十一二个" },
+            { question: "13本 or 14本", answer: "十三四本" },
+            { question: "1个小时 or 2个小时", answer: "一两个小时" },
+            { question: "4杯 or 5杯", answer: "四五杯" },
+            { question: "600米 or 700米", answer: "六七百米" }
+        ];
+
+        // Game state
+        let currentPlayer = 1; // 1 or 2
+        let gameBoard = Array(16).fill(0); // 0: unselected, 1: Player 1, 2: Player 2
+        let gameActive = true;
+        let cooldownCells = []; // Cells on cooldown for current turn
+        let nextCooldownCells = []; // Cells to be on cooldown for next turn
+        let selectedCellIndex = null; // Currently selected cell index
+        let shuffledQuestions = []; // For random distribution of questions
+
+        // DOM elements
+        const bingoGrid = document.getElementById('bingo-grid');
+        const currentPlayerElement = document.getElementById('current-player');
+        const gameStatusElement = document.getElementById('game-status');
+        const winMessage = document.getElementById('win-message');
+        const winnerText = document.getElementById('winner-text');
+        const newGameButton = document.getElementById('new-game');
+        const showAllButton = document.getElementById('show-all');
+        const playAgainButton = document.getElementById('play-again');
+        const modal = document.getElementById('modal');
+        const overlay = document.getElementById('overlay');
+        const modalQuestion = document.getElementById('modal-question');
+        const modalAnswer = document.getElementById('modal-answer');
+        const showAnswerButton = document.getElementById('show-answer');
+        const correctButton = document.getElementById('correct');
+        const wrongButton = document.getElementById('wrong');
+
+        // Helper function to shuffle array (for random question distribution)
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Initialize game
+        function initGame() {
+            // Clear game board
+            bingoGrid.innerHTML = '';
+            gameBoard = Array(16).fill(0);
+            currentPlayer = 1;
+            gameActive = true;
+            cooldownCells = [];
+            nextCooldownCells = [];
+            selectedCellIndex = null;
+            
+            // Shuffle questions for random distribution
+            shuffledQuestions = shuffleArray(questions);
+            
+            // Update UI
+            currentPlayerElement.textContent = 'Player 1';
+            currentPlayerElement.className = 'player1-color';
+            gameStatusElement.textContent = 'In Progress';
+            winMessage.style.display = 'none';
+            modal.classList.remove('active');
+            overlay.classList.remove('active');
+            
+            // Create bingo cells with shuffled questions
+            shuffledQuestions.forEach((item, index) => {
+                const cell = document.createElement('div');
+                cell.className = 'bingo-cell';
+                cell.dataset.index = index;
+                
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question';
+                questionElement.textContent = item.question;
+                
+                const answerElement = document.createElement('div');
+                answerElement.className = 'answer';
+                answerElement.textContent = `Answer: ${item.answer}`;
+                
+                cell.appendChild(questionElement);
+                cell.appendChild(answerElement);
+                
+                cell.addEventListener('click', () => handleCellClick(index));
+                bingoGrid.appendChild(cell);
+            });
+        }
+
+        // Check if cell is selectable
+        function isCellSelectable(index) {
+            // If cell is already selected (correct answer), not selectable
+            if (gameBoard[index] !== 0) return false;
+            
+            // If cell is on cooldown, not selectable
+            if (cooldownCells.includes(index)) {
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Handle cell click
+        function handleCellClick(index) {
+            if (!gameActive || !isCellSelectable(index)) return;
+            
+            selectedCellIndex = index;
+            const question = shuffledQuestions[index];
+            
+            // Show modal
+            modalQuestion.textContent = question.question;
+            modalAnswer.textContent = `Answer: ${question.answer}`;
+            modalAnswer.classList.remove('show');
+            modal.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        // Handle modal button clicks
+        showAnswerButton.addEventListener('click', () => {
+            modalAnswer.classList.add('show');
+        });
+
+        correctButton.addEventListener('click', () => {
+            // Mark cell as current player
+            gameBoard[selectedCellIndex] = currentPlayer;
+            const cell = bingoGrid.children[selectedCellIndex];
+            cell.classList.add(`player${currentPlayer}`);
+            cell.classList.add('show-answer');
+            
+            // Remove from cooldown lists if present
+            if (cooldownCells.includes(selectedCellIndex)) {
+                cooldownCells = cooldownCells.filter(i => i !== selectedCellIndex);
+                cell.classList.remove('cooldown');
+            }
+            if (nextCooldownCells.includes(selectedCellIndex)) {
+                nextCooldownCells = nextCooldownCells.filter(i => i !== selectedCellIndex);
+            }
+            
+            // Check for win
+            if (checkWin()) {
+                gameActive = false;
+                gameStatusElement.textContent = 'Game Over';
+                winnerText.textContent = `Player ${currentPlayer} Wins!`;
+                winnerText.className = `player${currentPlayer}-color`;
+                winMessage.style.display = 'block';
+            } else {
+                // Switch player with no new cooldowns
+                switchPlayer(false);
+            }
+            
+            // Close modal
+            modal.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        wrongButton.addEventListener('click', () => {
+            // Add wrong answer cell to next cooldown list
+            if (!nextCooldownCells.includes(selectedCellIndex)) {
+                nextCooldownCells.push(selectedCellIndex);
+            }
+            
+            // Switch player with new cooldowns
+            switchPlayer(true);
+            
+            // Close modal
+            modal.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Switch player
+        function switchPlayer(hasNewCooldown) {
+            // Update cooldown display
+            // First remove all current cooldown styles
+            cooldownCells.forEach(index => {
+                const cell = bingoGrid.children[index];
+                cell.classList.remove('cooldown');
+            });
+            
+            // Prepare new cooldown list for next turn
+            const newCooldown = hasNewCooldown ? [...nextCooldownCells] : [];
+            
+            // Apply new cooldown styles
+            newCooldown.forEach(index => {
+                const cell = bingoGrid.children[index];
+                cell.classList.add('cooldown');
+            });
+            
+            // Update cooldown lists
+            cooldownCells = newCooldown;
+            nextCooldownCells = []; // Reset next cooldown list
+            
+            // Switch player
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            currentPlayerElement.textContent = `Player ${currentPlayer}`;
+            currentPlayerElement.className = `player${currentPlayer}-color`;
+        }
+
+        // Check win condition
+        function checkWin() {
+            // Check rows
+            for (let row = 0; row < 4; row++) {
+                const start = row * 4;
+                if (gameBoard[start] === currentPlayer &&
+                    gameBoard[start+1] === currentPlayer &&
+                    gameBoard[start+2] === currentPlayer &&
+                    gameBoard[start+3] === currentPlayer) {
+                    return true;
+                }
+            }
+            
+            // Check columns
+            for (let col = 0; col < 4; col++) {
+                if (gameBoard[col] === currentPlayer &&
+                    gameBoard[col+4] === currentPlayer &&
+                    gameBoard[col+8] === currentPlayer &&
+                    gameBoard[col+12] === currentPlayer) {
+                    return true;
+                }
+            }
+            
+            // Check diagonals
+            if (gameBoard[0] === currentPlayer &&
+                gameBoard[5] === currentPlayer &&
+                gameBoard[10] === currentPlayer &&
+                gameBoard[15] === currentPlayer) {
+                return true;
+            }
+            
+            if (gameBoard[3] === currentPlayer &&
+                gameBoard[6] === currentPlayer &&
+                gameBoard[9] === currentPlayer &&
+                gameBoard[12] === currentPlayer) {
+                return true;
+            }
+            
+            return false;
+        }
+
+        // Show all answers
+        function showAllAnswers() {
+            const cells = bingoGrid.children;
+            for (let i = 0; i < cells.length; i++) {
+                cells[i].classList.add('show-answer');
+            }
+        }
+
+        // Close modal when clicking overlay
+        overlay.addEventListener('click', () => {
+            modal.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Event listeners
+        newGameButton.addEventListener('click', initGame);
+        showAllButton.addEventListener('click', showAllAnswers);
+        playAgainButton.addEventListener('click', initGame);
+
+        // Initialize game
+        initGame();
+    </script>
+</body>
+</html>
