@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Approximate Numbers Bingo</title>
+    <!-- 引入 Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             box-sizing: border-box;
@@ -202,7 +204,7 @@
             display: none;
         }
         .modal.active .modal-answer.show {
-            display: block;
+            display: inline-block;
         }
         .modal-buttons {
             display: flex;
@@ -248,6 +250,37 @@
         .overlay.active {
             display: block;
         }
+        
+        /* 新的喇叭图标样式 */
+        .speaker-icon {
+            color: #3498db;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: transform 0.2s;
+            display: none;
+        }
+
+        .speaker-icon:hover {
+            transform: scale(1.15);
+        }
+
+        /* 播放时动画 */
+        .speaker-icon.playing {
+            color: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* 只在答案显示时出现 */
+        .modal.active .modal-answer.show + .speaker-icon {
+            display: inline-block;
+        }
+        
         @media (max-width: 600px) {
             .bingo-cell {
                 padding: 5px;
@@ -293,6 +326,8 @@
     <div class="modal" id="modal">
         <div class="modal-question" id="modal-question"></div>
         <div class="modal-answer" id="modal-answer"></div>
+        <!-- 新的喇叭图标 -->
+        <i class="fas fa-volume-up speaker-icon" id="speaker-icon"></i>
         <div class="modal-buttons">
             <button id="show-answer">Show Answer</button>
             <button id="correct">Correct</button>
@@ -317,7 +352,7 @@
             { question: "Dozens of friends", answer: "几十个朋友" },
             { question: "More than 1200 years", answer: "一千两百多年" },
             { question: "More than 2 months", answer: "两个多月" },
-            { question: "More than 100 meters", answer: "一百多米" },  // Updated answer
+            { question: "More than 100 meters", answer: "一百多米" },
             { question: "3岁——4岁", answer: "三岁多" },
             { question: "20岁——30岁", answer: "二十多岁 or 二十几岁" },
             { question: "31个 or 32个", answer: "三十一二个" },
@@ -335,6 +370,7 @@
         let nextCooldownCells = []; // Cells to be on cooldown for next turn
         let selectedCellIndex = null; // Currently selected cell index
         let shuffledQuestions = []; // For random distribution of questions
+        let currentUtterance = null; // For speech synthesis
 
         // DOM elements
         const bingoGrid = document.getElementById('bingo-grid');
@@ -352,6 +388,7 @@
         const showAnswerButton = document.getElementById('show-answer');
         const correctButton = document.getElementById('correct');
         const wrongButton = document.getElementById('wrong');
+        const speakerIcon = document.getElementById('speaker-icon');
 
         // Helper function to shuffle array (for random question distribution)
         function shuffleArray(array) {
@@ -429,7 +466,7 @@
             
             // Show modal
             modalQuestion.textContent = question.question;
-            modalAnswer.textContent = `Answer: ${question.answer}`;
+            modalAnswer.textContent = question.answer; // 只显示中文答案
             modalAnswer.classList.remove('show');
             modal.classList.add('active');
             overlay.classList.add('active');
@@ -439,6 +476,43 @@
         showAnswerButton.addEventListener('click', () => {
             modalAnswer.classList.add('show');
         });
+
+        // Function to read the answer aloud
+        function readAnswer() {
+            if (!modalAnswer.classList.contains('show')) return;
+            
+            // Stop any ongoing speech
+            if (currentUtterance && window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                speakerIcon.classList.remove('playing');
+                return;
+            }
+            
+            // 获取答案文本
+            const answerText = modalAnswer.textContent;
+            
+            // 创建语音合成实例
+            currentUtterance = new SpeechSynthesisUtterance(answerText);
+            
+            // 设置中文语音
+            currentUtterance.lang = 'zh-CN';
+            
+            // 播放开始时添加动画效果
+            currentUtterance.onstart = () => {
+                speakerIcon.classList.add('playing');
+            };
+            
+            // 播放结束时移除动画效果
+            currentUtterance.onend = () => {
+                speakerIcon.classList.remove('playing');
+            };
+            
+            // 播放语音
+            window.speechSynthesis.speak(currentUtterance);
+        }
+
+        // 添加喇叭点击事件
+        speakerIcon.addEventListener('click', readAnswer);
 
         correctButton.addEventListener('click', () => {
             // Mark cell as current player
@@ -471,6 +545,7 @@
             // Close modal
             modal.classList.remove('active');
             overlay.classList.remove('active');
+            speakerIcon.classList.remove('playing');
         });
 
         wrongButton.addEventListener('click', () => {
@@ -485,6 +560,7 @@
             // Close modal
             modal.classList.remove('active');
             overlay.classList.remove('active');
+            speakerIcon.classList.remove('playing');
         });
 
         // Switch player
@@ -568,6 +644,7 @@
         overlay.addEventListener('click', () => {
             modal.classList.remove('active');
             overlay.classList.remove('active');
+            speakerIcon.classList.remove('playing');
         });
 
         // Event listeners
