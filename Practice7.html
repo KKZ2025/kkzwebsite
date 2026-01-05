@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Castle Treasure Hunt - Compound Directional Complement Practice</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        header {
+            background: linear-gradient(to right, #4CAF50, #2E8B57);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+        
+        .game-area {
+            padding: 20px;
+        }
+        
+        .game-container {
+            width: 100%;
+            height: 500px;
+            border: 3px solid #4CAF50;
+            position: relative;
+            overflow: hidden;
+            background-color: #e8f5e9;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .warrior {
+            width: 120px;
+            height: 180px;
+            position: absolute;
+            transition: all 2.5s ease-in-out;
+            z-index: 2;
+        }
+        
+        .castle {
+            width: 400px;
+            height: 350px;
+            position: absolute;
+            right: 50px;
+            top: 100px;
+            z-index: 1;
+        }
+        
+        .staircase {
+            width: 500px;
+            height: 300px;
+            position: absolute;
+            right: 0;
+            top: 150px;
+            z-index: 1;
+            display: none;
+        }
+        
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .answer-input {
+            padding: 12px;
+            font-size: 16px;
+            width: 300px;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .answer-input:focus {
+            border-color: #2E8B57;
+            box-shadow: 0 0 8px rgba(46, 139, 87, 0.5);
+        }
+        
+        .submit-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            background: linear-gradient(to bottom, #4CAF50, #2E8B57);
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .submit-btn:hover {
+            background: linear-gradient(to bottom, #45a049, #26734d);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        .message {
+            margin-top: 15px;
+            font-size: 18px;
+            color: #333;
+            min-height: 24px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .level-indicator {
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #2E8B57;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            height: 20px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #2E8B57);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+        }
+        
+        .instructions {
+            background-color: #f1f8e9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4CAF50;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #2E8B57;
+        }
+        
+        .instructions p {
+            margin-bottom: 10px;
+        }
+        
+        /* 第四关特定样式 */
+        .jump-warrior {
+            position: absolute;
+            width: 150px;
+            height: 200px;
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        .jump-warrior img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        /* 第五关特定样式 */
+        .table-warrior {
+            position: absolute;
+            width: 120px;
+            height: 180px;
+            transition: left 2s ease-in-out;
+            z-index: 10;
+        }
+        
+        .table-warrior img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        /* 第六关特定样式 */
+        .chest-warrior {
+            position: absolute;
+            width: 150px;
+            height: auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .success-message {
+            text-align: center;
+            font-size: 28px;
+            color: #2E8B57;
+            margin: 20px 0;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Castle Treasure Hunt</h1>
+            <div class="subtitle">Compound Directional Complement Practice</div>
+        </header>
+        
+        <div class="game-area">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            
+            <div class="level-indicator" id="level-indicator">Level 1</div>
+            
+            <div class="instructions">
+                <h3>How to Play:</h3>
+                <p>Enter the correct directional complement in Chinese to guide the warrior through each level.</p>
+            </div>
+            
+            <!-- 第一关 -->
+            <div id="level1" class="tab-content active">
+                <div class="game-container">
+                    <img class="warrior" id="warrior1" src="images/warrior1.png" alt="Warrior">
+                    <img class="castle" id="castle1" src="images/castle1.png" alt="Castle">
+                </div>
+                <div class="input-area">
+                    <input type="text" class="answer-input" id="answer1" placeholder="Enter the directional complement...">
+                    <button class="submit-btn" id="submit1">Submit</button>
+                </div>
+                <div class="message" id="message1"></div>
+            </div>
+            
+            <!-- 第二关 -->
+            <div id="level2" class="tab-content" style="display: none;">
+                <div class="game-container">
+                    <img class="warrior" id="warrior2" src="images/warrior1.png" alt="Warrior">
+                    <img class="staircase" id="staircase2" src="images/staircase2.png" alt="Staircase">
+                </div>
+                <div class="input-area">
+                    <input type="text" class="answer-input" id="answer2" placeholder="Enter the directional complement...">
+                    <button class="submit-btn" id="submit2">Submit</button>
+                </div>
+                <div class="message" id="message2"></div>
+            </div>
+            
+            <!-- 第三关 -->
+            <div id="level3" class="tab-content" style="display: none;">
+                <div class="game-container">
+                    <img class="background" src="images/level3-bg.png" alt="Level 3 Background">
+                    <img class="warrior" id="warrior3" src="images/warrior3.png" alt="Warrior">
+                </div>
+                <div class="input-area">
+                    <input type="text" class="answer-input" id="answer3" placeholder="Enter the answer">
+                    <button class="submit-btn" id="submit3">Submit</button>
+                </div>
+                <div class="message" id="message3"></div>
+            </div>
+            
+            <!-- 第四关 -->
+            <div id="level4" class="tab-content" style="display: none;">
+                <div class="game-container">
+                    <div class="background" style="background-image: url('images/level4-bg.png'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+                    <div class="jump-warrior" id="warrior4">
+                        <img src="images/warrior4.png" alt="Warrior">
+                    </div>
+                </div>
+                <div class="input-area">
+                    <input type="text" class="answer-input" id="answer4" placeholder="Enter command...">
+                    <button class="submit-btn" id="submit4">Execute</button>
+                </div>
+                <div class="message" id="message4"></div>
+            </div>
+            
+            <!-- 第五关 -->
+            <div id="level5" class="tab-content" style="display: none;">
+                <div class="game-container">
+                    <div class="background" style="background-image: url('images/level5-bg.png'); background-size: cover; background-position: center;"></div>
+                    <div class="table-warrior" id="warrior5">
+                        <img src="images/warrior5.png" alt="Warrior">
+                    </div>
+                </div>
+                <div class="input-area">
+                    <input type="text" class="answer-input" id="answer5" placeholder="Enter command">
+                    <button class="submit-btn" id="submit5">Execute</button>
+                </div>
+                <div class="message" id="message5"></div>
+            </div>
+            
+            <!-- 第六关 -->
+            <div id="level6" class="tab-content" style="display: none;">
+                <div class="game-container" id="game-container6">
+                    <div class="background" style="background-image: url('images/level6-bg.png'); background-size: cover; background-position: center;"></div>
+                    <img class="chest-warrior" id="warrior6" src="images/warrior6.png" alt="Warrior">
+                </div>
+                <div class="input-area">
+                    <input type="text" class="answer-input" id="answer6" placeholder="Enter command...">
+                    <button class="submit-btn" id="submit6">Execute</button>
+                </div>
+                <div class="message" id="message6"></div>
+            </div>
+            
+            <!-- 完成所有关卡 -->
+            <div id="level-complete" class="tab-content" style="display: none;">
+                <div class="success-message">
+                    Congratulations! You've completed all levels!
+                </div>
+                <div style="text-align: center;">
+                    <img src="images/warrior6.png" alt="Warrior" style="width: 200px; height: auto;">
+                </div>
+                <div class="success-message">
+                    You are now a master of compound directional complements!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 游戏状态管理
+        const gameState = {
+            currentLevel: 1,
+            totalLevels: 6,
+            completedLevels: 0
+        };
+        
+        // 更新进度条
+        function updateProgressBar() {
+            const progress = (gameState.completedLevels / gameState.totalLevels) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+        
+        // 显示下一关
+        function showNextLevel() {
+            // 隐藏当前关卡
+            document.getElementById(`level${gameState.currentLevel}`).style.display = 'none';
+            
+            // 增加已完成关卡数
+            gameState.completedLevels++;
+            
+            // 更新进度条
+            updateProgressBar();
+            
+            // 如果还有更多关卡
+            if (gameState.currentLevel < gameState.totalLevels) {
+                gameState.currentLevel++;
+                document.getElementById(`level${gameState.currentLevel}`).style.display = 'block';
+                document.getElementById('level-indicator').textContent = `Level ${gameState.currentLevel}`;
+            } else {
+                // 显示完成画面
+                document.getElementById('level-complete').style.display = 'block';
+                document.getElementById('level-indicator').textContent = 'Completed!';
+            }
+        }
+        
+        // 第一关逻辑
+        const warrior1 = document.getElementById('warrior1');
+        const castle1 = document.getElementById('castle1');
+        const answer1 = document.getElementById('answer1');
+        const submit1 = document.getElementById('submit1');
+        const message1 = document.getElementById('message1');
+        
+        // 初始位置设置
+        warrior1.style.left = '50px';
+        warrior1.style.top = '250px';
+        
+        submit1.addEventListener('click', checkAnswer1);
+        answer1.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer1();
+            }
+        });
+        
+        function checkAnswer1() {
+            const answer = answer1.value.trim();
+            
+            if (answer === '走进去') {
+                message1.textContent = 'Correct! The warrior entered the castle!';
+                setTimeout(() => {
+                    warrior1.style.left = '550px'; 
+                    warrior1.style.top = '250px';
+                    
+                    setTimeout(() => {
+                        message1.textContent = 'Level completed! Moving to next level...';
+                        setTimeout(() => {
+                            showNextLevel();
+                        }, 2000);
+                    }, 2500);
+                }, 500);
+            } else {
+                message1.textContent = 'Incorrect, please try again.';
+            }
+        }
+        
+        // 第二关逻辑
+        const warrior2 = document.getElementById('warrior2');
+        const staircase2 = document.getElementById('staircase2');
+        const answer2 = document.getElementById('answer2');
+        const submit2 = document.getElementById('submit2');
+        const message2 = document.getElementById('message2');
+        
+        // 初始位置设置 - 左下角
+        warrior2.style.left = '50px';
+        warrior2.style.bottom = '100px';
+        staircase2.style.display = 'block';
+        
+        submit2.addEventListener('click', checkAnswer2);
+        answer2.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer2();
+            }
+        });
+        
+        function checkAnswer2() {
+            const answer = answer2.value.trim();
+            
+            if (answer === '走上去') {
+                message2.textContent = 'Excellent! The warrior went up the stairs!';
+                setTimeout(() => {
+                    warrior2.style.transition = 'all 3s ease-in-out';
+                    warrior2.style.left = '600px';
+                    warrior2.style.bottom = '200px';
+                    
+                    setTimeout(() => {
+                        message2.textContent = 'Level completed! Moving to next level...';
+                        setTimeout(() => {
+                            showNextLevel();
+                        }, 2000);
+                    }, 3000);
+                }, 500);
+            } else {
+                message2.textContent = 'Incorrect, please try again.';
+            }
+        }
+        
+        // 第三关逻辑
+        const warrior3 = document.getElementById('warrior3');
+        const answer3 = document.getElementById('answer3');
+        const submit3 = document.getElementById('submit3');
+        const message3 = document.getElementById('message3');
+
+        // 调整第三关勇士的初始位置到左下角
+        warrior3.style.left = '50px';
+        warrior3.style.bottom = '100px';
+
+        submit3.addEventListener('click', () => {
+            const answer = answer3.value.trim();
+            if (answer === '跑过去') {
+                message3.textContent = 'Correct! The warrior ran to the cabinet!';
+                warrior3.style.left = '850px';
+                
+                setTimeout(() => {
+                    message3.textContent = 'Level completed! Moving to next level...';
+                    setTimeout(() => {
+                        showNextLevel();
+                    }, 2000);
+                }, 3000);
+            } else {
+                message3.textContent = 'Incorrect, please try again.';
+            }
+        });
+        
+        answer3.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submit3.click();
+            }
+        });
+        
+        // 第四关逻辑
+        const warrior4 = document.getElementById('warrior4');
+        const answer4 = document.getElementById('answer4');
+        const submit4 = document.getElementById('submit4');
+        const message4 = document.getElementById('message4');
+        
+        // 调整第四关勇士的位置，使其脚和柜子的脚平行
+        warrior4.style.left = '150px';
+        warrior4.style.bottom = '100px';
+        
+        function jumpAnimation() {
+            return new Promise(resolve => {
+                const originalTransform = warrior4.style.transform;
+                
+                setTimeout(() => {
+                    warrior4.style.transform = originalTransform + ' translateY(-150px)';
+                    
+                    setTimeout(() => {
+                        warrior4.style.transform = originalTransform;
+                        setTimeout(resolve, 500);
+                    }, 500);
+                }, 10);
+            });
+        }
+        
+        async function executeCommand4() {
+            const command = answer4.value.trim();
+            
+            if (command === '跳起来') {
+                message4.textContent = 'Correct! The warrior jumped!';
+                await jumpAnimation();
+                answer4.value = '';
+                
+                setTimeout(() => {
+                    message4.textContent = 'Level completed! Moving to next level...';
+                    setTimeout(() => {
+                        showNextLevel();
+                    }, 2000);
+                }, 1000);
+            } else if (command) {
+                message4.textContent = 'Incorrect, please try again.';
+            }
+        }
+        
+        submit4.addEventListener('click', executeCommand4);
+        answer4.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                executeCommand4();
+            }
+        });
+        
+        // 第五关逻辑
+        const warrior5 = document.getElementById('warrior5');
+        const answer5 = document.getElementById('answer5');
+        const submit5 = document.getElementById('submit5');
+        const message5 = document.getElementById('message5');
+        
+        // 调整第五关勇士的初始位置在柜子旁边
+        warrior5.style.left = '220px';
+        warrior5.style.bottom = '60px';
+        
+        const targetLeft = 750;
+        
+        function executeCommand5() {
+            const command = answer5.value.trim();
+            
+            if (command === "走过去") {
+                message5.textContent = 'Correct! The warrior walked to the table!';
+                warrior5.style.left = `${targetLeft}px`;
+                answer5.value = '';
+                
+                setTimeout(() => {
+                    message5.textContent = 'Level completed! Moving to next level...';
+                    setTimeout(() => {
+                        showNextLevel();
+                    }, 2000);
+                }, 3000);
+            } else if (command) {
+                message5.textContent = 'Incorrect, please try again.';
+            }
+        }
+        
+        submit5.addEventListener('click', executeCommand5);
+        answer5.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                executeCommand5();
+            }
+        });
+        
+        // 第六关逻辑
+        const gameContainer6 = document.getElementById('game-container6');
+        const answer6 = document.getElementById('answer6');
+        const submit6 = document.getElementById('submit6');
+        const message6 = document.getElementById('message6');
+        const warrior6 = document.getElementById('warrior6');
+        
+        // 调整第六关勇士的初始位置在最左边
+        warrior6.style.left = '50px';
+        warrior6.style.bottom = '120px';
+        
+        submit6.addEventListener('click', handleCommand6);
+        answer6.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleCommand6();
+            }
+        });
+        
+        function handleCommand6() {
+            const command = answer6.value.trim();
+            
+            if (command === '拿出来') {
+                message6.textContent = 'Correct! The warrior took out the treasure!';
+                createConfetti();
+                
+                warrior6.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    warrior6.style.transform = 'scale(1)';
+                }, 300);
+                
+                answer6.disabled = true;
+                submit6.disabled = true;
+                
+                setTimeout(() => {
+                    message6.textContent = 'Level completed! Congratulations!';
+                    setTimeout(() => {
+                        showNextLevel();
+                    }, 3000);
+                }, 2000);
+            } else {
+                message6.textContent = 'Incorrect, please try again.';
+            }
+        }
+        
+        function createConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            const containerRect = gameContainer6.getBoundingClientRect();
+            const confettiCount = 200;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                
+                const size = Math.random() * 10 + 5;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const startX = Math.random() * containerRect.width;
+                
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                confetti.style.backgroundColor = color;
+                confetti.style.left = `${startX}px`;
+                confetti.style.top = '-10px';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                
+                gameContainer6.appendChild(confetti);
+                animateConfetti(confetti, containerRect);
+            }
+        }
+        
+        function animateConfetti(confetti, containerRect) {
+            const duration = Math.random() * 3 + 2;
+            const startY = -10;
+            const endY = containerRect.height + 10;
+            const startOpacity = 1;
+            const endOpacity = 0;
+            const drift = (Math.random() - 0.5) * 100;
+            
+            let startTime = null;
+            
+            function animate(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const timeElapsed = currentTime - startTime;
+                const progress = Math.min(timeElapsed / (duration * 1000), 1);
+                
+                const y = startY + (endY - startY) * progress;
+                const x = parseFloat(confetti.style.left) + drift * progress;
+                const opacity = startOpacity + (endOpacity - startOpacity) * progress;
+                
+                confetti.style.top = `${y}px`;
+                confetti.style.left = `${x}px`;
+                confetti.style.opacity = opacity;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    confetti.remove();
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // 初始化进度条
+        updateProgressBar();
+    </script>
+</body>
+</html>
