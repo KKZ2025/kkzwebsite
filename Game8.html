@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Challenge - Chinese Listening Lab</title>
+    <style>
+        :root {
+            --primary: #ff9800;
+            --success: #4caf50;
+            --danger: #f44336;
+            --text: #2c3e50;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #ffffff; 
+            display: flex; flex-direction: column; align-items: center;
+            height: 100vh; overflow: hidden; color: var(--text);
+        }
+
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; position: relative; }
+        .active { display: flex; }
+
+        /* --- 1. 地图首页 --- */
+        #map-container {
+            position: relative;
+            width: 900px; height: 500px;
+            margin: auto;
+            background: #fafafa; 
+            border: 1px solid #eee; border-radius: 30px;
+        }
+
+        .map-pin { position: absolute; width: 120px; cursor: pointer; text-align: center; transition: transform 0.3s; }
+        .map-pin:hover { transform: translateY(-10px); }
+        .map-pin img { width: 60px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+        
+        .map-pin span { 
+            display: block; background: #fff; padding: 6px 12px; 
+            border-radius: 20px; font-size: 16px; font-weight: bold; 
+            margin-top: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #f0f0f0; color: #333;
+        }
+        .completed { filter: grayscale(1); opacity: 0.3; pointer-events: none; }
+        .completed::after { content: "✔"; position: absolute; top: -15px; right: 20px; font-size: 28px; color: var(--success); font-weight: bold; }
+
+        /* --- 2. 任务页头部 (English UI) --- */
+        #game-header {
+            width: 100%; height: 75px; background: white;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; box-sizing: border-box;
+            border-bottom: 1px solid #eee;
+        }
+        .header-left { width: 180px; }
+        .header-mid { flex-grow: 1; text-align: center; font-size: 20px; font-weight: bold; color: var(--primary); }
+        .header-right { width: 220px; display: flex; align-items: center; justify-content: flex-end; }
+        
+        .btn-ui {
+            padding: 8px 15px; background: #f8f8f8; border: 1px solid #ddd;
+            border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px;
+        }
+
+        #temp-bar-bg { width: 100px; height: 12px; background: #eee; border-radius: 6px; overflow: hidden; margin-left: 8px; }
+        #temp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #f44336, #ff9800); }
+
+        /* --- 3. 辅助学习按钮区域 (Hints) --- */
+        #hint-section {
+            background: #fffbe6; width: 100%; display: flex; flex-direction: column; align-items: center;
+            padding: 15px 0; border-bottom: 1px solid #ffe58f;
+        }
+        .hint-btn-group { display: flex; gap: 15px; margin-bottom: 10px; }
+        .hint-btn {
+            padding: 5px 12px; font-size: 12px; cursor: pointer; background: white;
+            border: 1px solid #d48806; border-radius: 4px; color: #d48806; transition: all 0.2s;
+        }
+        .hint-btn:hover { background: #fff1b8; }
+        
+        #display-text { min-height: 40px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .text-line { font-size: 24px; font-weight: bold; display: none; color: #333; }
+        .pinyin-line { font-size: 16px; color: #777; display: none; }
+        .english-line { font-size: 16px; color: #4b5cc4; display: none; font-style: italic; }
+
+        /* --- 4. 游戏画布 --- */
+        #game-stage {
+            position: relative; flex-grow: 1; width: 1000px; max-width: 95vw;
+            margin: 20px; background: #fafafa; border-radius: 25px; overflow: hidden;
+            border: 1px solid #eee;
+        }
+        #rider-wrapper { position: absolute; left: 40px; bottom: 40px; width: 280px; z-index: 10; }
+        #rider-img { width: 100%; display: block; pointer-events: none; }
+        
+        /* 外卖袋初始位置调整：向上移动 */
+        #draggable-bag { 
+            position: absolute; 
+            width: 85px; 
+            cursor: grab; 
+            z-index: 1000; 
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.1)); 
+        }
+
+        #target-container { position: absolute; right: 80px; bottom: 60px; width: 400px; z-index: 5; }
+        #target-img { width: 100%; display: block; }
+        #hotspot-guide {
+            position: absolute; width: 65px; height: 65px; background: rgba(76, 175, 80, 0.4); 
+            border: 3px solid #4caf50; border-radius: 50%; display: none; transform: translate(-50%, -50%);
+        }
+
+        /* 遮罩 */
+        .overlay {
+            position: absolute; inset: 0; background: rgba(255,255,255,0.96);
+            display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .btn-msg { padding: 12px 40px; background: var(--text); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 18px; margin-top: 20px; font-weight: bold; }
+
+        /* 排行榜 */
+        #leaderboard-screen { background: #fff; padding-top: 40px; }
+        .leaderboard-table { width: 450px; border-collapse: collapse; margin-top: 20px; }
+        .leaderboard-table th, .leaderboard-table td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <!-- 屏幕1：城市地图 -->
+    <div id="map-screen" class="screen active">
+        <h1 style="margin-top: 40px;">Delivery Challenge Map</h1>
+        <p style="color: #999;">Select a Chinese location and follow the voice command!</p>
+        
+        <div id="map-container">
+            <div class="map-pin" style="left: 15%; top: 20%;" onclick="startTask(0)" id="pin-0">
+                <img src="https://cdn-icons-png.flaticon.com/512/2853/2853361.png">
+                <span>学校</span>
+            </div>
+            <div class="map-pin" style="left: 65%; top: 18%;" onclick="startTask(1)" id="pin-1">
+                <img src="https://cdn-icons-png.flaticon.com/512/3074/3074058.png">
+                <span>学生公寓</span>
+            </div>
+            <div class="map-pin" style="left: 28%; top: 62%;" onclick="startTask(2)" id="pin-2">
+                <img src="https://cdn-icons-png.flaticon.com/512/2331/2331970.png">
+                <span>苏州中心</span>
+            </div>
+            <div class="map-pin" style="left: 75%; top: 65%;" onclick="startTask(3)" id="pin-3">
+                <img src="https://cdn-icons-png.flaticon.com/512/619/619153.png">
+                <span>幸福小区</span>
+            </div>
+        </div>
+        
+        <div id="timer-display" style="margin-top: 25px; font-size: 22px; font-weight: bold; color: var(--primary);">
+            ⏱ Total Time: 0.0s
+        </div>
+    </div>
+
+    <!-- 屏幕2：配送现场 -->
+    <div id="game-screen" class="screen">
+        <div id="game-header">
+            <div class="header-left"><button class="btn-ui" onclick="goBackToMap()">⬅ Back to Map</button></div>
+            <div id="current-task-name" class="header-mid">Location</div>
+            <div class="header-right">
+                <span style="font-size: 14px; font-weight: bold; color: #888;">Food Heat</span>
+                <div id="temp-bar-bg"><div id="temp-bar"></div></div>
+            </div>
+        </div>
+
+        <!-- 辅助学习按钮 -->
+        <div id="hint-section">
+            <div class="hint-btn-group">
+                <button class="hint-btn" onclick="toggleHint('chinese')">Show Chinese</button>
+                <button class="hint-btn" onclick="toggleHint('pinyin')">Show Pinyin</button>
+                <button class="hint-btn" onclick="toggleHint('english')">Show English</button>
+            </div>
+            <div id="display-text">
+                <div id="hint-zh" class="text-line"></div>
+                <div id="hint-py" class="pinyin-line"></div>
+                <div id="hint-en" class="english-line"></div>
+            </div>
+        </div>
+
+        <div id="game-stage">
+            <div id="rider-wrapper">
+                <img id="rider-img" src="https://raw.githubusercontent.com/KKZ2025/kkzwebsite/main/images/game8/delivery_rider_without_bag.png">
+                <img id="draggable-bag" src="https://raw.githubusercontent.com/KKZ2025/kkzwebsite/main/images/game8/takeaway_bag.png">
+            </div>
+            <div id="target-container">
+                <img id="target-img" src="">
+                <div id="hotspot-guide"></div>
+            </div>
+            <div id="task-overlay" class="overlay">
+                <h2 id="overlay-msg" style="font-size: 32px;">Success!</h2>
+                <button class="btn-msg" id="overlay-btn" onclick="overlayAction()">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 屏幕3：成绩提交 -->
+    <div id="submit-screen" class="screen">
+        <div style="font-size: 80px; margin-top: 50px;">🏁</div>
+        <h1 style="font-size: 32px;">Mission Accomplished!</h1>
+        <p id="final-time-text" style="font-size: 24px; color: var(--primary); font-weight: bold;"></p>
+        <input type="text" id="name-input" placeholder="Your Name" maxlength="12">
+        <button class="btn-msg" onclick="saveScore()">Submit & View Rankings</button>
+    </div>
+
+    <!-- 屏幕4：排行榜 -->
+    <div id="leaderboard-screen" class="screen">
+        <h1>Leaderboard</h1>
+        <table class="leaderboard-table" id="leaderboard-list">
+            <thead><tr><th>Rank</th><th>Name</th><th>Time</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <button class="btn-msg" onclick="location.reload()">Play Again</button>
+    </div>
+
+    <script>
+        const STAGES = [
+            { 
+                name: "学校", 
+                zh: "请帮我把外卖放到外卖柜里。", 
+                py: "Qǐng bāng wǒ bǎ wàimài fàng dào wàimài guì lǐ.",
+                en: "Please put the takeaway into the food locker.",
+                img: "https://raw.githubusercontent.com/KKZ2025/kkzwebsite/main/images/game8/food_locker.png", 
+                tx: 50, ty: 55, rad: 80 
+            },
+            { 
+                name: "学生公寓", 
+                zh: "请帮我把外卖挂在门上。", 
+                py: "Qǐng bāng wǒ bǎ wàimài guà zài mén shàng.",
+                en: "Please help me hang the takeaway on the door.",
+                img: "https://raw.githubusercontent.com/KKZ2025/kkzwebsite/main/images/game8/door_with_handle.png", 
+                tx: 42, ty: 53, rad: 45 
+            },
+            { 
+                name: "苏州中心", 
+                zh: "请把外卖递给我。", 
+                py: "Qǐng bǎ wàimài dì gěi wǒ.",
+                en: "Please hand the takeaway to me.",
+                img: "https://raw.githubusercontent.com/KKZ2025/kkzwebsite/main/images/game8/person_reaching_hand.png", 
+                tx: 30, ty: 35, rad: 50 
+            },
+            { 
+                name: "幸福小区", 
+                zh: "请把外卖放在门口的柜子上。", 
+                py: "Qǐng bǎ wàimài fàng zài ménkǒu de guìzi shàng.",
+                en: "Please put the takeaway on the cabinet by the door.",
+                img: "https://raw.githubusercontent.com/KKZ2025/kkzwebsite/main/images/game8/cabinet_at_door.png", 
+                tx: 80, ty: 42, rad: 45 
+            }
+        ];
+
+        let finishedTasks = new Set();
+        let currentIdx = -1;
+        let temperature = 100;
+        let tempTimer = null;
+        let gameActive = false;
+        let totalStartTime = null;
+        let mainTimerInterval = null;
+        let recordTime = 0;
+
+        const bag = document.getElementById('draggable-bag');
+        const targetImg = document.getElementById('target-img');
+        const guide = document.getElementById('hotspot-guide');
+        const tempBar = document.getElementById('temp-bar');
+        const taskOverlay = document.getElementById('task-overlay');
+
+        // --- 任务初始化 ---
+        function startTask(idx) {
+            if (!totalStartTime) {
+                totalStartTime = Date.now();
+                mainTimerInterval = setInterval(() => {
+                    const elapsed = (Date.now() - totalStartTime) / 1000;
+                    document.getElementById('timer-display').innerText = `⏱ Total Time: ${elapsed.toFixed(1)}s`;
+                }, 100);
+            }
+
+            currentIdx = idx;
+            document.getElementById('map-screen').classList.remove('active');
+            document.getElementById('game-screen').classList.add('active');
+            taskOverlay.style.display = 'none';
+
+            // Reset Hints
+            document.getElementById('hint-zh').style.display = 'none';
+            document.getElementById('hint-py').style.display = 'none';
+            document.getElementById('hint-en').style.display = 'none';
+
+            const config = STAGES[idx];
+            document.getElementById('current-task-name').innerText = config.name;
+            document.getElementById('hint-zh').innerText = config.zh;
+            document.getElementById('hint-py').innerText = config.py;
+            document.getElementById('hint-en').innerText = config.en;
+            targetImg.src = config.img;
+            guide.style.left = config.tx + '%';
+            guide.style.top = config.ty + '%';
+            
+            resetBag();
+            temperature = 100;
+            tempBar.style.width = '100%';
+            gameActive = true;
+            
+            setTimeout(() => {
+                playVoice(config.zh);
+                startTempTimer();
+            }, 600);
+        }
+
+        function toggleHint(type) {
+            const zh = document.getElementById('hint-zh');
+            const py = document.getElementById('hint-py');
+            const en = document.getElementById('hint-en');
+            if(type === 'chinese') zh.style.display = zh.style.display === 'block' ? 'none' : 'block';
+            if(type === 'pinyin') py.style.display = py.style.display === 'block' ? 'none' : 'block';
+            if(type === 'english') en.style.display = en.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function goBackToMap() {
+            clearInterval(tempTimer);
+            gameActive = false;
+            document.getElementById('game-screen').classList.remove('active');
+            document.getElementById('map-screen').classList.add('active');
+            taskOverlay.style.display = 'none';
+            if (finishedTasks.size === 4) finishGame();
+        }
+
+        function startTempTimer() {
+            clearInterval(tempTimer);
+            tempTimer = setInterval(() => {
+                if (!gameActive) return;
+                temperature -= 0.3; 
+                tempBar.style.width = temperature + '%';
+                if (temperature <= 0) showResult(false);
+            }, 100);
+        }
+
+        function showResult(success) {
+            gameActive = false;
+            clearInterval(tempTimer);
+            const msg = document.getElementById('overlay-msg');
+            const btn = document.getElementById('overlay-btn');
+            taskOverlay.style.display = 'flex';
+            if (success) {
+                msg.innerText = "Success! ✅";
+                msg.style.color = "#4caf50";
+                btn.innerText = "Back to Map";
+                finishedTasks.add(currentIdx);
+                document.getElementById(`pin-${currentIdx}`).classList.add('completed');
+            } else {
+                msg.innerText = "Too Cold! ❄️";
+                msg.style.color = "#f44336";
+                btn.innerText = "Try Again";
+            }
+        }
+
+        function overlayAction() {
+            if (temperature <= 0) {
+                taskOverlay.style.display = 'none';
+                startTask(currentIdx);
+            } else {
+                goBackToMap();
+            }
+        }
+
+        function finishGame() {
+            clearInterval(mainTimerInterval);
+            recordTime = ((Date.now() - totalStartTime) / 1000).toFixed(1);
+            document.getElementById('map-screen').classList.remove('active');
+            document.getElementById('submit-screen').classList.add('active');
+            document.getElementById('final-time-text').innerText = `Your Time: ${recordTime}s`;
+            playVoice("Congratulations! Mission Accomplished!");
+        }
+
+        function saveScore() {
+            const name = document.getElementById('name-input').value.trim() || "Rider";
+            let leaderboard = JSON.parse(localStorage.getItem('delivery_v7_scores') || '[]');
+            leaderboard.push({ name: name, time: parseFloat(recordTime) });
+            leaderboard.sort((a, b) => a.time - b.time);
+            leaderboard = leaderboard.slice(0, 10);
+            localStorage.setItem('delivery_v7_scores', JSON.stringify(leaderboard));
+            renderLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            document.getElementById('submit-screen').classList.remove('active');
+            document.getElementById('leaderboard-screen').classList.add('active');
+            const listBody = document.getElementById('leaderboard-list').querySelector('tbody');
+            const scores = JSON.parse(localStorage.getItem('delivery_v7_scores') || '[]');
+            listBody.innerHTML = scores.map((s, i) => `<tr><td>${i+1}</td><td>${s.name}</td><td>${s.time}s</td></tr>`).join('');
+        }
+
+        // --- 拖拽与坐标控制 ---
+        function resetBag() {
+            bag.style.transition = 'none';
+            // 调整坐标：190, 220 确保外卖袋处于外卖员手部
+            bag.style.left = '190px'; 
+            bag.style.top = '220px'; 
+            bag.style.pointerEvents = 'auto';
+        }
+
+        function bindDrag() {
+            let sx, sy, il, it;
+            bag.onmousedown = (e) => {
+                if (!gameActive) return;
+                sx = e.clientX; sy = e.clientY;
+                il = bag.offsetLeft; it = bag.offsetTop;
+                bag.style.transition = 'none';
+                document.onmousemove = (me) => {
+                    bag.style.left = (il + (me.clientX - sx)) + 'px';
+                    bag.style.top = (it + (me.clientY - sy)) + 'px';
+                    guide.style.display = checkHit() ? 'block' : 'none';
+                };
+                document.onmouseup = () => {
+                    document.onmousemove = null;
+                    if (checkHit()) {
+                        const config = STAGES[currentIdx];
+                        const tRect = targetImg.getBoundingClientRect();
+                        const snapX = targetImg.parentElement.offsetLeft + (tRect.width * config.tx / 100) - (bag.offsetWidth / 2);
+                        const snapY = targetImg.parentElement.offsetTop + (tRect.height * config.ty / 100) - 15;
+                        bag.style.transition = 'all 0.3s ease-out';
+                        bag.style.left = snapX + 'px'; bag.style.top = snapY + 'px';
+                        bag.style.pointerEvents = 'none';
+                        showResult(true);
+                    } else {
+                        bag.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                        resetBag();
+                    }
+                    guide.style.display = 'none';
+                };
+            };
+        }
+
+        function checkHit() {
+            if (currentIdx < 0) return false;
+            const config = STAGES[currentIdx];
+            const b = bag.getBoundingClientRect();
+            const t = targetImg.getBoundingClientRect();
+            // 判定点：外卖袋顶部中心（提手处）
+            const bx = b.left + b.width / 2;
+            const by = b.top + 15;
+            const gx = t.left + (t.width * config.tx / 100);
+            const gy = t.top + (t.height * config.ty / 100);
+            const dist = Math.sqrt(Math.pow(bx - gx, 2) + Math.pow(by - gy, 2));
+            return dist < config.rad;
+        }
+
+        function playVoice(text) {
+            window.speechSynthesis.cancel();
+            const m = new SpeechSynthesisUtterance(text);
+            m.lang = 'zh-CN';
+            window.speechSynthesis.speak(m);
+        }
+
+        window.onload = () => {
+            bindDrag();
+            document.body.onclick = () => { 
+                if(!totalStartTime) playVoice(""); 
+            };
+        };
+    </script>
+</body>
+</html>
