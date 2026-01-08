@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Delivery Challenge - Chinese Listening Lab</title>
     <style>
         :root {
@@ -18,6 +18,7 @@
             background: #ffffff; 
             display: flex; flex-direction: column; align-items: center;
             height: 100vh; overflow: hidden; color: var(--text);
+            touch-action: none; /* 禁用移动端默认触摸行为（如缩放/滚动） */
         }
 
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; position: relative; }
@@ -30,6 +31,10 @@
             margin: auto;
             background: #fafafa; 
             border: 1px solid #eee; border-radius: 30px;
+            /* 移动端地图适配 */
+            max-width: 95vw;
+            height: auto;
+            aspect-ratio: 900/500;
         }
 
         .map-pin { position: absolute; width: 120px; cursor: pointer; text-align: center; transition: transform 0.3s; }
@@ -51,6 +56,9 @@
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 40px; box-sizing: border-box;
             border-bottom: 1px solid #eee;
+            /* 移动端头部适配 */
+            height: auto;
+            padding: 10px 20px;
         }
         .header-left { width: 180px; }
         .header-mid { flex-grow: 1; text-align: center; font-size: 20px; font-weight: bold; color: var(--primary); }
@@ -75,6 +83,13 @@
             border: 1px solid #d48806; border-radius: 4px; color: #d48806; transition: all 0.2s;
         }
         .hint-btn:hover { background: #fff1b8; }
+        /* 新增：语音重播按钮样式，更醒目 */
+        .replay-btn {
+            padding: 8px 18px; font-size: 14px; cursor: pointer; 
+            background: #ff9800; color: white; border: none; border-radius: 6px;
+            transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .replay-btn:hover { background: #e68900; transform: scale(1.05); }
         
         #display-text { min-height: 40px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .text-line { font-size: 24px; font-weight: bold; display: none; color: #333; }
@@ -86,17 +101,32 @@
             position: relative; flex-grow: 1; width: 1000px; max-width: 95vw;
             margin: 20px; background: #fafafa; border-radius: 25px; overflow: hidden;
             border: 1px solid #eee;
+            /* 移动端画布适配 */
+            width: 95vw;
+            margin: 10px 0;
         }
         #rider-wrapper { position: absolute; left: 40px; bottom: 40px; width: 280px; z-index: 10; }
         #rider-img { width: 100%; display: block; pointer-events: none; }
         
-        /* 外卖袋初始位置调整：向上移动 */
+        /* 外卖袋优化：扩大点击热区 + 触摸反馈 */
         #draggable-bag { 
             position: absolute; 
             width: 85px; 
             cursor: grab; 
             z-index: 1000; 
             filter: drop-shadow(0 8px 15px rgba(0,0,0,0.1)); 
+            /* 扩大点击热区（视觉不变）- 关键优化 */
+            padding: 20px;
+            margin: -20px;
+            /* 触摸反馈 */
+            transition: transform 0.1s ease;
+        }
+        #draggable-bag:active {
+            transform: scale(1.05); /* 触摸/点击时轻微放大 */
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
+        }
+        #draggable-bag.dragging {
+            cursor: grabbing; /* 拖拽时改变光标样式 */
         }
 
         #target-container { position: absolute; right: 80px; bottom: 60px; width: 400px; z-index: 5; }
@@ -111,12 +141,42 @@
             position: absolute; inset: 0; background: rgba(255,255,255,0.96);
             display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 2000;
         }
-        .btn-msg { padding: 12px 40px; background: var(--text); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 18px; margin-top: 20px; font-weight: bold; }
+        .btn-msg { 
+            padding: 12px 40px; background: var(--text); color: white; border: none; border-radius: 10px; 
+            cursor: pointer; font-size: 18px; margin-top: 20px; font-weight: bold;
+            /* 移动端按钮适配 */
+            padding: 15px 50px;
+            font-size: 20px;
+        }
 
         /* 排行榜 */
         #leaderboard-screen { background: #fff; padding-top: 40px; }
-        .leaderboard-table { width: 450px; border-collapse: collapse; margin-top: 20px; }
+        .leaderboard-table { width: 450px; border-collapse: collapse; margin-top: 20px;
+            /* 移动端表格适配 */
+            max-width: 90vw;
+        }
         .leaderboard-table th, .leaderboard-table td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
+        
+        /* 移动端响应式调整 */
+        @media (max-width: 768px) {
+            .map-pin { width: 80px; }
+            .map-pin img { width: 40px; }
+            .map-pin span { font-size: 14px; padding: 4px 8px; }
+            
+            .header-left { width: 120px; }
+            .header-right { width: 180px; }
+            .btn-ui { font-size: 12px; padding: 6px 10px; }
+            
+            #rider-wrapper { width: 200px; left: 20px; bottom: 20px; }
+            #target-container { width: 280px; right: 20px; bottom: 40px; }
+            
+            .text-line { font-size: 20px; }
+            .pinyin-line, .english-line { font-size: 14px; }
+            
+            .hint-btn { padding: 8px 15px; font-size: 14px; }
+            .replay-btn { padding: 10px 20px; font-size: 16px; } /* 移动端放大重播按钮 */
+            .hint-btn-group { gap: 10px; }
+        }
     </style>
 </head>
 <body>
@@ -161,12 +221,14 @@
             </div>
         </div>
 
-        <!-- 辅助学习按钮 -->
+        <!-- 辅助学习按钮 - 新增语音重播按钮 -->
         <div id="hint-section">
             <div class="hint-btn-group">
                 <button class="hint-btn" onclick="toggleHint('chinese')">Show Chinese</button>
                 <button class="hint-btn" onclick="toggleHint('pinyin')">Show Pinyin</button>
                 <button class="hint-btn" onclick="toggleHint('english')">Show English</button>
+                <!-- 新增：语音重播按钮 -->
+                <button class="replay-btn" onclick="replayCurrentVoice()">🔊 Replay Voice</button>
             </div>
             <div id="display-text">
                 <div id="hint-zh" class="text-line"></div>
@@ -196,7 +258,8 @@
         <div style="font-size: 80px; margin-top: 50px;">🏁</div>
         <h1 style="font-size: 32px;">Mission Accomplished!</h1>
         <p id="final-time-text" style="font-size: 24px; color: var(--primary); font-weight: bold;"></p>
-        <input type="text" id="name-input" placeholder="Your Name" maxlength="12">
+        <input type="text" id="name-input" placeholder="Your Name" maxlength="12" 
+               style="padding: 12px 20px; font-size: 18px; border-radius: 8px; border: 1px solid #ddd; margin: 20px 0; width: 80%; max-width: 400px;">
         <button class="btn-msg" onclick="saveScore()">Submit & View Rankings</button>
     </div>
 
@@ -254,6 +317,8 @@
         let totalStartTime = null;
         let mainTimerInterval = null;
         let recordTime = 0;
+        // 新增：存储当前语音文本，用于重播
+        let currentVoiceText = "";
 
         const bag = document.getElementById('draggable-bag');
         const targetImg = document.getElementById('target-img');
@@ -295,10 +360,26 @@
             tempBar.style.width = '100%';
             gameActive = true;
             
+            // 新增：保存当前语音文本
+            currentVoiceText = config.zh;
+            
             setTimeout(() => {
-                playVoice(config.zh);
+                playVoice(currentVoiceText);
                 startTempTimer();
             }, 600);
+        }
+
+        // 新增：重播当前语音的函数
+        function replayCurrentVoice() {
+            if (currentVoiceText) {
+                playVoice(currentVoiceText);
+                // 视觉反馈：按钮短暂变色，提示用户语音正在播放
+                const replayBtn = document.querySelector('.replay-btn');
+                replayBtn.style.background = '#4caf50';
+                setTimeout(() => {
+                    replayBtn.style.background = '#ff9800';
+                }, 500);
+            }
         }
 
         function toggleHint(type) {
@@ -384,45 +465,89 @@
             listBody.innerHTML = scores.map((s, i) => `<tr><td>${i+1}</td><td>${s.name}</td><td>${s.time}s</td></tr>`).join('');
         }
 
-        // --- 拖拽与坐标控制 ---
+        // --- 拖拽与坐标控制（修复核心问题：事件绑定逻辑） ---
         function resetBag() {
             bag.style.transition = 'none';
             // 调整坐标：190, 220 确保外卖袋处于外卖员手部
             bag.style.left = '190px'; 
             bag.style.top = '220px'; 
             bag.style.pointerEvents = 'auto';
+            bag.classList.remove('dragging');
         }
 
         function bindDrag() {
             let sx, sy, il, it;
-            bag.onmousedown = (e) => {
+            
+            // 通用拖拽开始逻辑 - 修复核心：只在开始时绑定移动/结束事件
+            function startDrag(e) {
                 if (!gameActive) return;
-                sx = e.clientX; sy = e.clientY;
-                il = bag.offsetLeft; it = bag.offsetTop;
+                
+                // 兼容鼠标和触摸事件
+                const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+                
+                sx = clientX; 
+                sy = clientY;
+                il = bag.offsetLeft; 
+                it = bag.offsetTop;
                 bag.style.transition = 'none';
-                document.onmousemove = (me) => {
-                    bag.style.left = (il + (me.clientX - sx)) + 'px';
-                    bag.style.top = (it + (me.clientY - sy)) + 'px';
-                    guide.style.display = checkHit() ? 'block' : 'none';
-                };
-                document.onmouseup = () => {
-                    document.onmousemove = null;
-                    if (checkHit()) {
-                        const config = STAGES[currentIdx];
-                        const tRect = targetImg.getBoundingClientRect();
-                        const snapX = targetImg.parentElement.offsetLeft + (tRect.width * config.tx / 100) - (bag.offsetWidth / 2);
-                        const snapY = targetImg.parentElement.offsetTop + (tRect.height * config.ty / 100) - 15;
-                        bag.style.transition = 'all 0.3s ease-out';
-                        bag.style.left = snapX + 'px'; bag.style.top = snapY + 'px';
-                        bag.style.pointerEvents = 'none';
-                        showResult(true);
-                    } else {
-                        bag.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                        resetBag();
-                    }
-                    guide.style.display = 'none';
-                };
-            };
+                bag.classList.add('dragging');
+                
+                // 绑定移动和结束事件（关键修复：只在拖拽开始时绑定）
+                document.addEventListener('mousemove', moveDrag);
+                document.addEventListener('touchmove', moveDrag);
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchend', endDrag);
+                
+                // 阻止默认行为（避免移动端滚动）
+                e.preventDefault();
+            }
+            
+            // 通用拖拽移动逻辑
+            function moveDrag(e) {
+                if (!gameActive) return;
+                
+                const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+                
+                bag.style.left = (il + (clientX - sx)) + 'px';
+                bag.style.top = (it + (clientY - sy)) + 'px';
+                guide.style.display = checkHit() ? 'block' : 'none';
+                
+                // 阻止默认行为
+                e.preventDefault();
+            }
+            
+            // 通用拖拽结束逻辑
+            function endDrag() {
+                // 移除移动事件监听（仅在拖拽结束时移除）
+                document.removeEventListener('mousemove', moveDrag);
+                document.removeEventListener('touchmove', moveDrag);
+                document.removeEventListener('mouseup', endDrag);
+                document.removeEventListener('touchend', endDrag);
+                
+                bag.classList.remove('dragging');
+                
+                if (checkHit()) {
+                    const config = STAGES[currentIdx];
+                    const tRect = targetImg.getBoundingClientRect();
+                    const snapX = targetImg.parentElement.offsetLeft + (tRect.width * config.tx / 100) - (bag.offsetWidth / 2);
+                    const snapY = targetImg.parentElement.offsetTop + (tRect.height * config.ty / 100) - 15;
+                    bag.style.transition = 'all 0.3s ease-out';
+                    bag.style.left = snapX + 'px'; 
+                    bag.style.top = snapY + 'px';
+                    bag.style.pointerEvents = 'none';
+                    showResult(true);
+                } else {
+                    bag.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    resetBag();
+                }
+                guide.style.display = 'none';
+            }
+            
+            // 只绑定一次开始事件（核心修复）
+            bag.addEventListener('mousedown', startDrag);
+            bag.addEventListener('touchstart', startDrag);
         }
 
         function checkHit() {
@@ -439,11 +564,16 @@
             return dist < config.rad;
         }
 
+        // 优化语音播放函数，确保可重复调用
         function playVoice(text) {
+            // 先停止当前正在播放的语音
             window.speechSynthesis.cancel();
-            const m = new SpeechSynthesisUtterance(text);
-            m.lang = 'zh-CN';
-            window.speechSynthesis.speak(m);
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            // 可选：调整语速和音量，提升体验
+            utterance.rate = 0.9; // 语速稍慢，便于听清
+            utterance.volume = 1; // 最大音量
+            window.speechSynthesis.speak(utterance);
         }
 
         window.onload = () => {
