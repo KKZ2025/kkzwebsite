@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delivery Challenge - Chinese Listening Lab</title>
     <style>
         :root {
@@ -17,21 +17,35 @@
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
             background: #ffffff; 
             display: flex; flex-direction: column; align-items: center;
-            height: 100vh; overflow: hidden; color: var(--text);
-            touch-action: none; /* 禁用移动端默认触摸行为（如缩放/滚动） */
+            /* 核心修改：移除overflow:hidden，保留原始高度，允许滚动 */
+            min-height: 100vh; 
+            color: var(--text);
+            /* 仅禁用缩放，保留滚动和触摸交互 */
+            touch-action: pan-y pinch-zoom; 
+            overflow-y: auto; /* 强制显示垂直滚动条 */
         }
 
-        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; position: relative; }
+        .screen { 
+            display: none; 
+            width: 100%; 
+            /* 核心修改：移除固定高度，让内容自然撑开 */
+            min-height: 100vh;
+            flex-direction: column; 
+            align-items: center; 
+            position: relative; 
+            padding: 20px 0; /* 上下留白 */
+        }
         .active { display: flex; }
 
         /* --- 1. 地图首页 --- */
         #map-container {
             position: relative;
+            /* 保留原始尺寸，不压缩 */
             width: 900px; height: 500px;
-            margin: auto;
+            margin: 20px auto;
             background: #fafafa; 
             border: 1px solid #eee; border-radius: 30px;
-            /* 移动端地图适配 */
+            /* 移动端仅限制最大宽度，高度按比例自适应 */
             max-width: 95vw;
             height: auto;
             aspect-ratio: 900/500;
@@ -52,13 +66,12 @@
 
         /* --- 2. 任务页头部 (English UI) --- */
         #game-header {
-            width: 100%; height: 75px; background: white;
+            width: 100%; 
+            background: white;
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 40px; box-sizing: border-box;
-            border-bottom: 1px solid #eee;
-            /* 移动端头部适配 */
-            height: auto;
             padding: 10px 20px;
+            box-sizing: border-box;
+            border-bottom: 1px solid #eee;
         }
         .header-left { width: 180px; }
         .header-mid { flex-grow: 1; text-align: center; font-size: 20px; font-weight: bold; color: var(--primary); }
@@ -83,7 +96,7 @@
             border: 1px solid #d48806; border-radius: 4px; color: #d48806; transition: all 0.2s;
         }
         .hint-btn:hover { background: #fff1b8; }
-        /* 新增：语音重播按钮样式，更醒目 */
+        /* 语音重播按钮样式 */
         .replay-btn {
             padding: 8px 18px; font-size: 14px; cursor: pointer; 
             background: #ff9800; color: white; border: none; border-radius: 6px;
@@ -98,38 +111,58 @@
 
         /* --- 4. 游戏画布 --- */
         #game-stage {
-            position: relative; flex-grow: 1; width: 1000px; max-width: 95vw;
-            margin: 20px; background: #fafafa; border-radius: 25px; overflow: hidden;
+            position: relative; 
+            /* 保留原始尺寸，不压缩 */
+            width: 1000px; 
+            height: 600px; /* 恢复原始高度 */
+            margin: 20px; 
+            background: #fafafa; 
+            border-radius: 25px; 
+            overflow: hidden;
             border: 1px solid #eee;
-            /* 移动端画布适配 */
-            width: 95vw;
-            margin: 10px 0;
+            /* 移动端仅限制最大宽度，高度按比例自适应 */
+            max-width: 95vw;
+            height: auto;
+            aspect-ratio: 1000/600;
         }
-        #rider-wrapper { position: absolute; left: 40px; bottom: 40px; width: 280px; z-index: 10; }
+        #rider-wrapper { 
+            position: absolute; 
+            left: 40px; 
+            bottom: 40px; 
+            width: 280px; 
+            z-index: 10; 
+        }
         #rider-img { width: 100%; display: block; pointer-events: none; }
         
-        /* 外卖袋优化：扩大点击热区 + 触摸反馈 */
+        /* 外卖袋样式（保留原有优化） */
         #draggable-bag { 
             position: absolute; 
             width: 85px; 
             cursor: grab; 
             z-index: 1000; 
             filter: drop-shadow(0 8px 15px rgba(0,0,0,0.1)); 
-            /* 扩大点击热区（视觉不变）- 关键优化 */
             padding: 20px;
             margin: -20px;
-            /* 触摸反馈 */
             transition: transform 0.1s ease;
+            /* 恢复原始初始位置 */
+            left: 190px;
+            top: 220px;
         }
         #draggable-bag:active {
-            transform: scale(1.05); /* 触摸/点击时轻微放大 */
+            transform: scale(1.05);
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
         }
         #draggable-bag.dragging {
-            cursor: grabbing; /* 拖拽时改变光标样式 */
+            cursor: grabbing;
         }
 
-        #target-container { position: absolute; right: 80px; bottom: 60px; width: 400px; z-index: 5; }
+        #target-container { 
+            position: absolute; 
+            right: 80px; 
+            bottom: 60px; 
+            width: 400px; 
+            z-index: 5; 
+        }
         #target-img { width: 100%; display: block; }
         #hotspot-guide {
             position: absolute; width: 65px; height: 65px; background: rgba(76, 175, 80, 0.4); 
@@ -144,20 +177,14 @@
         .btn-msg { 
             padding: 12px 40px; background: var(--text); color: white; border: none; border-radius: 10px; 
             cursor: pointer; font-size: 18px; margin-top: 20px; font-weight: bold;
-            /* 移动端按钮适配 */
-            padding: 15px 50px;
-            font-size: 20px;
         }
 
         /* 排行榜 */
         #leaderboard-screen { background: #fff; padding-top: 40px; }
-        .leaderboard-table { width: 450px; border-collapse: collapse; margin-top: 20px;
-            /* 移动端表格适配 */
-            max-width: 90vw;
-        }
+        .leaderboard-table { width: 450px; border-collapse: collapse; margin-top: 20px; }
         .leaderboard-table th, .leaderboard-table td { padding: 15px; border-bottom: 1px solid #eee; text-align: left; }
         
-        /* 移动端响应式调整 */
+        /* 移动端仅调整按钮/文字大小，不压缩核心容器 */
         @media (max-width: 768px) {
             .map-pin { width: 80px; }
             .map-pin img { width: 40px; }
@@ -167,15 +194,21 @@
             .header-right { width: 180px; }
             .btn-ui { font-size: 12px; padding: 6px 10px; }
             
-            #rider-wrapper { width: 200px; left: 20px; bottom: 20px; }
-            #target-container { width: 280px; right: 20px; bottom: 40px; }
-            
             .text-line { font-size: 20px; }
             .pinyin-line, .english-line { font-size: 14px; }
             
             .hint-btn { padding: 8px 15px; font-size: 14px; }
-            .replay-btn { padding: 10px 20px; font-size: 16px; } /* 移动端放大重播按钮 */
+            .replay-btn { padding: 10px 20px; font-size: 16px; }
             .hint-btn-group { gap: 10px; }
+            
+            .btn-msg {
+                padding: 15px 50px;
+                font-size: 20px;
+            }
+            
+            .leaderboard-table {
+                max-width: 90vw;
+            }
         }
     </style>
 </head>
@@ -221,13 +254,12 @@
             </div>
         </div>
 
-        <!-- 辅助学习按钮 - 新增语音重播按钮 -->
+        <!-- 辅助学习按钮 - 语音重播按钮 -->
         <div id="hint-section">
             <div class="hint-btn-group">
                 <button class="hint-btn" onclick="toggleHint('chinese')">Show Chinese</button>
                 <button class="hint-btn" onclick="toggleHint('pinyin')">Show Pinyin</button>
                 <button class="hint-btn" onclick="toggleHint('english')">Show English</button>
-                <!-- 新增：语音重播按钮 -->
                 <button class="replay-btn" onclick="replayCurrentVoice()">🔊 Replay Voice</button>
             </div>
             <div id="display-text">
@@ -317,7 +349,6 @@
         let totalStartTime = null;
         let mainTimerInterval = null;
         let recordTime = 0;
-        // 新增：存储当前语音文本，用于重播
         let currentVoiceText = "";
 
         const bag = document.getElementById('draggable-bag');
@@ -360,7 +391,6 @@
             tempBar.style.width = '100%';
             gameActive = true;
             
-            // 新增：保存当前语音文本
             currentVoiceText = config.zh;
             
             setTimeout(() => {
@@ -369,11 +399,10 @@
             }, 600);
         }
 
-        // 新增：重播当前语音的函数
+        // 重播当前语音
         function replayCurrentVoice() {
             if (currentVoiceText) {
                 playVoice(currentVoiceText);
-                // 视觉反馈：按钮短暂变色，提示用户语音正在播放
                 const replayBtn = document.querySelector('.replay-btn');
                 replayBtn.style.background = '#4caf50';
                 setTimeout(() => {
@@ -465,10 +494,10 @@
             listBody.innerHTML = scores.map((s, i) => `<tr><td>${i+1}</td><td>${s.name}</td><td>${s.time}s</td></tr>`).join('');
         }
 
-        // --- 拖拽与坐标控制（修复核心问题：事件绑定逻辑） ---
+        // --- 拖拽与坐标控制 ---
         function resetBag() {
             bag.style.transition = 'none';
-            // 调整坐标：190, 220 确保外卖袋处于外卖员手部
+            // 恢复原始初始位置
             bag.style.left = '190px'; 
             bag.style.top = '220px'; 
             bag.style.pointerEvents = 'auto';
@@ -478,11 +507,9 @@
         function bindDrag() {
             let sx, sy, il, it;
             
-            // 通用拖拽开始逻辑 - 修复核心：只在开始时绑定移动/结束事件
             function startDrag(e) {
                 if (!gameActive) return;
                 
-                // 兼容鼠标和触摸事件
                 const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
                 const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
                 
@@ -493,17 +520,14 @@
                 bag.style.transition = 'none';
                 bag.classList.add('dragging');
                 
-                // 绑定移动和结束事件（关键修复：只在拖拽开始时绑定）
                 document.addEventListener('mousemove', moveDrag);
                 document.addEventListener('touchmove', moveDrag);
                 document.addEventListener('mouseup', endDrag);
                 document.addEventListener('touchend', endDrag);
                 
-                // 阻止默认行为（避免移动端滚动）
                 e.preventDefault();
             }
             
-            // 通用拖拽移动逻辑
             function moveDrag(e) {
                 if (!gameActive) return;
                 
@@ -514,13 +538,10 @@
                 bag.style.top = (it + (clientY - sy)) + 'px';
                 guide.style.display = checkHit() ? 'block' : 'none';
                 
-                // 阻止默认行为
                 e.preventDefault();
             }
             
-            // 通用拖拽结束逻辑
             function endDrag() {
-                // 移除移动事件监听（仅在拖拽结束时移除）
                 document.removeEventListener('mousemove', moveDrag);
                 document.removeEventListener('touchmove', moveDrag);
                 document.removeEventListener('mouseup', endDrag);
@@ -545,7 +566,6 @@
                 guide.style.display = 'none';
             }
             
-            // 只绑定一次开始事件（核心修复）
             bag.addEventListener('mousedown', startDrag);
             bag.addEventListener('touchstart', startDrag);
         }
@@ -555,7 +575,6 @@
             const config = STAGES[currentIdx];
             const b = bag.getBoundingClientRect();
             const t = targetImg.getBoundingClientRect();
-            // 判定点：外卖袋顶部中心（提手处）
             const bx = b.left + b.width / 2;
             const by = b.top + 15;
             const gx = t.left + (t.width * config.tx / 100);
@@ -564,15 +583,13 @@
             return dist < config.rad;
         }
 
-        // 优化语音播放函数，确保可重复调用
+        // 语音播放函数
         function playVoice(text) {
-            // 先停止当前正在播放的语音
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'zh-CN';
-            // 可选：调整语速和音量，提升体验
-            utterance.rate = 0.9; // 语速稍慢，便于听清
-            utterance.volume = 1; // 最大音量
+            utterance.rate = 0.9;
+            utterance.volume = 1;
             window.speechSynthesis.speak(utterance);
         }
 
