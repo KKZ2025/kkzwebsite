@@ -178,13 +178,6 @@
             transition: width 0.5s ease;
         }
         
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            opacity: 0;
-        }
-        
         .instructions {
             background-color: #f1f8e9;
             padding: 15px;
@@ -257,8 +250,8 @@
             <div class="level-indicator" id="level-indicator">Level 1</div>
             
             <div class="instructions">
-                <h3>How to Play:</h3>
-                <p>Enter a Chinese sentence or command using directional complements to guide the warrior.</p>
+                <h3>Goal:</h3>
+                <p>Enter the correct Chinese command to guide the warrior through the castle.</p>
             </div>
             
             <!-- Level 1 -->
@@ -268,7 +261,7 @@
                     <img class="castle" id="castle1" src="images/castle1.png" alt="Castle">
                 </div>
                 <div class="input-area">
-                    <input type="text" class="answer-input" id="answer1" placeholder="Enter command (e.g. 走进去)">
+                    <input type="text" class="answer-input" id="answer1" placeholder="Enter command...">
                     <button class="submit-btn" id="submit1">Submit</button>
                 </div>
                 <div class="message" id="message1"></div>
@@ -281,7 +274,7 @@
                     <img class="staircase" id="staircase2" src="images/staircase2.png" alt="Staircase">
                 </div>
                 <div class="input-area">
-                    <input type="text" class="answer-input" id="answer2" placeholder="Enter command (e.g. 走上去)">
+                    <input type="text" class="answer-input" id="answer2" placeholder="Enter command...">
                     <button class="submit-btn" id="submit2">Submit</button>
                 </div>
                 <div class="message" id="message2"></div>
@@ -294,7 +287,7 @@
                     <img class="warrior" id="warrior3" src="images/warrior3.png" alt="Warrior">
                 </div>
                 <div class="input-area">
-                    <input type="text" class="answer-input" id="answer3" placeholder="Enter command (e.g. 跑过去)">
+                    <input type="text" class="answer-input" id="answer3" placeholder="Enter command...">
                     <button class="submit-btn" id="submit3">Submit</button>
                 </div>
                 <div class="message" id="message3"></div>
@@ -309,7 +302,7 @@
                     </div>
                 </div>
                 <div class="input-area">
-                    <input type="text" class="answer-input" id="answer4" placeholder="Enter command (e.g. 跳起来)">
+                    <input type="text" class="answer-input" id="answer4" placeholder="Enter command...">
                     <button class="submit-btn" id="submit4">Execute</button>
                 </div>
                 <div class="message" id="message4"></div>
@@ -324,7 +317,7 @@
                     </div>
                 </div>
                 <div class="input-area">
-                    <input type="text" class="answer-input" id="answer5" placeholder="Enter command (e.g. 走过去)">
+                    <input type="text" class="answer-input" id="answer5" placeholder="Enter command...">
                     <button class="submit-btn" id="submit5">Execute</button>
                 </div>
                 <div class="message" id="message5"></div>
@@ -337,13 +330,13 @@
                     <img class="chest-warrior" id="warrior6" src="images/warrior6.png" alt="Warrior">
                 </div>
                 <div class="input-area">
-                    <input type="text" class="answer-input" id="answer6" placeholder="Enter command (e.g. 拿出来)">
+                    <input type="text" class="answer-input" id="answer6" placeholder="Enter command...">
                     <button class="submit-btn" id="submit6">Execute</button>
                 </div>
                 <div class="message" id="message6"></div>
             </div>
             
-            <!-- Completion Screen -->
+            <!-- Level Complete -->
             <div id="level-complete" class="tab-content" style="display: none;">
                 <div class="success-message">Congratulations! You've completed all levels!</div>
                 <div style="text-align: center;">
@@ -355,7 +348,7 @@
     </div>
 
     <script>
-        // 1. GAME DATA & LOGIC
+        // --- DATA & AI FEEDBACK ENGINE ---
         const levelLogic = {
             1: { targets: ['走进去', '跑进去'], verbs: ['走', '跑'], dir: '进', end: '去' },
             2: { targets: ['走上去', '跑上去'], verbs: ['走', '跑'], dir: '上', end: '去' },
@@ -367,45 +360,43 @@
 
         const gameState = { currentLevel: 1, totalLevels: 6, completedLevels: 0 };
 
-        // 2. THE AI FEEDBACK ENGINE
         function getFeedback(input, levelNum) {
             const val = input.trim();
             const logic = levelLogic[levelNum];
 
-            // Success check
             if (logic.targets.some(t => val.includes(t))) return "SUCCESS";
             if (val === "") return "Please enter a command.";
 
-            // Special Scaffolding for Level 4
+            // Scaffolding for Level 4
             if (levelNum === 4) {
-                if (val.includes("跳") && !val.includes("起来")) return "When jumping UP, use '起来'. Try '跳起来'!";
-                if (val.includes("爬") && !val.includes("上去")) return "When climbing up and away, use '上去'. Try '爬上去'!";
-                return "Try '跳起来' (jump up) or '爬上去' (climb up).";
+                if (val.includes("跳") && !val.includes("起来")) return "When jumping UP, the direction is '起来'.";
+                if (val.includes("爬") && !val.includes("上去")) return "When climbing up and away, the direction is '上去'.";
+                return "Think about how to say 'jump up' or 'climb up' in Chinese.";
             }
 
-            // Component analysis
+            // Component analysis for smart feedback
             const hasVerb = logic.verbs.some(v => val.includes(v));
             const hasDir = val.includes(logic.dir);
             const hasEnd = val.includes(logic.end);
             const wrongEnd = val.includes(logic.end === '来' ? '去' : '来');
 
             if (hasVerb && hasDir && wrongEnd) {
-                return `Almost! But the warrior is moving ${logic.end === '去' ? 'away from' : 'toward'} you. Use '${logic.end}' instead of '${logic.end === '来' ? '去' : '来'}'.`;
+                return `Check the perspective! Is the warrior moving toward you or away from you?`;
             }
             if (hasVerb && hasDir && !hasEnd) {
-                return `You have the action and direction! Now add '${logic.end}' to complete the perspective.`;
+                return `You have the action and direction! Now complete the phrase with '来' or '去'.`;
             }
             if (hasVerb && !hasDir) {
-                return `Good verb! But you need the direction word '${logic.dir}'.`;
+                return `Good verb choice! But you are missing the directional part (like '${logic.dir}').`;
             }
             if (!hasVerb && (hasDir || hasEnd)) {
-                return `You have the direction, but how is he moving? Add a verb like '${logic.verbs[0]}' or '${logic.verbs[1]}'.`;
+                return `How is the warrior moving? Add an action verb (like '${logic.verbs[0]}').`;
             }
 
-            return `Try the pattern: Verb + ${logic.dir} + ${logic.end}. (e.g. ${logic.targets[0]})`;
+            return `Incorrect. Try to use the: [Verb] + [Direction] + [Perspective] pattern.`;
         }
 
-        // 3. UI CONTROLS
+        // --- UI CONTROLS ---
         function updateProgressBar() {
             const progress = (gameState.completedLevels / gameState.totalLevels) * 100;
             document.getElementById('progress-bar').style.width = `${progress}%`;
@@ -425,7 +416,7 @@
             }
         }
 
-        // 4. LEVEL SPECIFIC ACTIONS
+        // --- LEVEL LOGIC ---
         // Level 1
         const warrior1 = document.getElementById('warrior1');
         warrior1.style.left = '50px'; warrior1.style.top = '250px';
@@ -436,14 +427,14 @@
                 msg.textContent = 'Correct! The warrior entered the castle!';
                 msg.style.color = "#2E8B57";
                 warrior1.style.left = '550px';
-                setTimeout(showNextLevel, 4500);
+                setTimeout(showNextLevel, 4000);
             } else { msg.textContent = fb; msg.style.color = "#b21f1f"; }
         };
 
         // Level 2
         const warrior2 = document.getElementById('warrior2');
-        const staircase2 = document.getElementById('staircase2');
-        warrior2.style.left = '50px'; warrior2.style.bottom = '100px'; staircase2.style.display = 'block';
+        warrior2.style.left = '50px'; warrior2.style.bottom = '100px';
+        document.getElementById('staircase2').style.display = 'block';
         document.getElementById('submit2').onclick = () => {
             const fb = getFeedback(document.getElementById('answer2').value, 2);
             const msg = document.getElementById('message2');
@@ -451,7 +442,7 @@
                 msg.textContent = 'Excellent! The warrior went up the stairs!';
                 msg.style.color = "#2E8B57";
                 warrior2.style.left = '600px'; warrior2.style.bottom = '200px';
-                setTimeout(showNextLevel, 4500);
+                setTimeout(showNextLevel, 4000);
             } else { msg.textContent = fb; msg.style.color = "#b21f1f"; }
         };
 
@@ -462,22 +453,22 @@
             const fb = getFeedback(document.getElementById('answer3').value, 3);
             const msg = document.getElementById('message3');
             if (fb === "SUCCESS") {
-                msg.textContent = 'Correct! The warrior ran to the cabinet!';
+                msg.textContent = 'Correct! The warrior reached the cabinet!';
                 msg.style.color = "#2E8B57";
                 warrior3.style.left = '850px';
-                setTimeout(showNextLevel, 4500);
+                setTimeout(showNextLevel, 4000);
             } else { msg.textContent = fb; msg.style.color = "#b21f1f"; }
         };
 
         // Level 4
         const warrior4 = document.getElementById('warrior4');
         warrior4.style.left = '150px'; warrior4.style.bottom = '100px';
-        document.getElementById('submit4').onclick = async () => {
+        document.getElementById('submit4').onclick = () => {
             const val = document.getElementById('answer4').value;
             const fb = getFeedback(val, 4);
             const msg = document.getElementById('message4');
             if (fb === "SUCCESS") {
-                msg.textContent = 'Action executed!'; msg.style.color = "#2E8B57";
+                msg.textContent = 'Correct!'; msg.style.color = "#2E8B57";
                 if(val.includes("跳")) {
                     warrior4.style.transform = 'translateY(-150px)';
                     setTimeout(() => warrior4.style.transform = 'translateY(0)', 500);
@@ -498,7 +489,7 @@
                 msg.textContent = 'Correct! The warrior reached the table!';
                 msg.style.color = "#2E8B57";
                 warrior5.style.left = '750px';
-                setTimeout(showNextLevel, 4500);
+                setTimeout(showNextLevel, 4000);
             } else { msg.textContent = fb; msg.style.color = "#b21f1f"; }
         };
 
@@ -513,31 +504,28 @@
                 msg.style.color = "#2E8B57";
                 createConfetti();
                 warrior6.style.transform = 'scale(1.2)';
-                setTimeout(showNextLevel, 4500);
+                setTimeout(showNextLevel, 4000);
             } else { msg.textContent = fb; msg.style.color = "#b21f1f"; }
         };
 
-        // Confetti helper
         function createConfetti() {
             const container = document.getElementById('game-container6');
-            for (let i = 0; i < 100; i++) {
+            for (let i = 0; i < 80; i++) {
                 const c = document.createElement('div');
-                c.className = 'confetti';
+                c.style.position = 'absolute';
+                c.style.width = '10px'; c.style.height = '10px';
                 c.style.backgroundColor = ['#ff0', '#f0f', '#0ff', '#f00'][Math.floor(Math.random()*4)];
                 c.style.left = Math.random() * 100 + '%';
                 c.style.top = '-10px';
-                c.style.width = '10px'; c.style.height = '10px';
-                c.style.position = 'absolute';
-                c.style.opacity = '1';
                 container.appendChild(c);
                 c.animate([
-                    { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
-                    { transform: `translateY(500px) rotate(720deg)`, opacity: 0 }
-                ], { duration: 2000 + Math.random() * 3000, easing: 'ease-out' }).onfinish = () => c.remove();
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: 'translateY(500px) rotate(720deg)', opacity: 0 }
+                ], { duration: 2000 + Math.random() * 2000 }).onfinish = () => c.remove();
             }
         }
 
-        // Initialize Enter keys
+        // Enter key support
         document.querySelectorAll('.answer-input').forEach((input, i) => {
             input.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') document.getElementById(`submit${i+1}`).click();
