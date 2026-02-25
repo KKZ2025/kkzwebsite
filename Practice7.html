@@ -138,16 +138,9 @@
             font-weight: bold;
         }
         
-        .submit-btn:hover {
-            background: linear-gradient(to bottom, #45a049, #26734d);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-        }
-        
         .message {
             margin-top: 15px;
             font-size: 18px;
-            color: #333;
             min-height: 24px;
             text-align: center;
             font-weight: bold;
@@ -159,7 +152,6 @@
             font-weight: bold;
             color: #2E8B57;
             text-align: center;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
         
         .progress-container {
@@ -185,12 +177,7 @@
             margin-bottom: 20px;
             border-left: 5px solid #4CAF50;
         }
-        
-        .instructions h3 {
-            margin-top: 0;
-            color: #2E8B57;
-        }
-        
+
         .jump-warrior {
             position: absolute;
             width: 150px;
@@ -198,12 +185,8 @@
             transition: transform 0.5s ease-in-out, left 2s ease-in-out, bottom 2s ease-in-out;
         }
         
-        .jump-warrior img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        
+        .jump-warrior img { width: 100%; height: 100%; object-fit: contain; }
+
         .table-warrior {
             position: absolute;
             width: 120px;
@@ -211,13 +194,7 @@
             transition: left 2s ease-in-out;
             z-index: 10;
         }
-        
-        .table-warrior img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        
+
         .chest-warrior {
             position: absolute;
             width: 150px;
@@ -231,7 +208,6 @@
             color: #2E8B57;
             margin: 20px 0;
             font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -250,8 +226,8 @@
             <div class="level-indicator" id="level-indicator">Level 1</div>
             
             <div class="instructions">
-                <h3>Goal:</h3>
-                <p>Enter the correct Chinese command to guide the warrior through the castle.</p>
+                <h3>Challenge:</h3>
+                <p>Observe the scene and guide the warrior using the correct Chinese directional commands.</p>
             </div>
             
             <!-- Level 1 -->
@@ -336,23 +312,22 @@
                 <div class="message" id="message6"></div>
             </div>
             
-            <!-- Level Complete -->
+            <!-- Completion -->
             <div id="level-complete" class="tab-content" style="display: none;">
-                <div class="success-message">Congratulations! You've completed all levels!</div>
+                <div class="success-message">Excellent work! You've mastered the directional complements!</div>
                 <div style="text-align: center;">
-                    <img src="images/warrior6.png" alt="Warrior" style="width: 200px; height: auto;">
+                    <img src="images/warrior6.png" alt="Warrior" style="width: 200px;">
                 </div>
-                <div class="success-message">You are now a master of compound directional complements!</div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- DATA & AI FEEDBACK ENGINE ---
+        // --- DATA & AI CORE ---
         const levelLogic = {
             1: { targets: ['走进去', '跑进去'], verbs: ['走', '跑'], dir: '进', end: '去' },
             2: { targets: ['走上去', '跑上去'], verbs: ['走', '跑'], dir: '上', end: '去' },
-            3: { targets: ['跑过去', '冲过去'], verbs: ['跑', '冲'], dir: '过', end: '去' },
+            3: { targets: ['跑过去', '冲过去'], verbs: ['跑', '冲'], dir: '过', end: '去', dog: true },
             4: { targets: ['跳起来', '爬上去'], verbs: ['跳', '爬'], dir: ['起', '上'], end: ['来', '去'] },
             5: { targets: ['走过去', '跑过去'], verbs: ['走', '跑'], dir: '过', end: '去' },
             6: { targets: ['拿出来', '取出来'], verbs: ['拿', '取'], dir: '出', end: '来' }
@@ -360,52 +335,54 @@
 
         const gameState = { currentLevel: 1, totalLevels: 6, completedLevels: 0 };
 
-        function getFeedback(input, levelNum) {
+        function getAIResponse(input, levelNum) {
             const val = input.trim();
             const logic = levelLogic[levelNum];
 
+            // 1. Success
             if (logic.targets.some(t => val.includes(t))) return "SUCCESS";
-            if (val === "") return "Please enter a command.";
+            if (val === "") return "The warrior is waiting for your command!";
 
-            // Scaffolding for Level 4
-            if (levelNum === 4) {
-                if (val.includes("跳") && !val.includes("起来")) return "When jumping UP, the direction is '起来'.";
-                if (val.includes("爬") && !val.includes("上去")) return "When climbing up and away, the direction is '上去'.";
-                return "Think about how to say 'jump up' or 'climb up' in Chinese.";
+            // 2. Level 3 Dog Logic (Functional Fail)
+            if (levelNum === 3 && val.includes("走过去")) {
+                return "Great grammar! But watch out—the dog is fast! 🐕 Walking is too slow to escape. Can you think of a more urgent action verb?";
             }
 
-            // Component analysis for smart feedback
+            // 3. Compound vs Simple check
+            const simpleDir = (Array.isArray(logic.dir) ? logic.dir[0] : logic.dir) + (Array.isArray(logic.end) ? logic.end[0] : logic.end);
+            if (val === simpleDir || val.includes(simpleDir) && !logic.verbs.some(v => val.includes(v))) {
+                return "Excellent! You've got the direction perfectly. Now, add an action verb at the start to describe *how* the warrior moves.";
+            }
+
+            // 4. Perspective Check (来 vs 去)
+            const correctEnd = Array.isArray(logic.end) ? logic.end[0] : logic.end;
+            const wrongEnd = correctEnd === '去' ? '来' : '去';
+            if (val.includes(wrongEnd)) {
+                return "So close! Your sentence structure is great. Now, look at the warrior's path—is he heading **away** from us or coming **closer** to us? Check that very last character!";
+            }
+
+            // 5. Component Scaffolding
             const hasVerb = logic.verbs.some(v => val.includes(v));
-            const hasDir = val.includes(logic.dir);
-            const hasEnd = val.includes(logic.end);
-            const wrongEnd = val.includes(logic.end === '来' ? '去' : '来');
-
-            if (hasVerb && hasDir && wrongEnd) {
-                return `Check the perspective! Is the warrior moving toward you or away from you?`;
+            const currentDir = Array.isArray(logic.dir) ? logic.dir[0] : logic.dir;
+            if (hasVerb && !val.includes(currentDir)) {
+                return `Good action! But you are missing the directional part (like '${currentDir}'). Show him the way!`;
             }
-            if (hasVerb && hasDir && !hasEnd) {
-                return `You have the action and direction! Now complete the phrase with '来' or '去'.`;
-            }
-            if (hasVerb && !hasDir) {
-                return `Good verb choice! But you are missing the directional part (like '${logic.dir}').`;
-            }
-            if (!hasVerb && (hasDir || hasEnd)) {
-                return `How is the warrior moving? Add an action verb (like '${logic.verbs[0]}').`;
+            if (hasVerb && !val.includes(correctEnd)) {
+                return "You've got the action and the direction! Now, just add the final particle to show the perspective.";
             }
 
-            return `Incorrect. Try to use the: [Verb] + [Direction] + [Perspective] pattern.`;
+            return "Not quite. Try the pattern: [Action Verb] + [Direction] + [Perspective].";
         }
 
-        // --- UI CONTROLS ---
-        function updateProgressBar() {
-            const progress = (gameState.completedLevels / gameState.totalLevels) * 100;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
+        // --- UI & ANIMATION ---
+        function updateProgress() {
+            document.getElementById('progress-bar').style.width = `${(gameState.completedLevels / gameState.totalLevels) * 100}%`;
         }
 
-        function showNextLevel() {
+        function showNext() {
             document.getElementById(`level${gameState.currentLevel}`).style.display = 'none';
             gameState.completedLevels++;
-            updateProgressBar();
+            updateProgress();
             if (gameState.currentLevel < gameState.totalLevels) {
                 gameState.currentLevel++;
                 document.getElementById(`level${gameState.currentLevel}`).style.display = 'block';
@@ -416,97 +393,62 @@
             }
         }
 
-        // --- LEVEL LOGIC ---
+        function triggerLevel(levelNum, onWin) {
+            const input = document.getElementById(`answer${levelNum}`).value;
+            const msg = document.getElementById(`message${levelNum}`);
+            const feedback = getAIResponse(input, levelNum);
+
+            if (feedback === "SUCCESS") {
+                msg.textContent = "Correct! Encouraging progress!";
+                msg.style.color = "#2E8B57";
+                onWin(input);
+                setTimeout(showNext, 4000);
+            } else {
+                msg.textContent = feedback;
+                msg.style.color = "#b21f1f";
+            }
+        }
+
+        // --- LEVEL INITIALIZATION ---
         // Level 1
         const warrior1 = document.getElementById('warrior1');
         warrior1.style.left = '50px'; warrior1.style.top = '250px';
-        document.getElementById('submit1').onclick = () => {
-            const fb = getFeedback(document.getElementById('answer1').value, 1);
-            const msg = document.getElementById('message1');
-            if (fb === "SUCCESS") {
-                msg.textContent = 'Correct! The warrior entered the castle!';
-                msg.style.color = "#2E8B57";
-                warrior1.style.left = '550px';
-                setTimeout(showNextLevel, 4000);
-            } else { msg.textContent = fb; msg.style.color = "#b21f1f"; }
-        };
+        document.getElementById('submit1').onclick = () => triggerLevel(1, () => warrior1.style.left = '550px');
 
         // Level 2
         const warrior2 = document.getElementById('warrior2');
         warrior2.style.left = '50px'; warrior2.style.bottom = '100px';
         document.getElementById('staircase2').style.display = 'block';
-        document.getElementById('submit2').onclick = () => {
-            const fb = getFeedback(document.getElementById('answer2').value, 2);
-            const msg = document.getElementById('message2');
-            if (fb === "SUCCESS") {
-                msg.textContent = 'Excellent! The warrior went up the stairs!';
-                msg.style.color = "#2E8B57";
-                warrior2.style.left = '600px'; warrior2.style.bottom = '200px';
-                setTimeout(showNextLevel, 4000);
-            } else { msg.textContent = fb; msg.style.color = "#b21f1f"; }
-        };
+        document.getElementById('submit2').onclick = () => triggerLevel(2, () => {
+            warrior2.style.left = '600px'; warrior2.style.bottom = '200px';
+        });
 
         // Level 3
         const warrior3 = document.getElementById('warrior3');
         warrior3.style.left = '50px'; warrior3.style.bottom = '100px';
-        document.getElementById('submit3').onclick = () => {
-            const fb = getFeedback(document.getElementById('answer3').value, 3);
-            const msg = document.getElementById('message3');
-            if (fb === "SUCCESS") {
-                msg.textContent = 'Correct! The warrior reached the cabinet!';
-                msg.style.color = "#2E8B57";
-                warrior3.style.left = '850px';
-                setTimeout(showNextLevel, 4000);
-            } else { msg.textContent = fb; msg.style.color = "#b21f1f"; }
-        };
+        document.getElementById('submit3').onclick = () => triggerLevel(3, () => warrior3.style.left = '850px');
 
         // Level 4
         const warrior4 = document.getElementById('warrior4');
         warrior4.style.left = '150px'; warrior4.style.bottom = '100px';
-        document.getElementById('submit4').onclick = () => {
-            const val = document.getElementById('answer4').value;
-            const fb = getFeedback(val, 4);
-            const msg = document.getElementById('message4');
-            if (fb === "SUCCESS") {
-                msg.textContent = 'Correct!'; msg.style.color = "#2E8B57";
-                if(val.includes("跳")) {
-                    warrior4.style.transform = 'translateY(-150px)';
-                    setTimeout(() => warrior4.style.transform = 'translateY(0)', 500);
-                } else {
-                    warrior4.style.bottom = "250px"; warrior4.style.left = "400px";
-                }
-                setTimeout(showNextLevel, 3000);
-            } else { msg.textContent = fb; msg.style.color = "#b21f1f"; }
-        };
+        document.getElementById('submit4').onclick = () => triggerLevel(4, (val) => {
+            if(val.includes("跳")) {
+                warrior4.style.transform = 'translateY(-150px)';
+                setTimeout(() => warrior4.style.transform = 'translateY(0)', 500);
+            } else { warrior4.style.bottom = "250px"; warrior4.style.left = "400px"; }
+        });
 
         // Level 5
         const warrior5 = document.getElementById('warrior5');
         warrior5.style.left = '220px'; warrior5.style.bottom = '60px';
-        document.getElementById('submit5').onclick = () => {
-            const fb = getFeedback(document.getElementById('answer5').value, 5);
-            const msg = document.getElementById('message5');
-            if (fb === "SUCCESS") {
-                msg.textContent = 'Correct! The warrior reached the table!';
-                msg.style.color = "#2E8B57";
-                warrior5.style.left = '750px';
-                setTimeout(showNextLevel, 4000);
-            } else { msg.textContent = fb; msg.style.color = "#b21f1f"; }
-        };
+        document.getElementById('submit5').onclick = () => triggerLevel(5, () => warrior5.style.left = '750px');
 
         // Level 6
         const warrior6 = document.getElementById('warrior6');
         warrior6.style.left = '50px'; warrior6.style.bottom = '120px';
-        document.getElementById('submit6').onclick = () => {
-            const fb = getFeedback(document.getElementById('answer6').value, 6);
-            const msg = document.getElementById('message6');
-            if (fb === "SUCCESS") {
-                msg.textContent = 'Correct! You found the treasure!';
-                msg.style.color = "#2E8B57";
-                createConfetti();
-                warrior6.style.transform = 'scale(1.2)';
-                setTimeout(showNextLevel, 4000);
-            } else { msg.textContent = fb; msg.style.color = "#b21f1f"; }
-        };
+        document.getElementById('submit6').onclick = () => triggerLevel(6, () => {
+            createConfetti(); warrior6.style.transform = 'scale(1.2)';
+        });
 
         function createConfetti() {
             const container = document.getElementById('game-container6');
@@ -518,21 +460,15 @@
                 c.style.left = Math.random() * 100 + '%';
                 c.style.top = '-10px';
                 container.appendChild(c);
-                c.animate([
-                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
-                    { transform: 'translateY(500px) rotate(720deg)', opacity: 0 }
-                ], { duration: 2000 + Math.random() * 2000 }).onfinish = () => c.remove();
+                c.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(500px)', opacity: 0 }], 2000).onfinish = () => c.remove();
             }
         }
 
-        // Enter key support
-        document.querySelectorAll('.answer-input').forEach((input, i) => {
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') document.getElementById(`submit${i+1}`).click();
-            });
+        document.querySelectorAll('.answer-input').forEach((el, i) => {
+            el.onkeypress = (e) => { if(e.key === 'Enter') document.getElementById(`submit${i+1}`).click(); };
         });
 
-        updateProgressBar();
+        updateProgress();
     </script>
 </body>
 </html>
