@@ -3,215 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Castle Treasure Hunt - Compound Directional Complement Practice</title>
+    <title>Castle Treasure Hunt - AI Enhanced Practice</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
+        /* CSS remains identical to maintain your UI */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            display: flex; flex-direction: column; align-items: center;
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            color: #333;
+            margin: 0; padding: 20px; min-height: 100vh; color: #333;
         }
-        
         .container {
-            width: 100%;
-            max-width: 1000px;
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            position: relative;
+            width: 100%; max-width: 1000px; background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); overflow: hidden; position: relative;
         }
-        
-        header {
-            background: linear-gradient(to right, #4CAF50, #2E8B57);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        h1 {
-            margin: 0;
-            font-size: 32px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .subtitle {
-            font-size: 18px;
-            margin-top: 5px;
-            opacity: 0.9;
-        }
-        
-        .game-area {
-            padding: 20px;
-        }
-        
+        header { background: linear-gradient(to right, #4CAF50, #2E8B57); color: white; padding: 20px; text-align: center; }
+        .game-area { padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .game-container {
-            width: 100%;
-            height: 500px;
-            border: 3px solid #4CAF50;
-            position: relative;
-            overflow: hidden;
-            background-color: #e8f5e9;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
+            width: fit-content; max-width: 100%; height: auto; border: 5px solid #4CAF50;
+            position: relative; overflow: hidden; margin-bottom: 20px; border-radius: 10px; background: #fff;
         }
-        
-        .warrior {
-            width: 120px;
-            height: 180px;
-            position: absolute;
-            transition: all 2.5s ease-in-out;
-            z-index: 2;
-        }
-        
-        .castle {
-            width: 400px;
-            height: 350px;
-            position: absolute;
-            right: 50px;
-            top: 100px;
-            z-index: 1;
-        }
-        
-        .staircase {
-            width: 500px;
-            height: 300px;
-            position: absolute;
-            right: 0;
-            top: 150px;
-            z-index: 1;
-            display: none;
-        }
-        
-        .background {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        
-        .input-area {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            justify-content: center;
-        }
-        
-        .answer-input {
-            padding: 12px;
-            font-size: 16px;
-            width: 300px;
-            border: 2px solid #4CAF50;
-            border-radius: 5px;
-            outline: none;
-            transition: all 0.3s;
-        }
-        
-        .answer-input:focus {
-            border-color: #2E8B57;
-            box-shadow: 0 0 8px rgba(46, 139, 87, 0.5);
-        }
-        
-        .submit-btn {
-            padding: 12px 24px;
-            font-size: 16px;
-            background: linear-gradient(to bottom, #4CAF50, #2E8B57);
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: all 0.3s;
-            font-weight: bold;
-        }
-        
-        .message {
-            margin-top: 15px;
-            font-size: 18px;
-            min-height: 24px;
-            text-align: center;
-            font-weight: bold;
-        }
-        
-        .level-indicator {
-            font-size: 24px;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: #2E8B57;
-            text-align: center;
-        }
-        
-        .progress-container {
-            width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            overflow: hidden;
-            height: 20px;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(to right, #4CAF50, #2E8B57);
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-        
-        .instructions {
-            background-color: #f1f8e9;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 5px solid #4CAF50;
-        }
-
-        .jump-warrior {
-            position: absolute;
-            width: 150px;
-            height: 200px;
-            transition: transform 0.5s ease-in-out, left 2s ease-in-out, bottom 2s ease-in-out;
-        }
-        
-        .jump-warrior img { width: 100%; height: 100%; object-fit: contain; }
-
-        .table-warrior {
-            position: absolute;
-            width: 120px;
-            height: 180px;
-            transition: left 2s ease-in-out;
-            z-index: 10;
-        }
-
-        .chest-warrior {
-            position: absolute;
-            width: 150px;
-            height: auto;
-            transition: transform 0.3s ease;
-        }
-        
-        .success-message {
-            text-align: center;
-            font-size: 28px;
-            color: #2E8B57;
-            margin: 20px 0;
-            font-weight: bold;
-        }
+        .background-img { display: block; max-width: 100%; max-height: 75vh; height: auto; position: relative; z-index: 1; }
+        .warrior-char { width: 120px; height: auto; position: absolute; z-index: 10; transition: all 2.5s ease-in-out; }
+        #warrior2 { width: 160px; }
+        #warrior4 { width: 220px; transition: transform 0.6s ease-out, left 2.5s, bottom 2.5s; }
+        #warrior6 { width: 220px; }
+        .input-area { display: flex; gap: 10px; margin-top: 15px; width: 100%; justify-content: center; }
+        .answer-input { padding: 12px; font-size: 16px; width: 350px; border: 2px solid #4CAF50; border-radius: 5px; outline: none; }
+        .submit-btn { padding: 12px 24px; font-size: 16px; background: linear-gradient(to bottom, #4CAF50, #2E8B57); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .message { margin-top: 15px; font-size: 18px; min-height: 50px; text-align: center; font-weight: bold; max-width: 80%; line-height: 1.4; }
+        .level-indicator { font-size: 24px; margin-bottom: 15px; font-weight: bold; color: #2E8B57; }
+        .progress-container { width: 100%; background-color: #e0e0e0; border-radius: 10px; margin-bottom: 20px; height: 20px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(to right, #4CAF50, #2E8B57); width: 0%; transition: width 0.5s ease; }
+        .instructions { background-color: #f1f8e9; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #4CAF50; width: 100%; }
+        .success-message { text-align: center; font-size: 28px; color: #2E8B57; margin: 20px 0; font-weight: bold; }
     </style>
 </head>
 <body>
+
     <div class="container">
         <header>
             <h1>Castle Treasure Hunt</h1>
@@ -226,111 +55,85 @@
             <div class="level-indicator" id="level-indicator">Level 1</div>
             
             <div class="instructions">
-                <h3>Challenge:</h3>
-                <p>Observe the scene and guide the warrior using the correct Chinese directional commands.</p>
+                <h3>The Mission:</h3>
+                <p>Use your Chinese skills to guide the warrior. Type your command as a phrase or a full sentence!</p>
             </div>
             
             <!-- Level 1 -->
             <div id="level1" class="tab-content active">
                 <div class="game-container">
-                    <img class="warrior" id="warrior1" src="images/warrior1.png" alt="Warrior">
-                    <img class="castle" id="castle1" src="images/castle1.png" alt="Castle">
+                    <img class="background-img" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/level1-bg.JPG?raw=true">
+                    <img class="warrior-char" id="warrior1" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior1.png?raw=true">
                 </div>
-                <div class="input-area">
-                    <input type="text" class="answer-input" id="answer1" placeholder="Enter command...">
-                    <button class="submit-btn" id="submit1">Submit</button>
-                </div>
+                <div class="input-area"><input type="text" class="answer-input" id="answer1" placeholder="Enter your command..."><button class="submit-btn" id="submit1">Submit</button></div>
                 <div class="message" id="message1"></div>
             </div>
             
             <!-- Level 2 -->
             <div id="level2" class="tab-content" style="display: none;">
                 <div class="game-container">
-                    <img class="warrior" id="warrior2" src="images/warrior1.png" alt="Warrior">
-                    <img class="staircase" id="staircase2" src="images/staircase2.png" alt="Staircase">
+                    <img class="background-img" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/level2-bg.JPG?raw=true">
+                    <img class="warrior-char" id="warrior2" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior2.png?raw=true">
                 </div>
-                <div class="input-area">
-                    <input type="text" class="answer-input" id="answer2" placeholder="Enter command...">
-                    <button class="submit-btn" id="submit2">Submit</button>
-                </div>
+                <div class="input-area"><input type="text" class="answer-input" id="answer2" placeholder="Enter your command..."><button class="submit-btn" id="submit2">Submit</button></div>
                 <div class="message" id="message2"></div>
             </div>
-            
+
             <!-- Level 3 -->
             <div id="level3" class="tab-content" style="display: none;">
                 <div class="game-container">
-                    <img class="background" src="images/level3-bg.png" alt="Level 3 Background">
-                    <img class="warrior" id="warrior3" src="images/warrior3.png" alt="Warrior">
+                    <img class="background-img" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/level3-bg.JPG?raw=true">
+                    <img class="warrior-char" id="warrior3" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior3.png?raw=true">
                 </div>
-                <div class="input-area">
-                    <input type="text" class="answer-input" id="answer3" placeholder="Enter command...">
-                    <button class="submit-btn" id="submit3">Submit</button>
-                </div>
+                <div class="input-area"><input type="text" class="answer-input" id="answer3" placeholder="Enter your command..."><button class="submit-btn" id="submit3">Submit</button></div>
                 <div class="message" id="message3"></div>
             </div>
-            
+
             <!-- Level 4 -->
             <div id="level4" class="tab-content" style="display: none;">
                 <div class="game-container">
-                    <div class="background" style="background-image: url('images/level4-bg.png'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
-                    <div class="jump-warrior" id="warrior4">
-                        <img src="images/warrior4.png" alt="Warrior">
-                    </div>
+                    <img class="background-img" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/level4-bg.PNG?raw=true">
+                    <img class="warrior-char" id="warrior4" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior4.png?raw=true">
                 </div>
-                <div class="input-area">
-                    <input type="text" class="answer-input" id="answer4" placeholder="Enter command...">
-                    <button class="submit-btn" id="submit4">Execute</button>
-                </div>
+                <div class="input-area"><input type="text" class="answer-input" id="answer4" placeholder="Enter your command..."><button class="submit-btn" id="submit4">Execute</button></div>
                 <div class="message" id="message4"></div>
             </div>
-            
+
             <!-- Level 5 -->
             <div id="level5" class="tab-content" style="display: none;">
                 <div class="game-container">
-                    <div class="background" style="background-image: url('images/level5-bg.png'); background-size: cover; background-position: center;"></div>
-                    <div class="table-warrior" id="warrior5">
-                        <img src="images/warrior5.png" alt="Warrior">
-                    </div>
+                    <img class="background-img" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/level5-bg.JPG?raw=true">
+                    <img class="warrior-char" id="warrior5" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior5.png?raw=true">
                 </div>
-                <div class="input-area">
-                    <input type="text" class="answer-input" id="answer5" placeholder="Enter command...">
-                    <button class="submit-btn" id="submit5">Execute</button>
-                </div>
+                <div class="input-area"><input type="text" class="answer-input" id="answer5" placeholder="Enter your command..."><button class="submit-btn" id="submit5">Execute</button></div>
                 <div class="message" id="message5"></div>
             </div>
-            
+
             <!-- Level 6 -->
             <div id="level6" class="tab-content" style="display: none;">
                 <div class="game-container" id="game-container6">
-                    <div class="background" style="background-image: url('images/level6-bg.png'); background-size: cover; background-position: center;"></div>
-                    <img class="chest-warrior" id="warrior6" src="images/warrior6.png" alt="Warrior">
+                    <img class="background-img" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/level6-bg.JPG?raw=true">
+                    <img class="warrior-char" id="warrior6" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior6.png?raw=true">
                 </div>
-                <div class="input-area">
-                    <input type="text" class="answer-input" id="answer6" placeholder="Enter command...">
-                    <button class="submit-btn" id="submit6">Execute</button>
-                </div>
+                <div class="input-area"><input type="text" class="answer-input" id="answer6" placeholder="Enter your command..."><button class="submit-btn" id="submit6">Execute</button></div>
                 <div class="message" id="message6"></div>
             </div>
             
-            <!-- Completion -->
             <div id="level-complete" class="tab-content" style="display: none;">
-                <div class="success-message">Excellent work! You've mastered the directional complements!</div>
-                <div style="text-align: center;">
-                    <img src="images/warrior6.png" alt="Warrior" style="width: 200px;">
-                </div>
+                <div class="success-message">Mastered! You are a Directional Complement Expert!</div>
+                <div style="text-align: center;"><img src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior6.png?raw=true" style="width: 250px;"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- DATA & AI CORE ---
         const levelLogic = {
-            1: { targets: ['走进去', '跑进去'], verbs: ['走', '跑'], dir: '进', end: '去' },
-            2: { targets: ['走上去', '跑上去'], verbs: ['走', '跑'], dir: '上', end: '去' },
-            3: { targets: ['跑过去', '冲过去'], verbs: ['跑', '冲'], dir: '过', end: '去', dog: true },
-            4: { targets: ['跳起来', '爬上去'], verbs: ['跳', '爬'], dir: ['起', '上'], end: ['来', '去'] },
-            5: { targets: ['走过去', '跑过去'], verbs: ['走', '跑'], dir: '过', end: '去' },
-            6: { targets: ['拿出来', '取出来'], verbs: ['拿', '取'], dir: '出', end: '来' }
+            1: { targets: ['走进去', '跑进去'], verbs: ['走', '跑'], dir: '进', end: '去', goal: "enter the castle" },
+            2: { targets: ['走上去', '跑上去'], verbs: ['走', '跑'], dir: '上', end: '去', goal: "go up the stairs" },
+            3: { targets: ['跑过去', '冲过去'], verbs: ['跑', '冲'], dir: '过', end: '去', goal: "move across to the cabinet" },
+            4: { targets: ['跳起来'], verbs: ['跳'], dir: '起', end: '来', goal: "reach the top of the closet" }, 
+            5: { targets: ['走过去', '跑过去'], verbs: ['走', '跑'], dir: '过', end: '去', goal: "walk across to the table" },
+            6: { targets: ['拿出来', '取出来'], verbs: ['拿', '取'], dir: '出', end: '来', goal: "take the treasure out" }
         };
 
         const gameState = { currentLevel: 1, totalLevels: 6, completedLevels: 0 };
@@ -338,58 +141,58 @@
         function getAIResponse(input, levelNum) {
             const val = input.trim();
             const logic = levelLogic[levelNum];
-
-            // 1. Success
+            
             if (logic.targets.some(t => val.includes(t))) return "SUCCESS";
-            if (val === "") return "The warrior is waiting for your command!";
+            if (val === "") return "The warrior is standing by for your command!";
 
-            // 2. Level 3 Dog Logic (Functional Fail)
+            // Narrative / Strategy
             if (levelNum === 3 && val.includes("走过去")) {
-                return "Great grammar! But watch out—the dog is fast! 🐕 Walking is too slow to escape. Can you think of a more urgent action verb?";
+                return "Your grammar is spot on! However, look at that dog! 🐕 If the warrior only walks, he won't be fast enough. Can you think of a more urgent action verb?";
+            }
+            if (levelNum === 4 && val.includes("爬上去")) {
+                return "Clever thinking! Usually that would work, but the surface is too slippery to climb! 🧊 Can you think of a more explosive way to reach the top?";
             }
 
-            // 3. Compound vs Simple check
-            const simpleDir = (Array.isArray(logic.dir) ? logic.dir[0] : logic.dir) + (Array.isArray(logic.end) ? logic.end[0] : logic.end);
-            if (val === simpleDir || val.includes(simpleDir) && !logic.verbs.some(v => val.includes(v))) {
-                return "Excellent! You've got the direction perfectly. Now, add an action verb at the start to describe *how* the warrior moves.";
-            }
-
-            // 4. Perspective Check (来 vs 去)
-            const correctEnd = Array.isArray(logic.end) ? logic.end[0] : logic.end;
-            const wrongEnd = correctEnd === '去' ? '来' : '去';
-            if (val.includes(wrongEnd)) {
-                return "So close! Your sentence structure is great. Now, look at the warrior's path—is he heading **away** from us or coming **closer** to us? Check that very last character!";
-            }
-
-            // 5. Component Scaffolding
             const hasVerb = logic.verbs.some(v => val.includes(v));
-            const currentDir = Array.isArray(logic.dir) ? logic.dir[0] : logic.dir;
-            if (hasVerb && !val.includes(currentDir)) {
-                return `Good action! But you are missing the directional part (like '${currentDir}'). Show him the way!`;
-            }
-            if (hasVerb && !val.includes(correctEnd)) {
-                return "You've got the action and the direction! Now, just add the final particle to show the perspective.";
+            const hasDir = Array.isArray(logic.dir) ? logic.dir.some(d => val.includes(d)) : val.includes(logic.dir);
+            const correctEnd = Array.isArray(logic.end) ? logic.end[0] : logic.end;
+            const hasEnd = val.includes(correctEnd);
+            const hasWrongEnd = val.includes(correctEnd === '去' ? '来' : '去');
+
+            // --- CONTEXTUAL OPTIMIZATION ---
+            // Student has Verb + Wrong Direction + Correct Perspective (e.g., 走过去 in Level 1)
+            if (hasVerb && !hasDir && hasEnd) {
+                return `Very close! You have the right action and perspective, but now you have to **${logic.goal}**. Try a different middle direction word!`;
             }
 
-            return "Not quite. Try the pattern: [Action Verb] + [Direction] + [Perspective].";
-        }
+            // Simple Directional check (e.g., 进去)
+            if (!hasVerb && hasDir && hasEnd) {
+                return "Spot on with the direction! Now, how does the warrior get there? (Walking? Running?). Add an action verb to the start!";
+            }
 
-        // --- UI & ANIMATION ---
-        function updateProgress() {
-            document.getElementById('progress-bar').style.width = `${(gameState.completedLevels / gameState.totalLevels) * 100}%`;
+            // Missing Perspective (e.g., 走进)
+            if (hasVerb && hasDir && !hasEnd && !hasWrongEnd) {
+                return "Nearly there! You have the action and the direction. Now, is he moving away from us or toward us? Add that final piece!";
+            }
+
+            // Perspective Error (e.g., mixing 来/去)
+            if (hasVerb && hasDir && hasWrongEnd) {
+                return "Great structure! Just one check: look at the warrior's path. Is he heading away into the scene, or toward us? Adjust that last character!";
+            }
+
+            return "Not quite. Remember the pattern: [Action Verb] + [Direction] + [Perspective]. You're doing great!";
         }
 
         function showNext() {
             document.getElementById(`level${gameState.currentLevel}`).style.display = 'none';
             gameState.completedLevels++;
-            updateProgress();
+            document.getElementById('progress-bar').style.width = `${(gameState.completedLevels / gameState.totalLevels) * 100}%`;
             if (gameState.currentLevel < gameState.totalLevels) {
                 gameState.currentLevel++;
                 document.getElementById(`level${gameState.currentLevel}`).style.display = 'block';
                 document.getElementById('level-indicator').textContent = `Level ${gameState.currentLevel}`;
             } else {
                 document.getElementById('level-complete').style.display = 'block';
-                document.getElementById('level-indicator').textContent = 'Completed!';
             }
         }
 
@@ -397,78 +200,65 @@
             const input = document.getElementById(`answer${levelNum}`).value;
             const msg = document.getElementById(`message${levelNum}`);
             const feedback = getAIResponse(input, levelNum);
-
+            
             if (feedback === "SUCCESS") {
-                msg.textContent = "Correct! Encouraging progress!";
-                msg.style.color = "#2E8B57";
+                msg.textContent = "Fantastic! That's the correct command!"; msg.style.color = "#2E8B57";
                 onWin(input);
                 setTimeout(showNext, 4000);
-            } else {
-                msg.textContent = feedback;
-                msg.style.color = "#b21f1f";
-            }
+            } else { msg.textContent = feedback; msg.style.color = "#b21f1f"; }
         }
 
-        // --- LEVEL INITIALIZATION ---
-        // Level 1
+        // --- ANIMATIONS & POSITIONS ---
         const warrior1 = document.getElementById('warrior1');
-        warrior1.style.left = '50px'; warrior1.style.top = '250px';
-        document.getElementById('submit1').onclick = () => triggerLevel(1, () => warrior1.style.left = '550px');
+        warrior1.style.left = '10%'; warrior1.style.bottom = '5%';
+        document.getElementById('submit1').onclick = () => triggerLevel(1, () => warrior1.style.left = '55%');
 
-        // Level 2
         const warrior2 = document.getElementById('warrior2');
-        warrior2.style.left = '50px'; warrior2.style.bottom = '100px';
-        document.getElementById('staircase2').style.display = 'block';
+        warrior2.style.left = '10%'; warrior2.style.bottom = '5%';
         document.getElementById('submit2').onclick = () => triggerLevel(2, () => {
-            warrior2.style.left = '600px'; warrior2.style.bottom = '200px';
+            warrior2.style.left = '70%'; warrior2.style.bottom = '60%';
         });
 
-        // Level 3
         const warrior3 = document.getElementById('warrior3');
-        warrior3.style.left = '50px'; warrior3.style.bottom = '100px';
-        document.getElementById('submit3').onclick = () => triggerLevel(3, () => warrior3.style.left = '850px');
+        warrior3.style.left = '5%'; warrior3.style.bottom = '5%';
+        document.getElementById('submit3').onclick = () => triggerLevel(3, () => warrior3.style.left = '80%');
 
-        // Level 4
         const warrior4 = document.getElementById('warrior4');
-        warrior4.style.left = '150px'; warrior4.style.bottom = '100px';
+        warrior4.style.left = '15%'; warrior4.style.bottom = '5%';
         document.getElementById('submit4').onclick = () => triggerLevel(4, (val) => {
             if(val.includes("跳")) {
-                warrior4.style.transform = 'translateY(-150px)';
-                setTimeout(() => warrior4.style.transform = 'translateY(0)', 500);
-            } else { warrior4.style.bottom = "250px"; warrior4.style.left = "400px"; }
+                warrior4.style.transform = 'translateY(-380px)'; 
+                setTimeout(() => warrior4.style.transform = 'translateY(0)', 600);
+            }
         });
 
-        // Level 5
         const warrior5 = document.getElementById('warrior5');
-        warrior5.style.left = '220px'; warrior5.style.bottom = '60px';
-        document.getElementById('submit5').onclick = () => triggerLevel(5, () => warrior5.style.left = '750px');
+        warrior5.style.left = '15%'; warrior5.style.bottom = '2%';
+        document.getElementById('submit5').onclick = () => triggerLevel(5, () => warrior5.style.left = '75%');
 
-        // Level 6
         const warrior6 = document.getElementById('warrior6');
-        warrior6.style.left = '50px'; warrior6.style.bottom = '120px';
+        warrior6.style.left = '55%'; warrior6.style.bottom = '5%';
         document.getElementById('submit6').onclick = () => triggerLevel(6, () => {
-            createConfetti(); warrior6.style.transform = 'scale(1.2)';
+            warrior6.style.transform = 'scale(1.2)';
+            createConfetti();
         });
 
         function createConfetti() {
             const container = document.getElementById('game-container6');
+            const rect = container.getBoundingClientRect();
             for (let i = 0; i < 80; i++) {
                 const c = document.createElement('div');
-                c.style.position = 'absolute';
-                c.style.width = '10px'; c.style.height = '10px';
+                c.style.position = 'absolute'; c.style.width = '10px'; c.style.height = '10px';
                 c.style.backgroundColor = ['#ff0', '#f0f', '#0ff', '#f00'][Math.floor(Math.random()*4)];
-                c.style.left = Math.random() * 100 + '%';
-                c.style.top = '-10px';
+                c.style.left = Math.random() * 100 + '%'; c.style.top = '-10px'; c.style.zIndex = '20';
                 container.appendChild(c);
-                c.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(500px)', opacity: 0 }], 2000).onfinish = () => c.remove();
+                c.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: `translateY(${rect.height}px)`, opacity: 0 }], 2000).onfinish = () => c.remove();
             }
         }
 
         document.querySelectorAll('.answer-input').forEach((el, i) => {
             el.onkeypress = (e) => { if(e.key === 'Enter') document.getElementById(`submit${i+1}`).click(); };
         });
-
-        updateProgress();
     </script>
 </body>
 </html>
