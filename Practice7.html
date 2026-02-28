@@ -44,7 +44,7 @@
         .svg-canvas { width: 800px; height: 450px; display: block; }
         #svg-l1 { background: #81d4fa; }
         #svg-l2 { background: #cfd8dc; } 
-        #svg-l3 { background: #b0bec5; } 
+        #svg-l3 { background: #bbdefb; } /* Changed background to contrast with the silver sword! */
         #svg-l4 { background: #cfd8dc; } 
         #svg-l5, #svg-l6 { background: #90a4ae; } 
         
@@ -125,7 +125,7 @@
         #l5-treasures { opacity: 0; }
         .is-walking-l5 #l5-treasures { animation: reveal-treasure 3.5s forwards; }
         .is-walking-l5 #warrior-group-5 { animation: walk-to-table 3.5s forwards linear; }
-        .is-walking-l5 #l5-arm { animation: insert-key 3.5s forwards; transform-origin: 45px 35px; }
+        .is-walking-l5 #l5-arm { animation: insert-key 3.5s forwards; transform-origin: 25px 25px; }
         .is-walking-l5 #chest-lid-l5 { animation: open-chest 3.5s forwards; }
 
         @keyframes walk-to-table { 0% { transform: translate(150px, 275px) scale(1.4); } 60%, 100% { transform: translate(550px, 275px) scale(1.4); } }
@@ -139,19 +139,13 @@
 
         @keyframes extract-arm {
             0% { transform: rotate(0deg); }
-            20%, 35% { transform: rotate(-20deg); } /* Reaches deep into chest */
-            50%, 65% { transform: rotate(-130deg); } /* Pulls up and out holding treasure */
-            75%, 85% { transform: rotate(100deg); } /* Slams diamond onto chest */
-            95%, 100% { transform: rotate(0deg); } /* Arm returns to neutral */
+            20%, 35% { transform: rotate(-45deg); } 
+            60%, 100% { transform: rotate(-130deg); } 
         }
         @keyframes gem-rise {
-            /* Starts hidden, magically appearing in the hand in the chest */
-            0%, 20% { transform: translate(-18px, 17px) scale(0.6); opacity: 0; }
-            25%, 35% { opacity: 1; transform: translate(-18px, 17px) scale(0.6); } 
-            /* Travels exactly to the final coordinates of the hand up high */
-            50%, 65% { transform: translate(-43px, -25px) scale(0.8); opacity: 1; } 
-            /* Planted permanently onto the warrior's chest */
-            75%, 100% { transform: translate(-69px, 22px) scale(0.5); opacity: 1; } 
+            0%, 20% { transform: translate(0px, 0px) scale(1); opacity: 0; }
+            25%, 35% { opacity: 1; transform: translate(0px, 0px) scale(1); } 
+            60%, 100% { transform: translate(-27.5px, -29.6px) scale(1.33); opacity: 1; }
         }
     </style>
 </head>
@@ -191,7 +185,7 @@
                             <path id="door-l" d="M500 420 v-100 q 25 -25 50 0 v 100 Z" fill="#6d4c41" stroke="#3e2723" />
                             <path id="door-r" d="M600 420 v-100 q -25 -25 -50 0 v 100 Z" fill="#6d4c41" stroke="#3e2723" />
                         </g>
-                        <!-- Warrior Grounded on Y=420 Floor -->
+                        <!-- Original Warrior Grounded on Y=420 Floor -->
                         <g id="warrior-group-1" style="transform: translate(80px, 345px);">
                             <path d="M20 0 q 10 -20 30 -10" stroke="#d32f2f" stroke-width="4" fill="none" />
                             <rect class="walk-leg" x="10" y="50" width="10" height="25" fill="#37474f" />
@@ -235,6 +229,7 @@
                         <rect x="760" y="150" width="10" height="40" fill="#4e342e" />
                         <rect x="600" y="140" width="200" height="10" fill="#5d4037" />
 
+                        <!-- Original Warrior -->
                         <g id="warrior-group-2" style="transform: translate(50px, 336px) scale(0.85);">
                             <path d="M20 0 q 10 -20 30 -10" stroke="#d32f2f" stroke-width="4" fill="none" />
                             <rect class="walk-leg" x="10" y="50" width="10" height="25" fill="#37474f" />
@@ -256,17 +251,14 @@
             <div id="level3" class="tab-content" style="display: none;">
                 <div class="game-container">
                     <svg id="svg-l3" class="svg-canvas" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Floor -->
                         <rect x="0" y="380" width="800" height="70" fill="#90a4ae" />
                         <line x1="0" y1="380" x2="800" y2="380" stroke="#546e7a" stroke-width="4" />
 
-                        <!-- Wall Pictures -->
                         <rect x="350" y="80" width="80" height="100" fill="#eceff1" stroke="#5d4037" stroke-width="6" />
                         <circle cx="390" cy="130" r="20" fill="#b0bec5" />
                         <rect x="480" y="100" width="120" height="80" fill="#eceff1" stroke="#5d4037" stroke-width="6" />
                         <path d="M490 170 L520 130 L550 160 L570 140 L590 170 Z" fill="#b0bec5" />
 
-                        <!-- Target Cabinet -->
                         <g transform="translate(620, 150)">
                             <rect x="0" y="0" width="140" height="230" fill="#6d4c41" stroke="#3e2723" stroke-width="3" />
                             <rect x="10" y="10" width="58" height="160" fill="#5d4037" stroke="#4e342e" stroke-width="2" />
@@ -277,7 +269,6 @@
                             <circle cx="70" cy="200" r="5" fill="#ffb300" />
                         </g>
 
-                        <!-- Golden Key -->
                         <g transform="translate(625, 130)">
                             <circle cx="10" cy="10" r="6" stroke="#ffb300" stroke-width="3" fill="none"/>
                             <rect x="16" y="8" width="20" height="4" fill="#ffb300" />
@@ -287,7 +278,6 @@
 
                         <!-- Dog -->
                         <g id="dog-group" style="transform: translate(150px, 350px) scale(0.6);">
-                            <!-- Dog body starts facing left, flips halfway through the animation -->
                             <g id="dog-body">
                                 <path d="M 85 25 Q 55 20 45 10 Q 55 35 85 35 Z" fill="#fbc02d" />
                                 <rect class="dog-leg-2" x="80" y="45" width="8" height="30" rx="4" fill="#f9a825" />
@@ -305,7 +295,7 @@
                             </g>
                         </g>
 
-                        <!-- Warrior -->
+                        <!-- Original Warrior Design (With running legs and sword) -->
                         <g id="warrior-group-3" style="transform: translate(70px, 316px) scale(0.85);">
                             <path d="M20 0 q 10 -20 30 -10" stroke="#d32f2f" stroke-width="4" fill="none" />
                             <rect class="run-leg-l" x="10" y="50" width="10" height="25" fill="#37474f" />
@@ -330,7 +320,6 @@
                         <rect x="0" y="400" width="800" height="50" fill="#9e9e9e" />
                         <line x1="0" y1="400" x2="800" y2="400" stroke="#757575" stroke-width="4" />
                         
-                        <!-- Zoomed Cabinet -->
                         <g transform="translate(450, 50)">
                             <rect x="0" y="0" width="280" height="350" fill="#6d4c41" stroke="#3e2723" stroke-width="4" />
                             <rect x="20" y="20" width="116" height="240" fill="#5d4037" stroke="#4e342e" stroke-width="3" />
@@ -341,7 +330,6 @@
                             <circle cx="140" cy="300" r="8" fill="#ffb300" />
                         </g>
 
-                        <!-- Golden Key -->
                         <g id="l4-key" style="transform: translate(460px, 15px) scale(1.5);">
                             <circle cx="10" cy="10" r="6" stroke="#ffb300" stroke-width="3" fill="none"/>
                             <rect x="16" y="8" width="20" height="4" fill="#ffb300" />
@@ -349,16 +337,14 @@
                             <rect x="24" y="12" width="4" height="4" fill="#ffb300" />
                         </g>
 
-                        <!-- Zoomed Warrior -->
+                        <!-- Zoomed Original Warrior (Empty hand) -->
                         <g id="warrior-group-4" style="transform: translate(380px, 295px) scale(1.4);">
                             <path d="M20 0 q 10 -20 30 -10" stroke="#d32f2f" stroke-width="4" fill="none" />
                             <rect class="walk-leg" x="10" y="50" width="10" height="25" fill="#37474f" />
                             <rect class="walk-leg-rev" x="25" y="50" width="10" height="25" fill="#37474f" />
                             <path d="M5 15 h35 l -5 40 h-25 Z" fill="#e0e0e0" stroke="#37474f" />
-                            
-                            <!-- Reaching Arm for jump -->
+                            <!-- Reaching Arm replacing sword -->
                             <path id="l4-arm" d="M25 25 l 15 15" stroke="#e0e0e0" stroke-width="6" stroke-linecap="round" />
-                            
                             <path d="M-5 25 q 0 30 20 40 q 20 -10 20 -40 Z" fill="#1976d2" stroke="white" />
                             <rect x="10" y="0" width="25" height="25" rx="5" fill="#546e7a" />
                             <rect x="12" y="10" width="21" height="5" fill="#263238" />
@@ -376,7 +362,6 @@
                         <rect x="0" y="380" width="800" height="70" fill="#546e7a" />
                         <line x1="0" y1="380" x2="800" y2="380" stroke="#37474f" stroke-width="4" />
                         
-                        <!-- Left Cabinet -->
                         <g transform="translate(50, 150)">
                             <rect x="0" y="0" width="140" height="230" fill="#6d4c41" stroke="#3e2723" stroke-width="3" />
                             <rect x="10" y="10" width="58" height="160" fill="#5d4037" stroke="#4e342e" stroke-width="2" />
@@ -387,17 +372,13 @@
                             <circle cx="70" cy="200" r="5" fill="#ffb300" />
                         </g>
 
-                        <!-- Scaled Table -->
                         <rect x="560" y="320" width="140" height="15" fill="#5d4037" stroke="#3e2723" stroke-width="3"/>
                         <rect x="575" y="335" width="15" height="45" fill="#4e342e" stroke="#3e2723" stroke-width="2"/>
                         <rect x="670" y="335" width="15" height="45" fill="#4e342e" stroke="#3e2723" stroke-width="2"/>
 
-                        <!-- Scaled Red Treasure Chest (Starts Closed, reveals treasure inside) -->
+                        <!-- Chest -->
                         <g transform="translate(585, 285)">
-                            <!-- Interior Background (Dark) -->
                             <path d="M 2 0 Q 45 -25 88 0 Z" fill="#212121" />
-                            
-                            <!-- The Hidden Treasures (Gold coins and Diamonds - Starts invisible!) -->
                             <g id="l5-treasures">
                                 <circle cx="20" cy="-5" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
                                 <circle cx="32" cy="-10" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
@@ -413,34 +394,31 @@
                                 <polygon points="28,-14 32,-9 28,-4 24,-9" fill="#ff4081" />
                                 <polygon points="62,-14 66,-9 62,-4 58,-9" fill="#00e5ff" />
                             </g>
-
-                            <!-- Front Wall -->
                             <rect x="0" y="0" width="90" height="35" fill="#b71c1c" stroke="#4a0000" stroke-width="3"/>
                             <rect x="15" y="0" width="8" height="35" fill="#ffb300" stroke="#f57f17" stroke-width="1"/>
                             <rect x="67" y="0" width="8" height="35" fill="#ffb300" stroke="#f57f17" stroke-width="1"/>
                             <rect x="35" y="0" width="20" height="15" fill="#ffb300" stroke="#f57f17"/>
                             <circle cx="45" cy="8" r="3" fill="#212121"/>
-                            
-                            <!-- The Lid that opens -->
                             <path id="chest-lid-l5" d="M0 0 Q 45 -25 90 0 Z" fill="#d32f2f" stroke="#4a0000" stroke-width="3" style="transform-origin: 90px 0px;"/>
                         </g>
 
-                        <!-- Warrior with Key -->
+                        <!-- Zoomed Original Warrior with Arm Holding Key -->
                         <g id="warrior-group-5" style="transform: translate(150px, 275px) scale(1.4);">
                             <path d="M20 0 q 10 -20 30 -10" stroke="#d32f2f" stroke-width="4" fill="none" />
                             <rect class="walk-leg" x="10" y="50" width="10" height="25" fill="#37474f" />
                             <rect class="walk-leg-rev" x="25" y="50" width="10" height="25" fill="#37474f" />
                             <path d="M5 15 h35 l -5 40 h-25 Z" fill="#e0e0e0" stroke="#37474f" />
                             
+                            <!-- Arm Holding Key -->
                             <g id="l5-arm">
-                                <g transform="translate(35, 25)">
+                                <path d="M25 25 L40 40" stroke="#e0e0e0" stroke-width="6" stroke-linecap="round" />
+                                <g transform="translate(35, 30)">
                                     <circle cx="10" cy="10" r="6" stroke="#ffb300" stroke-width="3" fill="none"/>
                                     <rect x="16" y="8" width="20" height="4" fill="#ffb300" />
                                     <rect x="30" y="12" width="4" height="6" fill="#ffb300" />
                                     <rect x="24" y="12" width="4" height="4" fill="#ffb300" />
                                 </g>
                             </g>
-
                             <path d="M-5 25 q 0 30 20 40 q 20 -10 20 -40 Z" fill="#1976d2" stroke="white" />
                             <rect x="10" y="0" width="25" height="25" rx="5" fill="#546e7a" />
                             <rect x="12" y="10" width="21" height="5" fill="#263238" />
@@ -463,12 +441,9 @@
                         <rect x="345" y="335" width="15" height="45" fill="#4e342e" stroke="#3e2723" stroke-width="2"/>
                         <rect x="440" y="335" width="15" height="45" fill="#4e342e" stroke="#3e2723" stroke-width="2"/>
 
-                        <!-- Centered Scaled Red Treasure Chest -->
+                        <!-- Open Chest -->
                         <g transform="translate(355, 285)">
-                            <!-- Interior Background -->
                             <path d="M 2 10 Q 45 -15 88 10 Z" fill="#212121" />
-                            
-                            <!-- Static Treasure Pile remaining in the chest -->
                             <g id="l6-treasures">
                                 <circle cx="20" cy="5" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
                                 <circle cx="32" cy="0" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
@@ -482,31 +457,13 @@
                                 <polygon points="28,-4 32,1 28,6 24,1" fill="#ff4081" />
                                 <polygon points="62,-4 66,1 62,6 58,1" fill="#00e5ff" />
                             </g>
-                            
-                            <!-- The Target Treasure (Upgraded Diamond, animated to chest) -->
-                            <g id="l6-gem" style="opacity: 0; transform-origin: 45px 20px;">
-                                <!-- Glowing aura -->
-                                <circle cx="45" cy="20" r="22" fill="#b2ebf2" opacity="0.6" />
-                                <!-- Main diamond shape -->
-                                <polygon points="45,0 65,15 45,40 25,15" fill="#00e5ff" />
-                                <!-- Facets -->
-                                <polygon points="45,0 25,15 45,15" fill="#84ffff" />
-                                <polygon points="45,0 65,15 45,15" fill="#00b8d4" />
-                                <polygon points="65,15 45,40 45,15" fill="#0097a7" />
-                                <!-- Sparkle / Reflection -->
-                                <path d="M45 5 L46 10 L51 11 L46 12 L45 17 L44 12 L39 11 L44 10 Z" fill="#ffffff" />
-                            </g>
-                            
-                            <!-- Front Wall -->
                             <rect x="0" y="10" width="90" height="25" fill="#b71c1c" stroke="#4a0000" stroke-width="3"/>
                             <rect x="15" y="10" width="8" height="25" fill="#ffb300" stroke="#f57f17" stroke-width="1"/>
                             <rect x="67" y="10" width="8" height="25" fill="#ffb300" stroke="#f57f17" stroke-width="1"/>
-                            
-                            <!-- Lid (Pre-opened swinging completely to the right) -->
                             <path d="M0 10 Q 45 -15 90 10 Z" fill="#d32f2f" stroke="#4a0000" stroke-width="3" style="transform: rotate(130deg); transform-origin: 90px 10px;"/>
                         </g>
 
-                        <!-- Centered Scaled Warrior (Empty handed initially) -->
+                        <!-- Zoomed Original Warrior (Empty hand initially) -->
                         <g id="warrior-group-6" style="transform: translate(320px, 275px) scale(1.4);">
                             <path d="M20 0 q 10 -20 30 -10" stroke="#d32f2f" stroke-width="4" fill="none" />
                             <rect x="10" y="50" width="10" height="25" fill="#37474f" />
@@ -514,12 +471,27 @@
                             <path d="M5 15 h35 l -5 40 h-25 Z" fill="#e0e0e0" stroke="#37474f" />
                             
                             <!-- Animated Reaching Arm -->
-                            <path id="l6-arm" d="M25 25 l 15 15" stroke="#e0e0e0" stroke-width="6" stroke-linecap="round" />
+                            <path id="l6-arm" d="M25 25 L40 40" stroke="#e0e0e0" stroke-width="6" stroke-linecap="round" />
                             
                             <path d="M-5 25 q 0 30 20 40 q 20 -10 20 -40 Z" fill="#1976d2" stroke="white" />
                             <rect x="10" y="0" width="25" height="25" rx="5" fill="#546e7a" />
                             <rect x="12" y="10" width="21" height="5" fill="#263238" />
                         </g>
+
+                        <!-- Target Treasure wrapper placed precisely inside the chest -->
+                        <g style="transform: translate(385px, 310px);">
+                            <g id="l6-gem" style="opacity: 0;">
+                                <g transform="scale(0.6)">
+                                    <circle cx="0" cy="0" r="22" fill="#b2ebf2" opacity="0.6" />
+                                    <polygon points="0,-20 20,-5 0,20 -20,-5" fill="#00e5ff" />
+                                    <polygon points="0,-20 -20,-5 0,-5" fill="#84ffff" />
+                                    <polygon points="0,-20 20,-5 0,-5" fill="#00b8d4" />
+                                    <polygon points="20,-5 0,20 0,-5" fill="#0097a7" />
+                                    <path d="M0 -15 L1 -10 L6 -9 L1 -8 L0 -3 L-1 -8 L-6 -9 L-1 -10 Z" fill="#ffffff" />
+                                </g>
+                            </g>
+                        </g>
+
                     </svg>
                 </div>
                 <div class="input-area"><input type="text" class="answer-input" id="answer6" placeholder=""><button class="submit-btn" id="submit6">Execute</button></div>
@@ -529,7 +501,7 @@
             <div id="level-complete" class="tab-content" style="display: none;">
                 <div class="success-message">Excellent work! Mastery achieved!</div>
                 <div style="text-align: center;">
-                    <!-- Updated Diamond in Success Screen -->
+                    <!-- Beautiful Victory Diamond -->
                     <svg width="250" height="250" viewBox="0 0 100 100">
                         <circle cx="50" cy="45" r="45" fill="#b2ebf2" opacity="0.6" />
                         <polygon points="50,10 80,40 50,90 20,40" fill="#00e5ff" />
@@ -554,6 +526,173 @@
         };
 
         const gameState = { currentLevel: 1, totalLevels: 6, completedLevels: 0 };
+
+        // --- WEB AUDIO API SYNTHESIZER FOR SOUND EFFECTS ---
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                const AC = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AC();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+
+            if (type === 'door') {
+                // Highly realistic heavy creaking door
+                const dur = 1.2;
+                
+                // Deep Rumble
+                const bufSize = audioCtx.sampleRate * dur;
+                const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+                const data = buf.getChannelData(0);
+                for(let i=0; i<bufSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
+                const rumbleSrc = audioCtx.createBufferSource();
+                rumbleSrc.buffer = buf;
+                
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(150, now);
+                filter.frequency.linearRampToValueAtTime(50, now + dur);
+                
+                const rumbleGain = audioCtx.createGain();
+                rumbleGain.gain.setValueAtTime(0, now);
+                rumbleGain.gain.linearRampToValueAtTime(0.8, now + 0.2);
+                rumbleGain.gain.linearRampToValueAtTime(0, now + dur);
+                
+                rumbleSrc.connect(filter).connect(rumbleGain).connect(audioCtx.destination);
+                rumbleSrc.start(now);
+                
+                // Wooden Hinge Creak
+                const creak = audioCtx.createOscillator();
+                creak.type = 'sawtooth';
+                creak.frequency.setValueAtTime(80, now);
+                creak.frequency.exponentialRampToValueAtTime(20, now + dur);
+                
+                const creakGain = audioCtx.createGain();
+                creakGain.gain.setValueAtTime(0, now);
+                creakGain.gain.linearRampToValueAtTime(0.4, now + 0.1);
+                creakGain.gain.linearRampToValueAtTime(0, now + dur);
+                
+                const stutter = audioCtx.createOscillator();
+                stutter.type = 'square';
+                stutter.frequency.setValueAtTime(12, now);
+                stutter.frequency.linearRampToValueAtTime(5, now + dur);
+                const stutterGain = audioCtx.createGain();
+                stutterGain.gain.value = 0.5;
+                stutter.connect(stutterGain).connect(creakGain.gain);
+                
+                creak.connect(creakGain).connect(audioCtx.destination);
+                stutter.start(now);
+                creak.start(now);
+                
+                stutter.stop(now + dur);
+                creak.stop(now + dur);
+                rumbleSrc.stop(now + dur);
+
+            } else if (type === 'stairs') {
+                for(let i=0; i<8; i++) {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(80 - i*2, now + i*0.4);
+                    gain.gain.setValueAtTime(0, now + i*0.4);
+                    gain.gain.linearRampToValueAtTime(0.15, now + i*0.4 + 0.05);
+                    gain.gain.linearRampToValueAtTime(0, now + i*0.4 + 0.15);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(now + i*0.4); osc.stop(now + i*0.4 + 0.15);
+                }
+            } else if (type === 'dog') {
+                // Highly realistic formant/noise bark
+                for(let i=0; i<2; i++) {
+                    const start = now + i * 0.35;
+                    const dur = 0.25;
+
+                    const osc = audioCtx.createOscillator();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(300, start);
+                    osc.frequency.exponentialRampToValueAtTime(80, start + 0.1);
+                    
+                    const oscGain = audioCtx.createGain();
+                    oscGain.gain.setValueAtTime(0, start);
+                    oscGain.gain.linearRampToValueAtTime(1.2, start + 0.02);
+                    oscGain.gain.exponentialRampToValueAtTime(0.01, start + dur);
+
+                    osc.connect(oscGain).connect(audioCtx.destination);
+                    osc.start(start); osc.stop(start + dur);
+
+                    const bufferSize = audioCtx.sampleRate * dur;
+                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let j = 0; j < bufferSize; j++) data[j] = Math.random() * 2 - 1;
+                    
+                    const noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
+
+                    const filter = audioCtx.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.Q.value = 1.0;
+                    filter.frequency.setValueAtTime(1200, start);
+                    filter.frequency.exponentialRampToValueAtTime(300, start + 0.1);
+
+                    const noiseGain = audioCtx.createGain();
+                    noiseGain.gain.setValueAtTime(0, start);
+                    noiseGain.gain.linearRampToValueAtTime(2.0, start + 0.02);
+                    noiseGain.gain.exponentialRampToValueAtTime(0.01, start + dur);
+
+                    noise.connect(filter).connect(noiseGain).connect(audioCtx.destination);
+                    noise.start(start);
+                }
+            } else if (type === 'bounce') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.5);
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.2, now + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(now); osc.stop(now + 0.5);
+            } else if (type === 'key') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.setValueAtTime(900, now + 0.1);
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.1, now + 0.02);
+                gain.gain.setValueAtTime(0, now + 0.05);
+                gain.gain.setValueAtTime(0.1, now + 0.1);
+                gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(now); osc.stop(now + 0.15);
+            } else if (type === 'victory') {
+                const freqs =[523.25, 659.25, 783.99, 1046.50];
+                freqs.forEach((f, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(f, now + i*0.12);
+                    gain.gain.setValueAtTime(0, now + i*0.12);
+                    gain.gain.linearRampToValueAtTime(0.2, now + i*0.12 + 0.02);
+                    if (i === freqs.length - 1) {
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + i*0.12 + 1.0);
+                        osc.start(now + i*0.12); osc.stop(now + i*0.12 + 1.0);
+                    } else {
+                        gain.gain.linearRampToValueAtTime(0, now + i*0.12 + 0.12);
+                        osc.start(now + i*0.12); osc.stop(now + i*0.12 + 0.12);
+                    }
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                });
+            }
+        }
 
         function getAIResponse(input, levelNum) {
             const val = input.trim();
@@ -581,34 +720,49 @@
             document.getElementById(`level${gameState.currentLevel}`).style.display = 'none';
             gameState.completedLevels++;
             document.getElementById('progress-bar').style.width = `${(gameState.completedLevels / gameState.totalLevels) * 100}%`;
+            
             if (gameState.currentLevel < gameState.totalLevels) {
                 gameState.currentLevel++;
                 document.getElementById(`level${gameState.currentLevel}`).style.display = 'block';
                 document.getElementById('level-indicator').textContent = `Level ${gameState.currentLevel}`;
-            } else { document.getElementById('level-complete').style.display = 'block'; }
+                
+                if (gameState.currentLevel === 3) {
+                    setTimeout(() => playSound('dog'), 200);
+                }
+            } else { 
+                document.getElementById('level-complete').style.display = 'block'; 
+            }
         }
 
         function triggerLevel(levelNum, onWin) {
+            initAudio();
             const input = document.getElementById(`answer${levelNum}`).value;
             const msg = document.getElementById(`message${levelNum}`);
             const feedback = getAIResponse(input, levelNum);
+            
             if (feedback === "SUCCESS") {
                 msg.textContent = "Correct! Outstanding!"; msg.style.color = "#2E8B57";
                 onWin(input);
                 setTimeout(showNext, 4500);
-            } else { msg.textContent = feedback; msg.style.color = "#b21f1f"; }
+            } else { 
+                msg.textContent = feedback; msg.style.color = "#b21f1f"; 
+            }
         }
 
-        // --- ANIMATION TRIGGERS ---
+        // --- ANIMATION & SOUND TRIGGERS ---
         
         document.getElementById('submit1').onclick = () => triggerLevel(1, () => {
             const lvl = document.getElementById('level1');
             lvl.classList.add('is-walking');
-            setTimeout(() => lvl.classList.add('open-gate'), 1200);
+            setTimeout(() => {
+                lvl.classList.add('open-gate');
+                playSound('door'); 
+            }, 1200);
         });
 
         document.getElementById('submit2').onclick = () => triggerLevel(2, () => {
             document.getElementById('level2').classList.add('is-climbing');
+            playSound('stairs'); 
         });
 
         document.getElementById('submit3').onclick = () => triggerLevel(3, () => {
@@ -617,17 +771,20 @@
 
         document.getElementById('submit4').onclick = () => triggerLevel(4, () => {
             document.getElementById('level4').classList.add('is-jumping');
+            playSound('bounce'); 
         });
 
         document.getElementById('submit5').onclick = () => triggerLevel(5, () => {
             document.getElementById('level5').classList.add('is-walking-l5');
+            setTimeout(() => playSound('key'), 2500); 
         });
 
         document.getElementById('submit6').onclick = () => triggerLevel(6, () => {
             document.getElementById('level6').classList.add('is-extracting');
             
-            // Wait until the gem is planted onto the chest (2.5 seconds) before scattering flowers
             setTimeout(() => {
+                playSound('victory'); 
+                
                 const container = document.getElementById('game-container6');
                 for (let i = 0; i < 50; i++) {
                     const c = document.createElement('div');
@@ -642,7 +799,7 @@
                         { transform: `translateY(400px) rotate(${Math.random() * 720 + 360}deg)`, opacity: 0 }
                     ], 2000 + Math.random() * 1000).onfinish = () => c.remove();
                 }
-            }, 2500);
+            }, 1500); 
         });
 
         document.querySelectorAll('.answer-input').forEach((el, i) => {
