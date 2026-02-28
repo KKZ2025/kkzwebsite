@@ -3,40 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Castle Treasure Hunt - AI Enhanced Practice</title>
+    <title>Castle Treasure Hunt - AI Master Edition</title>
     <style>
-        /* CSS remains identical to maintain your UI */
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex; flex-direction: column; align-items: center;
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             margin: 0; padding: 20px; min-height: 100vh; color: #333;
         }
+        
         .container {
             width: 100%; max-width: 1000px; background-color: rgba(255, 255, 255, 0.95);
             border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); overflow: hidden; position: relative;
         }
+        
         header { background: linear-gradient(to right, #4CAF50, #2E8B57); color: white; padding: 20px; text-align: center; }
         .game-area { padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
         .game-container {
             width: fit-content; max-width: 100%; height: auto; border: 5px solid #4CAF50;
             position: relative; overflow: hidden; margin-bottom: 20px; border-radius: 10px; background: #fff;
         }
-        .background-img { display: block; max-width: 100%; max-height: 75vh; height: auto; position: relative; z-index: 1; }
-        .warrior-char { width: 120px; height: auto; position: absolute; z-index: 10; transition: all 2.5s ease-in-out; }
-        #warrior2 { width: 160px; }
-        #warrior4 { width: 220px; transition: transform 0.6s ease-out, left 2.5s, bottom 2.5s; }
-        #warrior6 { width: 220px; }
+        
         .input-area { display: flex; gap: 10px; margin-top: 15px; width: 100%; justify-content: center; }
         .answer-input { padding: 12px; font-size: 16px; width: 350px; border: 2px solid #4CAF50; border-radius: 5px; outline: none; }
-        .submit-btn { padding: 12px 24px; font-size: 16px; background: linear-gradient(to bottom, #4CAF50, #2E8B57); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .submit-btn {
+            padding: 12px 24px; font-size: 16px; background: linear-gradient(to bottom, #4CAF50, #2E8B57);
+            color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;
+        }
+        
         .message { margin-top: 15px; font-size: 18px; min-height: 50px; text-align: center; font-weight: bold; max-width: 80%; line-height: 1.4; }
-        .level-indicator { font-size: 24px; margin-bottom: 15px; font-weight: bold; color: #2E8B57; }
+        .level-indicator { font-size: 24px; margin-bottom: 15px; font-weight: bold; color: #2E8B57; text-align: center; }
         .progress-container { width: 100%; background-color: #e0e0e0; border-radius: 10px; margin-bottom: 20px; height: 20px; overflow: hidden; }
         .progress-bar { height: 100%; background: linear-gradient(to right, #4CAF50, #2E8B57); width: 0%; transition: width 0.5s ease; }
         .instructions { background-color: #f1f8e9; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #4CAF50; width: 100%; }
-        .success-message { text-align: center; font-size: 28px; color: #2E8B57; margin: 20px 0; font-weight: bold; }
+
+        /* --- SVG UNIVERSAL ANIMATION STYLES --- */
+        .svg-canvas { width: 800px; height: 450px; display: block; }
+        #svg-l1 { background: #81d4fa; }
+        #svg-l2 { background: #cfd8dc; } 
+        #svg-l3 { background: #b0bec5; } 
+        #svg-l4 { background: #cfd8dc; } 
+        #svg-l5, #svg-l6 { background: #90a4ae; } 
+        
+        /* Slow Leg Movements */
+        .is-walking .walk-leg, .is-climbing .walk-leg, .is-walking-l5 .walk-leg { animation: leg-swing 0.3s infinite alternate; transform-origin: 15px 50px; }
+        .is-walking .walk-leg-rev, .is-climbing .walk-leg-rev, .is-walking-l5 .walk-leg-rev { animation: leg-swing 0.3s infinite alternate-reverse; transform-origin: 25px 50px; }
+        @keyframes leg-swing { from { transform: rotate(-20deg); } to { transform: rotate(20deg); } }
+
+        /* Fast Running Legs */
+        .is-running .run-leg-l { animation: sprint-cycle 0.15s infinite alternate; transform-origin: 15px 50px; }
+        .is-running .run-leg-r { animation: sprint-cycle 0.15s infinite alternate-reverse; transform-origin: 25px 50px; }
+        .is-running .dog-leg-1 { animation: sprint-cycle 0.15s infinite alternate; transform-origin: 84px 45px; }
+        .is-running .dog-leg-2 { animation: sprint-cycle 0.15s infinite alternate-reverse; transform-origin: 99px 45px; }
+        .is-running .dog-leg-3 { animation: sprint-cycle 0.15s infinite alternate; transform-origin: 129px 45px; }
+        .is-running .dog-leg-4 { animation: sprint-cycle 0.15s infinite alternate-reverse; transform-origin: 144px 45px; }
+        @keyframes sprint-cycle { from { transform: rotate(-40deg); } to { transform: rotate(40deg); } }
+
+        /* --- LEVEL 1 --- */
+        .is-walking #warrior-group-1 { 
+            transform: translate(520px, 345px) !important; opacity: 0;
+            transition: transform 3s linear, opacity 0.8s 2.2s; 
+        }
+        .open-gate #door-l { transform: scaleX(0.1); transition: transform 1.2s; transform-origin: 500px center; }
+        .open-gate #door-r { transform: scaleX(0.1); transition: transform 1.2s; transform-origin: 600px center; }
+
+        /* --- LEVEL 2 --- */
+        .is-climbing #warrior-group-2 { animation: climb-stairs 4s forwards linear; }
+        @keyframes climb-stairs {
+            0%   { transform: translate(50px, 336px) scale(0.85); } 
+            8%   { transform: translate(90px, 336px) scale(0.85); } 
+            12%  { transform: translate(110px, 316px) scale(0.85); } 
+            17%  { transform: translate(140px, 316px) scale(0.85); }
+            21%  { transform: translate(160px, 296px) scale(0.85); } 
+            26%  { transform: translate(190px, 296px) scale(0.85); }
+            30%  { transform: translate(210px, 276px) scale(0.85); } 
+            35%  { transform: translate(240px, 276px) scale(0.85); }
+            39%  { transform: translate(260px, 256px) scale(0.85); } 
+            44%  { transform: translate(290px, 256px) scale(0.85); }
+            48%  { transform: translate(310px, 236px) scale(0.85); } 
+            53%  { transform: translate(340px, 236px) scale(0.85); }
+            57%  { transform: translate(360px, 216px) scale(0.85); } 
+            62%  { transform: translate(390px, 216px) scale(0.85); }
+            66%  { transform: translate(410px, 196px) scale(0.85); } 
+            71%  { transform: translate(440px, 196px) scale(0.85); }
+            75%  { transform: translate(460px, 176px) scale(0.85); } 
+            80%  { transform: translate(490px, 176px) scale(0.85); }
+            84%  { transform: translate(510px, 156px) scale(0.85); } 
+            89%  { transform: translate(540px, 156px) scale(0.85); }
+            93%  { transform: translate(560px, 136px) scale(0.85); } 
+            100% { transform: translate(650px, 136px) scale(0.85); }
+        }
+
+        /* --- LEVEL 3 --- */
+        #dog-body { transform-origin: 110px 25px; transform: scaleX(-1); }
+        .is-running #dog-body { animation: dog-flip 2s forwards linear; }
+        .is-running #warrior-group-3 { animation: warrior-sprint 2s forwards linear; }
+        .is-running #dog-group { animation: dog-sprint 2s forwards linear; }
+        
+        @keyframes dog-flip { 0%, 25% { transform: scaleX(-1); } 26%, 100% { transform: scaleX(1); } }
+        @keyframes dog-sprint { 0%, 25% { transform: translate(150px, 350px) scale(0.6); } 100% { transform: translate(400px, 350px) scale(0.6); } }
+        @keyframes warrior-sprint { 0% { transform: translate(70px, 316px) scale(0.85) rotate(15deg); } 100% { transform: translate(530px, 316px) scale(0.85) rotate(15deg); } }
+
+        /* --- LEVEL 4 --- */
+        .is-jumping #warrior-group-4 { animation: jump-straight 1.5s forwards ease-in-out; }
+        .is-jumping #l4-arm { animation: arm-reach 1.5s forwards ease-in-out; transform-origin: 25px 25px; }
+        .is-jumping #l4-key { animation: key-vanish 1.5s forwards; }
+
+        @keyframes jump-straight {
+            0%   { transform: translate(380px, 295px) scale(1.4); } 
+            40%  { transform: translate(380px, 50px) scale(1.4); } 
+            60%  { transform: translate(380px, 50px) scale(1.4); } 
+            100% { transform: translate(380px, 295px) scale(1.4); } 
+        }
+        @keyframes arm-reach { 0%, 30% { transform: rotate(0deg); } 45%, 70% { transform: rotate(-135deg); } 85%, 100% { transform: rotate(0deg); } }
+        @keyframes key-vanish { 0%, 50% { opacity: 1; transform: translate(460px, 15px) scale(1.5); } 55%, 100% { opacity: 0; transform: translate(460px, 15px) scale(0); } }
+
+        /* --- LEVEL 5 --- */
+        #l5-treasures { opacity: 0; }
+        .is-walking-l5 #l5-treasures { animation: reveal-treasure 3.5s forwards; }
+        .is-walking-l5 #warrior-group-5 { animation: walk-to-table 3.5s forwards linear; }
+        .is-walking-l5 #l5-arm { animation: insert-key 3.5s forwards; transform-origin: 45px 35px; }
+        .is-walking-l5 #chest-lid-l5 { animation: open-chest 3.5s forwards; }
+
+        @keyframes walk-to-table { 0% { transform: translate(150px, 275px) scale(1.4); } 60%, 100% { transform: translate(550px, 275px) scale(1.4); } }
+        @keyframes insert-key { 0%, 65% { transform: rotate(0deg); } 70%, 80% { transform: rotate(-50deg); } 85%, 100% { transform: rotate(0deg); } }
+        @keyframes open-chest { 0%, 80% { transform: rotate(0deg); } 90%, 100% { transform: rotate(130deg); } }
+        @keyframes reveal-treasure { 0%, 85% { opacity: 0; } 90%, 100% { opacity: 1; } }
+
+        /* --- LEVEL 6 --- */
+        .is-extracting #l6-arm { animation: extract-arm 2.5s forwards ease-in-out; transform-origin: 25px 25px; }
+        .is-extracting #l6-gem { animation: gem-rise 2.5s forwards ease-in-out; }
+
+        @keyframes extract-arm {
+            0% { transform: rotate(0deg); }
+            20%, 35% { transform: rotate(-20deg); } /* Reaches deep into chest */
+            50%, 65% { transform: rotate(-130deg); } /* Pulls up and out holding treasure */
+            75%, 85% { transform: rotate(100deg); } /* Slams diamond onto chest */
+            95%, 100% { transform: rotate(0deg); } /* Arm returns to neutral */
+        }
+        @keyframes gem-rise {
+            /* Starts hidden, magically appearing in the hand in the chest */
+            0%, 20% { transform: translate(-18px, 17px) scale(0.6); opacity: 0; }
+            25%, 35% { opacity: 1; transform: translate(-18px, 17px) scale(0.6); } 
+            /* Travels exactly to the final coordinates of the hand up high */
+            50%, 65% { transform: translate(-43px, -25px) scale(0.8); opacity: 1; } 
+            /* Planted permanently onto the warrior's chest */
+            75%, 100% { transform: translate(-69px, 22px) scale(0.5); opacity: 1; } 
+        }
     </style>
 </head>
 <body>
@@ -56,84 +172,385 @@
             
             <div class="instructions">
                 <h3>The Mission:</h3>
-                <p>Use your Chinese skills to guide the warrior. Type your command as a phrase or a full sentence!</p>
+                <p>Observe the scene and guide the knight using a Compound Directional Complement!</p>
             </div>
             
-            <!-- Level 1 -->
+            <!-- LEVEL 1 -->
             <div id="level1" class="tab-content active">
                 <div class="game-container">
-                    <img class="background-img" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/level1-bg.JPG?raw=true">
-                    <img class="warrior-char" id="warrior1" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior1.png?raw=true">
+                    <svg id="svg-l1" class="svg-canvas" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="420" width="800" height="30" fill="#388e3c" />
+                        <g>
+                            <rect x="400" y="100" width="300" height="320" fill="#90a4ae" stroke="#455a64" stroke-width="2" />
+                            <rect x="430" y="70" width="50" height="30" fill="#455a64" />
+                            <rect x="525" y="70" width="50" height="30" fill="#455a64" />
+                            <rect x="620" y="70" width="50" height="30" fill="#455a64" />
+                            <ellipse cx="460" cy="180" rx="15" ry="25" fill="#8d7d3c" stroke="#263238" stroke-width="3" />
+                            <ellipse cx="640" cy="180" rx="15" ry="25" fill="#8d7d3c" stroke="#263238" stroke-width="3" />
+                            <path d="M500 420 v-100 q 50 -50 100 0 v 100 Z" fill="#212121" />
+                            <path id="door-l" d="M500 420 v-100 q 25 -25 50 0 v 100 Z" fill="#6d4c41" stroke="#3e2723" />
+                            <path id="door-r" d="M600 420 v-100 q -25 -25 -50 0 v 100 Z" fill="#6d4c41" stroke="#3e2723" />
+                        </g>
+                        <!-- Warrior Grounded on Y=420 Floor -->
+                        <g id="warrior-group-1" style="transform: translate(80px, 345px);">
+                            <path d="M20 0 q 10 -20 30 -10" stroke="#d32f2f" stroke-width="4" fill="none" />
+                            <rect class="walk-leg" x="10" y="50" width="10" height="25" fill="#37474f" />
+                            <rect class="walk-leg-rev" x="25" y="50" width="10" height="25" fill="#37474f" />
+                            <path d="M5 15 h35 l -5 40 h-25 Z" fill="#e0e0e0" stroke="#37474f" />
+                            <path d="M40 35 l 25 -10" stroke="#b0bec5" stroke-width="5" stroke-linecap="round" />
+                            <path d="M40 35 l 5 5" stroke="#5d4037" stroke-width="8" />
+                            <path d="M-5 25 q 0 30 20 40 q 20 -10 20 -40 Z" fill="#1976d2" stroke="white" />
+                            <rect x="10" y="0" width="25" height="25" rx="5" fill="#546e7a" />
+                            <rect x="12" y="10" width="21" height="5" fill="#263238" />
+                        </g>
+                    </svg>
                 </div>
-                <div class="input-area"><input type="text" class="answer-input" id="answer1" placeholder="Enter your command..."><button class="submit-btn" id="submit1">Submit</button></div>
+                <div class="input-area"><input type="text" class="answer-input" id="answer1" placeholder="Type your command..."><button class="submit-btn" id="submit1">Submit</button></div>
                 <div class="message" id="message1"></div>
             </div>
             
-            <!-- Level 2 -->
+            <!-- LEVEL 2 -->
             <div id="level2" class="tab-content" style="display: none;">
                 <div class="game-container">
-                    <img class="background-img" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/level2-bg.JPG?raw=true">
-                    <img class="warrior-char" id="warrior2" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior2.png?raw=true">
+                    <svg id="svg-l2" class="svg-canvas" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                        <rect y="400" width="800" height="50" fill="#78909c" />
+                        <g fill="#90a4ae" stroke="#607d8b" stroke-width="3">
+                            <path d="M 150,220 L 150,280 L 180,280 L 180,220 Q 165,190 165,170 Q 165,190 150,220 Z" />
+                            <path d="M 350,150 L 350,210 L 380,210 L 380,150 Q 365,120 365,100 Q 365,120 350,150 Z" />
+                            <path d="M 550,70 L 550,130 L 580,130 L 580,70 Q 565,40 565,20 Q 565,40 550,70 Z" />
+                        </g>
+                        <g fill="#fff59d" opacity="0.6">
+                            <path d="M 153,222 L 153,277 L 177,277 L 177,222 Q 165,195 165,175 Q 165,195 153,222 Z" />
+                            <path d="M 353,152 L 353,207 L 377,207 L 377,152 Q 365,125 365,105 Q 365,125 353,152 Z" />
+                            <path d="M 553,72 L 553,127 L 577,127 L 577,72 Q 565,45 565,25 Q 565,45 553,72 Z" />
+                        </g>
+                        <path d="M 100 400 L 100 380 L 150 380 L 150 360 L 200 360 L 200 340 L 250 340 L 250 320 
+                                 L 300 320 L 300 300 L 350 300 L 350 280 L 400 280 L 400 260 L 450 260 L 450 240 
+                                 L 500 240 L 500 220 L 550 220 L 550 200 L 600 200 L 600 400 Z" 
+                              fill="#90a4ae" stroke="#546e7a" stroke-width="2" />
+                        <rect x="600" y="200" width="200" height="200" fill="#90a4ae" stroke="#546e7a" stroke-width="2" />
+                        <rect x="600" y="190" width="200" height="10" fill="#5d4037" />
+                        <rect x="620" y="150" width="10" height="40" fill="#4e342e" />
+                        <rect x="690" y="150" width="10" height="40" fill="#4e342e" />
+                        <rect x="760" y="150" width="10" height="40" fill="#4e342e" />
+                        <rect x="600" y="140" width="200" height="10" fill="#5d4037" />
+
+                        <g id="warrior-group-2" style="transform: translate(50px, 336px) scale(0.85);">
+                            <path d="M20 0 q 10 -20 30 -10" stroke="#d32f2f" stroke-width="4" fill="none" />
+                            <rect class="walk-leg" x="10" y="50" width="10" height="25" fill="#37474f" />
+                            <rect class="walk-leg-rev" x="25" y="50" width="10" height="25" fill="#37474f" />
+                            <path d="M5 15 h35 l -5 40 h-25 Z" fill="#e0e0e0" stroke="#37474f" />
+                            <path d="M40 35 l 25 -10" stroke="#b0bec5" stroke-width="5" stroke-linecap="round" />
+                            <path d="M40 35 l 5 5" stroke="#5d4037" stroke-width="8" />
+                            <path d="M-5 25 q 0 30 20 40 q 20 -10 20 -40 Z" fill="#1976d2" stroke="white" />
+                            <rect x="10" y="0" width="25" height="25" rx="5" fill="#546e7a" />
+                            <rect x="12" y="10" width="21" height="5" fill="#263238" />
+                        </g>
+                    </svg>
                 </div>
-                <div class="input-area"><input type="text" class="answer-input" id="answer2" placeholder="Enter your command..."><button class="submit-btn" id="submit2">Submit</button></div>
+                <div class="input-area"><input type="text" class="answer-input" id="answer2" placeholder=""><button class="submit-btn" id="submit2">Submit</button></div>
                 <div class="message" id="message2"></div>
             </div>
 
-            <!-- Level 3 -->
+            <!-- LEVEL 3 -->
             <div id="level3" class="tab-content" style="display: none;">
                 <div class="game-container">
-                    <img class="background-img" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/level3-bg.JPG?raw=true">
-                    <img class="warrior-char" id="warrior3" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior3.png?raw=true">
+                    <svg id="svg-l3" class="svg-canvas" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Floor -->
+                        <rect x="0" y="380" width="800" height="70" fill="#90a4ae" />
+                        <line x1="0" y1="380" x2="800" y2="380" stroke="#546e7a" stroke-width="4" />
+
+                        <!-- Wall Pictures -->
+                        <rect x="350" y="80" width="80" height="100" fill="#eceff1" stroke="#5d4037" stroke-width="6" />
+                        <circle cx="390" cy="130" r="20" fill="#b0bec5" />
+                        <rect x="480" y="100" width="120" height="80" fill="#eceff1" stroke="#5d4037" stroke-width="6" />
+                        <path d="M490 170 L520 130 L550 160 L570 140 L590 170 Z" fill="#b0bec5" />
+
+                        <!-- Target Cabinet -->
+                        <g transform="translate(620, 150)">
+                            <rect x="0" y="0" width="140" height="230" fill="#6d4c41" stroke="#3e2723" stroke-width="3" />
+                            <rect x="10" y="10" width="58" height="160" fill="#5d4037" stroke="#4e342e" stroke-width="2" />
+                            <circle cx="58" cy="90" r="4" fill="#ffb300" />
+                            <rect x="72" y="10" width="58" height="160" fill="#5d4037" stroke="#4e342e" stroke-width="2" />
+                            <circle cx="82" cy="90" r="4" fill="#ffb300" />
+                            <rect x="10" y="180" width="120" height="40" fill="#795548" stroke="#4e342e" stroke-width="2" />
+                            <circle cx="70" cy="200" r="5" fill="#ffb300" />
+                        </g>
+
+                        <!-- Golden Key -->
+                        <g transform="translate(625, 130)">
+                            <circle cx="10" cy="10" r="6" stroke="#ffb300" stroke-width="3" fill="none"/>
+                            <rect x="16" y="8" width="20" height="4" fill="#ffb300" />
+                            <rect x="30" y="12" width="4" height="6" fill="#ffb300" />
+                            <rect x="24" y="12" width="4" height="4" fill="#ffb300" />
+                        </g>
+
+                        <!-- Dog -->
+                        <g id="dog-group" style="transform: translate(150px, 350px) scale(0.6);">
+                            <!-- Dog body starts facing left, flips halfway through the animation -->
+                            <g id="dog-body">
+                                <path d="M 85 25 Q 55 20 45 10 Q 55 35 85 35 Z" fill="#fbc02d" />
+                                <rect class="dog-leg-2" x="80" y="45" width="8" height="30" rx="4" fill="#f9a825" />
+                                <rect class="dog-leg-1" x="95" y="45" width="8" height="30" rx="4" fill="#fbc02d" />
+                                <rect class="dog-leg-4" x="125" y="45" width="8" height="30" rx="4" fill="#f9a825" />
+                                <rect class="dog-leg-3" x="140" y="45" width="8" height="30" rx="4" fill="#fbc02d" />
+                                <rect x="75" y="20" width="70" height="35" rx="15" fill="#fbc02d" />
+                                <circle cx="135" cy="35" r="20" fill="#fbc02d" />
+                                <circle cx="150" cy="15" r="16" fill="#fbc02d" />
+                                <rect x="155" y="10" width="25" height="12" rx="5" fill="#fbc02d" />
+                                <circle cx="178" cy="12" r="3" fill="#3e2723" />
+                                <path d="M 160 20 L 175 25 L 160 25 Z" fill="#d32f2f" />
+                                <path d="M 140 10 Q 125 30 140 35 Q 150 25 150 10 Z" fill="#f9a825" />
+                                <circle cx="155" cy="10" r="2" fill="#3e2723" />
+                            </g>
+                        </g>
+
+                        <!-- Warrior -->
+                        <g id="warrior-group-3" style="transform: translate(70px, 316px) scale(0.85);">
+                            <path d="M20 0 q 10 -20 30 -10" stroke="#d32f2f" stroke-width="4" fill="none" />
+                            <rect class="run-leg-l" x="10" y="50" width="10" height="25" fill="#37474f" />
+                            <rect class="run-leg-r" x="25" y="50" width="10" height="25" fill="#37474f" />
+                            <path d="M5 15 h35 l -5 40 h-25 Z" fill="#e0e0e0" stroke="#37474f" />
+                            <path d="M40 35 l 25 -10" stroke="#b0bec5" stroke-width="5" stroke-linecap="round" />
+                            <path d="M40 35 l 5 5" stroke="#5d4037" stroke-width="8" />
+                            <path d="M-5 25 q 0 30 20 40 q 20 -10 20 -40 Z" fill="#1976d2" stroke="white" />
+                            <rect x="10" y="0" width="25" height="25" rx="5" fill="#546e7a" />
+                            <rect x="12" y="10" width="21" height="5" fill="#263238" />
+                        </g>
+                    </svg>
                 </div>
-                <div class="input-area"><input type="text" class="answer-input" id="answer3" placeholder="Enter your command..."><button class="submit-btn" id="submit3">Submit</button></div>
+                <div class="input-area"><input type="text" class="answer-input" id="answer3" placeholder=""><button class="submit-btn" id="submit3">Submit</button></div>
                 <div class="message" id="message3"></div>
             </div>
 
-            <!-- Level 4 -->
+            <!-- LEVEL 4 -->
             <div id="level4" class="tab-content" style="display: none;">
                 <div class="game-container">
-                    <img class="background-img" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/level4-bg.PNG?raw=true">
-                    <img class="warrior-char" id="warrior4" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior4.png?raw=true">
+                    <svg id="svg-l4" class="svg-canvas" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="400" width="800" height="50" fill="#9e9e9e" />
+                        <line x1="0" y1="400" x2="800" y2="400" stroke="#757575" stroke-width="4" />
+                        
+                        <!-- Zoomed Cabinet -->
+                        <g transform="translate(450, 50)">
+                            <rect x="0" y="0" width="280" height="350" fill="#6d4c41" stroke="#3e2723" stroke-width="4" />
+                            <rect x="20" y="20" width="116" height="240" fill="#5d4037" stroke="#4e342e" stroke-width="3" />
+                            <circle cx="116" cy="140" r="8" fill="#ffb300" />
+                            <rect x="144" y="20" width="116" height="240" fill="#5d4037" stroke="#4e342e" stroke-width="3" />
+                            <circle cx="164" cy="140" r="8" fill="#ffb300" />
+                            <rect x="20" y="270" width="240" height="60" fill="#795548" stroke="#4e342e" stroke-width="3" />
+                            <circle cx="140" cy="300" r="8" fill="#ffb300" />
+                        </g>
+
+                        <!-- Golden Key -->
+                        <g id="l4-key" style="transform: translate(460px, 15px) scale(1.5);">
+                            <circle cx="10" cy="10" r="6" stroke="#ffb300" stroke-width="3" fill="none"/>
+                            <rect x="16" y="8" width="20" height="4" fill="#ffb300" />
+                            <rect x="30" y="12" width="4" height="6" fill="#ffb300" />
+                            <rect x="24" y="12" width="4" height="4" fill="#ffb300" />
+                        </g>
+
+                        <!-- Zoomed Warrior -->
+                        <g id="warrior-group-4" style="transform: translate(380px, 295px) scale(1.4);">
+                            <path d="M20 0 q 10 -20 30 -10" stroke="#d32f2f" stroke-width="4" fill="none" />
+                            <rect class="walk-leg" x="10" y="50" width="10" height="25" fill="#37474f" />
+                            <rect class="walk-leg-rev" x="25" y="50" width="10" height="25" fill="#37474f" />
+                            <path d="M5 15 h35 l -5 40 h-25 Z" fill="#e0e0e0" stroke="#37474f" />
+                            
+                            <!-- Reaching Arm for jump -->
+                            <path id="l4-arm" d="M25 25 l 15 15" stroke="#e0e0e0" stroke-width="6" stroke-linecap="round" />
+                            
+                            <path d="M-5 25 q 0 30 20 40 q 20 -10 20 -40 Z" fill="#1976d2" stroke="white" />
+                            <rect x="10" y="0" width="25" height="25" rx="5" fill="#546e7a" />
+                            <rect x="12" y="10" width="21" height="5" fill="#263238" />
+                        </g>
+                    </svg>
                 </div>
-                <div class="input-area"><input type="text" class="answer-input" id="answer4" placeholder="Enter your command..."><button class="submit-btn" id="submit4">Execute</button></div>
+                <div class="input-area"><input type="text" class="answer-input" id="answer4" placeholder=""><button class="submit-btn" id="submit4">Execute</button></div>
                 <div class="message" id="message4"></div>
             </div>
 
-            <!-- Level 5 -->
+            <!-- LEVEL 5 -->
             <div id="level5" class="tab-content" style="display: none;">
                 <div class="game-container">
-                    <img class="background-img" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/level5-bg.JPG?raw=true">
-                    <img class="warrior-char" id="warrior5" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior5.png?raw=true">
+                    <svg id="svg-l5" class="svg-canvas" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="380" width="800" height="70" fill="#546e7a" />
+                        <line x1="0" y1="380" x2="800" y2="380" stroke="#37474f" stroke-width="4" />
+                        
+                        <!-- Left Cabinet -->
+                        <g transform="translate(50, 150)">
+                            <rect x="0" y="0" width="140" height="230" fill="#6d4c41" stroke="#3e2723" stroke-width="3" />
+                            <rect x="10" y="10" width="58" height="160" fill="#5d4037" stroke="#4e342e" stroke-width="2" />
+                            <circle cx="58" cy="90" r="4" fill="#ffb300" />
+                            <rect x="72" y="10" width="58" height="160" fill="#5d4037" stroke="#4e342e" stroke-width="2" />
+                            <circle cx="82" cy="90" r="4" fill="#ffb300" />
+                            <rect x="10" y="180" width="120" height="40" fill="#795548" stroke="#4e342e" stroke-width="2" />
+                            <circle cx="70" cy="200" r="5" fill="#ffb300" />
+                        </g>
+
+                        <!-- Scaled Table -->
+                        <rect x="560" y="320" width="140" height="15" fill="#5d4037" stroke="#3e2723" stroke-width="3"/>
+                        <rect x="575" y="335" width="15" height="45" fill="#4e342e" stroke="#3e2723" stroke-width="2"/>
+                        <rect x="670" y="335" width="15" height="45" fill="#4e342e" stroke="#3e2723" stroke-width="2"/>
+
+                        <!-- Scaled Red Treasure Chest (Starts Closed, reveals treasure inside) -->
+                        <g transform="translate(585, 285)">
+                            <!-- Interior Background (Dark) -->
+                            <path d="M 2 0 Q 45 -25 88 0 Z" fill="#212121" />
+                            
+                            <!-- The Hidden Treasures (Gold coins and Diamonds - Starts invisible!) -->
+                            <g id="l5-treasures">
+                                <circle cx="20" cy="-5" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="32" cy="-10" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="45" cy="-12" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="58" cy="-10" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="70" cy="-5" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="25" cy="-1" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="38" cy="-3" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="52" cy="-3" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="65" cy="-1" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <polygon points="45,-20 50,-15 45,-10 40,-15" fill="#00e5ff" />
+                                <polygon points="45,-20 50,-15 40,-15" fill="#b2ebf2" />
+                                <polygon points="28,-14 32,-9 28,-4 24,-9" fill="#ff4081" />
+                                <polygon points="62,-14 66,-9 62,-4 58,-9" fill="#00e5ff" />
+                            </g>
+
+                            <!-- Front Wall -->
+                            <rect x="0" y="0" width="90" height="35" fill="#b71c1c" stroke="#4a0000" stroke-width="3"/>
+                            <rect x="15" y="0" width="8" height="35" fill="#ffb300" stroke="#f57f17" stroke-width="1"/>
+                            <rect x="67" y="0" width="8" height="35" fill="#ffb300" stroke="#f57f17" stroke-width="1"/>
+                            <rect x="35" y="0" width="20" height="15" fill="#ffb300" stroke="#f57f17"/>
+                            <circle cx="45" cy="8" r="3" fill="#212121"/>
+                            
+                            <!-- The Lid that opens -->
+                            <path id="chest-lid-l5" d="M0 0 Q 45 -25 90 0 Z" fill="#d32f2f" stroke="#4a0000" stroke-width="3" style="transform-origin: 90px 0px;"/>
+                        </g>
+
+                        <!-- Warrior with Key -->
+                        <g id="warrior-group-5" style="transform: translate(150px, 275px) scale(1.4);">
+                            <path d="M20 0 q 10 -20 30 -10" stroke="#d32f2f" stroke-width="4" fill="none" />
+                            <rect class="walk-leg" x="10" y="50" width="10" height="25" fill="#37474f" />
+                            <rect class="walk-leg-rev" x="25" y="50" width="10" height="25" fill="#37474f" />
+                            <path d="M5 15 h35 l -5 40 h-25 Z" fill="#e0e0e0" stroke="#37474f" />
+                            
+                            <g id="l5-arm">
+                                <g transform="translate(35, 25)">
+                                    <circle cx="10" cy="10" r="6" stroke="#ffb300" stroke-width="3" fill="none"/>
+                                    <rect x="16" y="8" width="20" height="4" fill="#ffb300" />
+                                    <rect x="30" y="12" width="4" height="6" fill="#ffb300" />
+                                    <rect x="24" y="12" width="4" height="4" fill="#ffb300" />
+                                </g>
+                            </g>
+
+                            <path d="M-5 25 q 0 30 20 40 q 20 -10 20 -40 Z" fill="#1976d2" stroke="white" />
+                            <rect x="10" y="0" width="25" height="25" rx="5" fill="#546e7a" />
+                            <rect x="12" y="10" width="21" height="5" fill="#263238" />
+                        </g>
+                    </svg>
                 </div>
-                <div class="input-area"><input type="text" class="answer-input" id="answer5" placeholder="Enter your command..."><button class="submit-btn" id="submit5">Execute</button></div>
+                <div class="input-area"><input type="text" class="answer-input" id="answer5" placeholder=""><button class="submit-btn" id="submit5">Execute</button></div>
                 <div class="message" id="message5"></div>
             </div>
 
-            <!-- Level 6 -->
+            <!-- LEVEL 6 -->
             <div id="level6" class="tab-content" style="display: none;">
                 <div class="game-container" id="game-container6">
-                    <img class="background-img" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/level6-bg.JPG?raw=true">
-                    <img class="warrior-char" id="warrior6" src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior6.png?raw=true">
+                    <svg id="svg-l6" class="svg-canvas" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0" y="380" width="800" height="70" fill="#546e7a" />
+                        <line x1="0" y1="380" x2="800" y2="380" stroke="#37474f" stroke-width="4" />
+
+                        <!-- Centered Scaled Table -->
+                        <rect x="330" y="320" width="140" height="15" fill="#5d4037" stroke="#3e2723" stroke-width="3"/>
+                        <rect x="345" y="335" width="15" height="45" fill="#4e342e" stroke="#3e2723" stroke-width="2"/>
+                        <rect x="440" y="335" width="15" height="45" fill="#4e342e" stroke="#3e2723" stroke-width="2"/>
+
+                        <!-- Centered Scaled Red Treasure Chest -->
+                        <g transform="translate(355, 285)">
+                            <!-- Interior Background -->
+                            <path d="M 2 10 Q 45 -15 88 10 Z" fill="#212121" />
+                            
+                            <!-- Static Treasure Pile remaining in the chest -->
+                            <g id="l6-treasures">
+                                <circle cx="20" cy="5" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="32" cy="0" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="45" cy="-2" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="58" cy="0" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="70" cy="5" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="25" cy="9" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="38" cy="7" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="52" cy="7" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <circle cx="65" cy="9" r="6" fill="#ffd700" stroke="#b7950b" stroke-width="1"/>
+                                <polygon points="28,-4 32,1 28,6 24,1" fill="#ff4081" />
+                                <polygon points="62,-4 66,1 62,6 58,1" fill="#00e5ff" />
+                            </g>
+                            
+                            <!-- The Target Treasure (Upgraded Diamond, animated to chest) -->
+                            <g id="l6-gem" style="opacity: 0; transform-origin: 45px 20px;">
+                                <!-- Glowing aura -->
+                                <circle cx="45" cy="20" r="22" fill="#b2ebf2" opacity="0.6" />
+                                <!-- Main diamond shape -->
+                                <polygon points="45,0 65,15 45,40 25,15" fill="#00e5ff" />
+                                <!-- Facets -->
+                                <polygon points="45,0 25,15 45,15" fill="#84ffff" />
+                                <polygon points="45,0 65,15 45,15" fill="#00b8d4" />
+                                <polygon points="65,15 45,40 45,15" fill="#0097a7" />
+                                <!-- Sparkle / Reflection -->
+                                <path d="M45 5 L46 10 L51 11 L46 12 L45 17 L44 12 L39 11 L44 10 Z" fill="#ffffff" />
+                            </g>
+                            
+                            <!-- Front Wall -->
+                            <rect x="0" y="10" width="90" height="25" fill="#b71c1c" stroke="#4a0000" stroke-width="3"/>
+                            <rect x="15" y="10" width="8" height="25" fill="#ffb300" stroke="#f57f17" stroke-width="1"/>
+                            <rect x="67" y="10" width="8" height="25" fill="#ffb300" stroke="#f57f17" stroke-width="1"/>
+                            
+                            <!-- Lid (Pre-opened swinging completely to the right) -->
+                            <path d="M0 10 Q 45 -15 90 10 Z" fill="#d32f2f" stroke="#4a0000" stroke-width="3" style="transform: rotate(130deg); transform-origin: 90px 10px;"/>
+                        </g>
+
+                        <!-- Centered Scaled Warrior (Empty handed initially) -->
+                        <g id="warrior-group-6" style="transform: translate(320px, 275px) scale(1.4);">
+                            <path d="M20 0 q 10 -20 30 -10" stroke="#d32f2f" stroke-width="4" fill="none" />
+                            <rect x="10" y="50" width="10" height="25" fill="#37474f" />
+                            <rect x="25" y="50" width="10" height="25" fill="#37474f" />
+                            <path d="M5 15 h35 l -5 40 h-25 Z" fill="#e0e0e0" stroke="#37474f" />
+                            
+                            <!-- Animated Reaching Arm -->
+                            <path id="l6-arm" d="M25 25 l 15 15" stroke="#e0e0e0" stroke-width="6" stroke-linecap="round" />
+                            
+                            <path d="M-5 25 q 0 30 20 40 q 20 -10 20 -40 Z" fill="#1976d2" stroke="white" />
+                            <rect x="10" y="0" width="25" height="25" rx="5" fill="#546e7a" />
+                            <rect x="12" y="10" width="21" height="5" fill="#263238" />
+                        </g>
+                    </svg>
                 </div>
-                <div class="input-area"><input type="text" class="answer-input" id="answer6" placeholder="Enter your command..."><button class="submit-btn" id="submit6">Execute</button></div>
+                <div class="input-area"><input type="text" class="answer-input" id="answer6" placeholder=""><button class="submit-btn" id="submit6">Execute</button></div>
                 <div class="message" id="message6"></div>
             </div>
             
             <div id="level-complete" class="tab-content" style="display: none;">
-                <div class="success-message">Mastered! You are a Directional Complement Expert!</div>
-                <div style="text-align: center;"><img src="https://github.com/KKZ2025/kkzwebsite/blob/main/images/game7/warrior6.png?raw=true" style="width: 250px;"></div>
+                <div class="success-message">Excellent work! Mastery achieved!</div>
+                <div style="text-align: center;">
+                    <!-- Updated Diamond in Success Screen -->
+                    <svg width="250" height="250" viewBox="0 0 100 100">
+                        <circle cx="50" cy="45" r="45" fill="#b2ebf2" opacity="0.6" />
+                        <polygon points="50,10 80,40 50,90 20,40" fill="#00e5ff" />
+                        <polygon points="50,10 20,40 50,40" fill="#84ffff" />
+                        <polygon points="50,10 80,40 50,40" fill="#00b8d4" />
+                        <polygon points="80,40 50,90 50,40" fill="#0097a7" />
+                        <path d="M50 20 L52 30 L62 32 L52 34 L50 44 L48 34 L38 32 L48 30 Z" fill="#ffffff" />
+                    </svg>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const levelLogic = {
-            1: { targets: ['走进去', '跑进去'], verbs: ['走', '跑'], dir: '进', end: '去', goal: "enter the castle" },
-            2: { targets: ['走上去', '跑上去'], verbs: ['走', '跑'], dir: '上', end: '去', goal: "go up the stairs" },
-            3: { targets: ['跑过去', '冲过去'], verbs: ['跑', '冲'], dir: '过', end: '去', goal: "move across to the cabinet" },
-            4: { targets: ['跳起来'], verbs: ['跳'], dir: '起', end: '来', goal: "reach the top of the closet" }, 
-            5: { targets: ['走过去', '跑过去'], verbs: ['走', '跑'], dir: '过', end: '去', goal: "walk across to the table" },
-            6: { targets: ['拿出来', '取出来'], verbs: ['拿', '取'], dir: '出', end: '来', goal: "take the treasure out" }
+            1: { targets:['走进去', '跑进去'], verbs:['走', '跑'], dir: '进', end: '去', goal: "enter the castle" },
+            2: { targets:['走上去', '跑上去'], verbs:['走', '跑'], dir: '上', end: '去', goal: "climb the stairs" },
+            3: { targets:['跑过去', '冲过去'], verbs:['跑', '冲'], dir: '过', end: '去', goal: "cross to the cabinet" },
+            4: { targets:['跳起来'], verbs:['跳'], dir: '起', end: '来', goal: "reach the top" }, 
+            5: { targets:['走过去', '跑过去'], verbs:['走', '跑'], dir: '过', end: '去', goal: "walk to the table" },
+            6: { targets:['拿出来', '取出来'], verbs:['拿', '取'], dir: '出', end: '来', goal: "extract the treasure" }
         };
 
         const gameState = { currentLevel: 1, totalLevels: 6, completedLevels: 0 };
@@ -141,46 +558,23 @@
         function getAIResponse(input, levelNum) {
             const val = input.trim();
             const logic = levelLogic[levelNum];
-            
             if (logic.targets.some(t => val.includes(t))) return "SUCCESS";
-            if (val === "") return "The warrior is standing by for your command!";
-
-            // Narrative / Strategy
-            if (levelNum === 3 && val.includes("走过去")) {
-                return "Your grammar is spot on! However, look at that dog! 🐕 If the warrior only walks, he won't be fast enough. Can you think of a more urgent action verb?";
-            }
-            if (levelNum === 4 && val.includes("爬上去")) {
-                return "Clever thinking! Usually that would work, but the surface is too slippery to climb! 🧊 Can you think of a more explosive way to reach the top?";
-            }
-
+            if (val === "") return "The warrior awaits your command!";
+            
+            if (levelNum === 3 && val.includes("走过去")) return "Correct grammar! But that dog is fast! 🐕 Walking won't work. Use a more urgent verb!";
+            if (levelNum === 4 && val.includes("爬上去")) return "Clever! But the surface is too slippery to climb. Is there a more explosive way up?";
+            
             const hasVerb = logic.verbs.some(v => val.includes(v));
             const hasDir = Array.isArray(logic.dir) ? logic.dir.some(d => val.includes(d)) : val.includes(logic.dir);
             const correctEnd = Array.isArray(logic.end) ? logic.end[0] : logic.end;
             const hasEnd = val.includes(correctEnd);
             const hasWrongEnd = val.includes(correctEnd === '去' ? '来' : '去');
 
-            // --- CONTEXTUAL OPTIMIZATION ---
-            // Student has Verb + Wrong Direction + Correct Perspective (e.g., 走过去 in Level 1)
-            if (hasVerb && !hasDir && hasEnd) {
-                return `Very close! You have the right action and perspective, but now you have to **${logic.goal}**. Try a different middle direction word!`;
-            }
-
-            // Simple Directional check (e.g., 进去)
-            if (!hasVerb && hasDir && hasEnd) {
-                return "Spot on with the direction! Now, how does the warrior get there? (Walking? Running?). Add an action verb to the start!";
-            }
-
-            // Missing Perspective (e.g., 走进)
-            if (hasVerb && hasDir && !hasEnd && !hasWrongEnd) {
-                return "Nearly there! You have the action and the direction. Now, is he moving away from us or toward us? Add that final piece!";
-            }
-
-            // Perspective Error (e.g., mixing 来/去)
-            if (hasVerb && hasDir && hasWrongEnd) {
-                return "Great structure! Just one check: look at the warrior's path. Is he heading away into the scene, or toward us? Adjust that last character!";
-            }
-
-            return "Not quite. Remember the pattern: [Action Verb] + [Direction] + [Perspective]. You're doing great!";
+            if (hasVerb && !hasDir && hasEnd) return `Nearly there! You have the right action and perspective, but you must **${logic.goal}**. Try a different directional word!`;
+            if (!hasVerb && hasDir && hasEnd) return "Great job with the direction! But how does he move? Add an action verb!";
+            if (hasVerb && hasDir && !hasEnd && !hasWrongEnd) return "So close! Now, is he moving away or toward us? Add the last piece!";
+            if (hasVerb && hasDir && hasWrongEnd) return "Perfect structure! Just one check: Is he heading away or toward us?";
+            return "Not quite. Remember:[Action Verb] +[Direction] +[Perspective].";
         }
 
         function showNext() {
@@ -191,70 +585,65 @@
                 gameState.currentLevel++;
                 document.getElementById(`level${gameState.currentLevel}`).style.display = 'block';
                 document.getElementById('level-indicator').textContent = `Level ${gameState.currentLevel}`;
-            } else {
-                document.getElementById('level-complete').style.display = 'block';
-            }
+            } else { document.getElementById('level-complete').style.display = 'block'; }
         }
 
         function triggerLevel(levelNum, onWin) {
             const input = document.getElementById(`answer${levelNum}`).value;
             const msg = document.getElementById(`message${levelNum}`);
             const feedback = getAIResponse(input, levelNum);
-            
             if (feedback === "SUCCESS") {
-                msg.textContent = "Fantastic! That's the correct command!"; msg.style.color = "#2E8B57";
+                msg.textContent = "Correct! Outstanding!"; msg.style.color = "#2E8B57";
                 onWin(input);
-                setTimeout(showNext, 4000);
+                setTimeout(showNext, 4500);
             } else { msg.textContent = feedback; msg.style.color = "#b21f1f"; }
         }
 
-        // --- ANIMATIONS & POSITIONS ---
-        const warrior1 = document.getElementById('warrior1');
-        warrior1.style.left = '10%'; warrior1.style.bottom = '5%';
-        document.getElementById('submit1').onclick = () => triggerLevel(1, () => warrior1.style.left = '55%');
+        // --- ANIMATION TRIGGERS ---
+        
+        document.getElementById('submit1').onclick = () => triggerLevel(1, () => {
+            const lvl = document.getElementById('level1');
+            lvl.classList.add('is-walking');
+            setTimeout(() => lvl.classList.add('open-gate'), 1200);
+        });
 
-        const warrior2 = document.getElementById('warrior2');
-        warrior2.style.left = '10%'; warrior2.style.bottom = '5%';
         document.getElementById('submit2').onclick = () => triggerLevel(2, () => {
-            warrior2.style.left = '70%'; warrior2.style.bottom = '60%';
+            document.getElementById('level2').classList.add('is-climbing');
         });
 
-        const warrior3 = document.getElementById('warrior3');
-        warrior3.style.left = '5%'; warrior3.style.bottom = '5%';
-        document.getElementById('submit3').onclick = () => triggerLevel(3, () => warrior3.style.left = '80%');
-
-        const warrior4 = document.getElementById('warrior4');
-        warrior4.style.left = '15%'; warrior4.style.bottom = '5%';
-        document.getElementById('submit4').onclick = () => triggerLevel(4, (val) => {
-            if(val.includes("跳")) {
-                warrior4.style.transform = 'translateY(-380px)'; 
-                setTimeout(() => warrior4.style.transform = 'translateY(0)', 600);
-            }
+        document.getElementById('submit3').onclick = () => triggerLevel(3, () => {
+            document.getElementById('level3').classList.add('is-running');
         });
 
-        const warrior5 = document.getElementById('warrior5');
-        warrior5.style.left = '15%'; warrior5.style.bottom = '2%';
-        document.getElementById('submit5').onclick = () => triggerLevel(5, () => warrior5.style.left = '75%');
+        document.getElementById('submit4').onclick = () => triggerLevel(4, () => {
+            document.getElementById('level4').classList.add('is-jumping');
+        });
 
-        const warrior6 = document.getElementById('warrior6');
-        warrior6.style.left = '55%'; warrior6.style.bottom = '5%';
+        document.getElementById('submit5').onclick = () => triggerLevel(5, () => {
+            document.getElementById('level5').classList.add('is-walking-l5');
+        });
+
         document.getElementById('submit6').onclick = () => triggerLevel(6, () => {
-            warrior6.style.transform = 'scale(1.2)';
-            createConfetti();
+            document.getElementById('level6').classList.add('is-extracting');
+            
+            // Wait until the gem is planted onto the chest (2.5 seconds) before scattering flowers
+            setTimeout(() => {
+                const container = document.getElementById('game-container6');
+                for (let i = 0; i < 50; i++) {
+                    const c = document.createElement('div');
+                    c.style.position = 'absolute'; c.style.width = '12px'; c.style.height = '12px';
+                    c.style.backgroundColor =['#ff4081', '#ffea00', '#00e676', '#29b6f6', '#ab47bc'][Math.floor(Math.random()*5)];
+                    c.style.borderRadius = '50% 0 50% 0';
+                    c.style.left = Math.random() * 100 + '%'; c.style.top = '-20px';
+                    container.appendChild(c);
+                    
+                    c.animate([
+                        { transform: 'translateY(0) rotate(0deg)', opacity: 1 }, 
+                        { transform: `translateY(400px) rotate(${Math.random() * 720 + 360}deg)`, opacity: 0 }
+                    ], 2000 + Math.random() * 1000).onfinish = () => c.remove();
+                }
+            }, 2500);
         });
-
-        function createConfetti() {
-            const container = document.getElementById('game-container6');
-            const rect = container.getBoundingClientRect();
-            for (let i = 0; i < 80; i++) {
-                const c = document.createElement('div');
-                c.style.position = 'absolute'; c.style.width = '10px'; c.style.height = '10px';
-                c.style.backgroundColor = ['#ff0', '#f0f', '#0ff', '#f00'][Math.floor(Math.random()*4)];
-                c.style.left = Math.random() * 100 + '%'; c.style.top = '-10px'; c.style.zIndex = '20';
-                container.appendChild(c);
-                c.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: `translateY(${rect.height}px)`, opacity: 0 }], 2000).onfinish = () => c.remove();
-            }
-        }
 
         document.querySelectorAll('.answer-input').forEach((el, i) => {
             el.onkeypress = (e) => { if(e.key === 'Enter') document.getElementById(`submit${i+1}`).click(); };
