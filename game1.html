@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentence Ending "了" Pair PK Game</title>
+    <title>Sentence Ending "了" Lantern Riddles</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,7 +14,8 @@
         }
         
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            /* Festive red gradient background */
+            background: linear-gradient(135deg, #8a0303 0%, #d32f2f 100%);
             min-height: 100vh;
             padding: 20px;
             display: flex;
@@ -25,614 +26,859 @@
         
         .container {
             width: 100%;
-            max-width: 1000px;
-            background: white;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
             padding: 30px;
-            margin-top: 20px;
+            margin-top: 10px;
+            border: 2px solid #ffd700;
         }
         
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             color: white;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
             margin: -30px -30px 30px;
             padding: 25px;
             border-radius: 20px 20px 0 0;
+            border-bottom: 4px solid #ffd700;
         }
         
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
         }
         
         .subtitle {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            color: #fff8e1;
             opacity: 0.9;
         }
         
-        .game-area {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-        
-        .wheel-container {
-            flex: 1;
-            min-width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-        }
-        
-        .wheel-wrapper {
-            position: relative;
-            width: 350px;
-            height: 350px;
-            margin: 20px 0;
-        }
-        
-        .wheel {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: relative;
-            overflow: hidden;
-            border: 10px solid #ff9f43;
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
-        }
-        
-        .wheel-section {
-            position: absolute;
-            width: 50%;
-            height: 50%;
-            transform-origin: bottom right;
-            left: 0;
-            top: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 10px;
-            font-weight: bold;
-            font-size: 1rem;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
-        }
-        
-        .pointer {
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 60px;
-            background: #ff6b6b;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            z-index: 10;
-        }
-        
-        .spin-btn {
-            background: linear-gradient(135deg, #ff9f43 0%, #feca57 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 7px 20px rgba(255, 159, 67, 0.4);
-            margin-top: 20px;
-        }
-        
-        .spin-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(255, 159, 67, 0.6);
-        }
-        
-        .spin-btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .players-container {
-            flex: 1;
-            min-width: 300px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .players-title {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-        }
-        
+        /* Players Section */
         .players {
             display: flex;
-            flex-wrap: wrap;
             gap: 20px;
             justify-content: center;
+            margin-bottom: 20px;
         }
         
         .player {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            min-width: 150px;
+            background: #fff8e1;
+            border-radius: 15px;
+            padding: 15px 25px;
+            min-width: 160px;
             text-align: center;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-            border-left: 4px solid #3498db;
+            position: relative;
+            transition: all 0.3s;
+            border: 2px solid #e0e0e0;
+        }
+
+        .player:not(.active) {
+            opacity: 0.6;
+            transform: scale(0.95);
         }
         
         .player.active {
-            box-shadow: 0 0 15px rgba(52, 152, 219, 0.6);
+            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.3);
             transform: scale(1.05);
-            transition: all 0.3s;
+            border: 2px solid #d32f2f;
+            background: #ffffff;
         }
-        
-        .player-name {
+
+        .turn-badge {
+            display: none;
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #d32f2f;
+            color: white;
+            padding: 4px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: bold;
-            margin-bottom: 10px;
-            color: #2c3e50;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            white-space: nowrap;
+            animation: bounce 1s infinite alternate;
+        }
+
+        .player.active .turn-badge {
+            display: block;
+        }
+
+        @keyframes bounce {
+            from { top: -12px; }
+            to { top: -18px; }
         }
         
         .player-score {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: bold;
-            color: #3498db;
+            color: #d32f2f;
+            margin: 5px 0;
         }
         
-        .add-score-btn {
-            background: #2ecc71;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 50px;
-            font-size: 0.9rem;
+        /* Lantern Riddles Section */
+        .lantern-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin: 30px 0 40px 0;
+            padding-top: 20px;
+            position: relative;
+        }
+
+        .lantern-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             cursor: pointer;
+            transform-origin: top center;
             transition: all 0.3s;
-            margin-top: 10px;
-            width: 100%;
         }
-        
-        .add-score-btn:hover {
-            background: #27ae60;
+
+        .lantern-wrapper:hover:not(.solved) {
+            transform: scale(1.1);
         }
-        
-        .challenge-section {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 30px;
+
+        /* Unique swinging animations so they don't look robotic */
+        .lantern-wrapper:nth-child(1) { animation: swing 3s infinite ease-in-out alternate; }
+        .lantern-wrapper:nth-child(2) { animation: swing 3.5s infinite ease-in-out alternate-reverse; }
+        .lantern-wrapper:nth-child(3) { animation: swing 2.8s infinite ease-in-out alternate; }
+        .lantern-wrapper:nth-child(4) { animation: swing 3.2s infinite ease-in-out alternate-reverse; }
+        .lantern-wrapper:nth-child(5) { animation: swing 3.1s infinite ease-in-out alternate; }
+        .lantern-wrapper:nth-child(6) { animation: swing 3.4s infinite ease-in-out alternate-reverse; }
+
+        @keyframes swing {
+            0% { transform: rotate(-5deg); }
+            100% { transform: rotate(5deg); }
         }
-        
-        .challenge-title {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
+
+        .lantern-string {
+            width: 2px;
+            height: 25px;
+            background: #333;
+            margin-bottom: -2px;
         }
-        
-        .challenge {
-            font-size: 1.4rem;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #2c3e50;
-            min-height: 70px;
+
+        .lantern-cap-top {
+            width: 35px;
+            height: 8px;
+            background: #ffd700;
+            border-radius: 3px 3px 0 0;
+            z-index: 2;
+        }
+
+        .lantern-body {
+            width: 70px;
+            height: 85px;
+            background: radial-gradient(circle at 30% 30%, #ff4e50, #c62828);
+            border-radius: 30px;
+            border: 2px solid #ffd700;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 0 20px rgba(255, 78, 80, 0.6);
+            position: relative;
         }
-        
-        .correct-answer {
-            font-size: 1.2rem;
-            text-align: center;
-            margin: 15px 0;
-            color: #2c3e50;
-            background: #e8f5e9;
-            padding: 10px;
+
+        .lantern-body::before {
+            content: "";
+            position: absolute;
+            width: 40px;
+            height: 100%;
+            border-left: 1px solid rgba(255, 215, 0, 0.3);
+            border-right: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+        }
+
+        .lantern-text {
+            color: #ffd700;
+            font-size: 1.8rem;
+            font-weight: bold;
+            z-index: 2;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            font-family: 'Kaiti', 'STKaiti', serif; /* Traditional font look */
+        }
+
+        .lantern-cap-bottom {
+            width: 35px;
+            height: 6px;
+            background: #ffd700;
+            border-radius: 0 0 3px 3px;
+            z-index: 2;
+        }
+
+        .lantern-tassel {
+            width: 15px;
+            height: 35px;
+            background: repeating-linear-gradient(90deg, #c62828, #c62828 2px, transparent 2px, transparent 4px);
+            margin-top: 2px;
+        }
+
+        /* When a lantern is played */
+        .lantern-wrapper.solved {
+            opacity: 0.3;
+            pointer-events: none;
+            animation: none;
+            transform: rotate(0deg);
+            filter: grayscale(100%);
+        }
+
+        .lantern-wrapper.solved .lantern-body {
+            box-shadow: none;
+        }
+
+        /* Action Area */
+        .action-area {
+            background: #fffdf5;
+            border-radius: 15px;
+            padding: 20px;
+            display: none; 
+            animation: fadeIn 0.5s;
+            border: 1px solid #ffd700;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .challenge-display {
+            background: white;
+            border: 2px dashed #d32f2f;
             border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .challenge-category {
+            color: #d32f2f;
+            font-size: 0.95rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .challenge-prompt {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .prompt-pinyin {
+            font-size: 1.1rem;
+            color: #e67e22;
             display: none;
         }
-        
-        .buttons {
+
+        .toggle-pinyin-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .toggle-pinyin-btn:hover {
+            background: #ffcdd2;
+        }
+
+        .input-modes {
             display: flex;
+            flex-direction: column;
             gap: 15px;
         }
-        
-        .check-btn {
-            background: linear-gradient(135deg, #2ecc71 0%, #1abc9c 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s;
+
+        .type-mode {
+            display: flex;
+            gap: 10px;
+        }
+
+        .type-input {
             flex: 1;
-            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
-        }
-        
-        .check-btn:hover {
-            transform: translateY(-3px);
-        }
-        
-        .next-btn {
-            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            flex: 1;
-            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.3);
-        }
-        
-        .next-btn:hover {
-            transform: translateY(-3px);
-        }
-        
-        .feedback {
-            margin-top: 20px;
             padding: 15px;
+            border: 2px solid #bdc3c7;
             border-radius: 10px;
-            text-align: center;
+            font-size: 1.2rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .type-input:focus { border-color: #d32f2f; }
+
+        .btn {
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
             font-weight: bold;
-            display: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        
-        .feedback.correct {
-            background: rgba(46, 204, 113, 0.1);
-            border: 1px solid #2ecc71;
-            color: #27ae60;
+
+        .submit-btn {
+            background: #d32f2f;
+            color: white;
         }
-        
-        .feedback.incorrect {
-            background: rgba(231, 76, 60, 0.1);
-            border: 1px solid #e74c3c;
-            color: #c0392b;
-        }
-        
-        .rules-section {
-            margin-top: 30px;
-            padding: 20px;
-            background: #fff8e1;
-            border-radius: 10px;
-            border-left: 5px solid #f39c12;
-        }
-        
-        .rules-title {
-            color: #f39c12;
-            margin-bottom: 15px;
+
+        .submit-btn:hover:not(:disabled) { background: #b71c1c; }
+
+        .or-divider {
             text-align: center;
-            font-size: 1.5rem;
+            color: #95a5a6;
+            font-size: 0.9rem;
+            position: relative;
         }
-        
-        .rule-item {
-            margin-bottom: 10px;
-            color: #7f8c8d;
-            padding: 5px 0;
+
+        .or-divider::before, .or-divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #bdc3c7;
         }
-        
-        @media (max-width: 900px) {
-            .game-area {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .wheel-wrapper {
-                width: 300px;
-                height: 300px;
-            }
+        .or-divider::before { left: 0; }
+        .or-divider::after { right: 0; }
+
+        .speak-btn {
+            background: #f39c12;
+            color: white;
+            width: 100%;
         }
+
+        .speak-btn:hover:not(:disabled) { background: #d35400; }
         
+        .speak-btn.listening {
+            background: #e74c3c;
+            animation: pulse-red 1.5s infinite;
+        }
+
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        .feedback-msg {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            min-height: 25px;
+            font-weight: bold;
+        }
+
+        /* Answer Display */
+        .correct-answer {
+            background: #e8f5e9;
+            border: 2px solid #2ecc71;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 15px;
+            display: none;
+            position: relative;
+        }
+
+        .audio-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .audio-btn:hover { transform: scale(1.1); }
+
+        .ans-chinese { font-size: 1.4rem; color: #2c3e50; font-weight: bold; }
+        .ans-pinyin { color: #7f8c8d; font-style: italic; margin-bottom: 8px; }
+        .ans-english { color: #34495e; margin-bottom: 10px; }
+        .ans-rule { font-size: 0.95rem; color: #d35400; background: rgba(211, 84, 0, 0.1); padding: 8px; border-radius: 5px; margin-top: 10px;}
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            color: white;
+        }
+
+        .show-ans-btn { background: #95a5a6; }
+        .show-ans-btn:hover:not(:disabled) { background: #7f8c8d; }
+        
+        .manual-score-btn { background: #f39c12; }
+        .manual-score-btn:hover:not(:disabled) { background: #d35400; }
+        
+        .next-turn-btn { background: #d32f2f; display: none; }
+        .next-turn-btn:hover { background: #b71c1c; }
+
+        .control-btn:disabled { background: #bdc3c7; cursor: not-allowed; }
+        
+        #restartBtn {
+            background: #d32f2f;
+            width: 100%;
+            margin-top: 15px;
+            display: none;
+            padding: 15px;
+            color: white;
+        }
+
+        .instruction-text {
+            text-align: center;
+            color: #d32f2f;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: -10px;
+        }
+
         @media (max-width: 600px) {
-            .wheel-wrapper {
-                width: 250px;
-                height: 250px;
-            }
-            
-            .wheel-section {
-                font-size: 0.8rem;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .container {
-                padding: 15px;
-            }
+            .type-mode { flex-direction: column; }
+            .lantern-container { gap: 15px; }
+            .lantern-body { width: 55px; height: 70px; }
+            .lantern-text { font-size: 1.4rem; }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Sentence Ending "了" Pair PK Game</h1>
-        <p class="subtitle">Say the correct sentence and earn points!</p>
+        <h1>Sentence Ending "了" Lantern Riddles</h1>
+        <p class="subtitle">Happy Lantern Festival! Pick a lantern to reveal a riddle.</p>
     </header>
     
     <div class="container">
-        <div class="game-area">
-            <div class="wheel-container">
-                <div class="wheel-wrapper">
-                    <div class="pointer"></div>
-                    <div class="wheel" id="wheel">
-                        <!-- 6 fixed sections with Chinese text as requested -->
-                        <div class="wheel-section" data-index="0" style="transform: rotate(0deg) skewY(30deg); background-color: #FF6B6B;">
-                            前天晚上+去+哪儿
-                        </div>
-                        <div class="wheel-section" data-index="1" style="transform: rotate(60deg) skewY(30deg); background-color: #4ECDC4;">
-                            昨天中午+吃饺子+affirmative sentence
-                        </div>
-                        <div class="wheel-section" data-index="2" style="transform: rotate(120deg) skewY(30deg); background-color: #FFE66D;">
-                            上周末+参观博物馆+Yes/No question with 了吗
-                        </div>
-                        <div class="wheel-section" data-index="3" style="transform: rotate(180deg) skewY(30deg); background-color: #6A0572;">
-                            前天下午+看电影+Yes/No question with 了没有
-                        </div>
-                        <div class="wheel-section" data-index="4" style="transform: rotate(240deg) skewY(30deg); background-color: #5C80BC;">
-                            昨天早上+买面包+Yes/No question with V没V
-                        </div>
-                        <div class="wheel-section" data-index="5" style="transform: rotate(300deg) skewY(30deg); background-color: #4C9173;">
-                            昨天下午+上中文课+negative sentence
-                        </div>
-                    </div>
-                </div>
-                <button class="spin-btn" id="spinBtn">Spin the Wheel</button>
+        
+        <div class="players">
+            <div class="player active" id="player1">
+                <div class="turn-badge">Your Turn!</div>
+                <div class="player-name">Player One</div>
+                <div class="player-score" id="score1">0</div>
             </div>
-            
-            <div class="players-container">
-                <h3 class="players-title">Player Scores</h3>
-                <div class="players">
-                    <div class="player active" id="player1">
-                        <div class="player-name">Player One</div>
-                        <div class="player-score">0</div>
-                        <button class="add-score-btn" data-player="1">Correct! +1 Point</button>
-                    </div>
-                    <div class="player" id="player2">
-                        <div class="player-name">Player Two</div>
-                        <div class="player-score">0</div>
-                        <button class="add-score-btn" data-player="2">Correct! +1 Point</button>
-                    </div>
+            <div class="player" id="player2">
+                <div class="turn-badge">Your Turn!</div>
+                <div class="player-name">Player Two</div>
+                <div class="player-score" id="score2">0</div>
+            </div>
+        </div>
+
+        <p class="instruction-text" id="instructionText"><i class="fas fa-hand-pointer"></i> Click a glowing lantern to draw a question!</p>
+
+        <!-- Lanterns -->
+        <div class="lantern-container" id="lanternContainer">
+            <!-- Dynamically generated in JS to allow shuffling -->
+        </div>
+
+        <!-- Action Area -->
+        <div class="action-area" id="actionArea">
+            <div class="challenge-display">
+                <button class="toggle-pinyin-btn" id="togglePinyinBtn"><i class="fas fa-eye"></i> Pinyin</button>
+                <div class="challenge-category" id="displayCategory">Category</div>
+                <div class="challenge-prompt" id="displayPrompt">Prompt goes here</div>
+                <div class="prompt-pinyin" id="displayPromptPinyin">pinyin goes here</div>
+            </div>
+
+            <div class="input-modes">
+                <div class="type-mode">
+                    <input type="text" id="typeInput" class="type-input" placeholder="Type Chinese answer here..." autocomplete="off">
+                    <button class="btn submit-btn" id="submitTypeBtn"><i class="fas fa-paper-plane"></i> Submit</button>
                 </div>
                 
-                <div class="challenge-section">
-                    <h3 class="challenge-title">Current Challenge</h3>
-                    <div class="challenge" id="challenge">
-                        Click "Spin the Wheel" to start
-                    </div>
-                    
-                    <div class="correct-answer" id="correctAnswer">
-                        <!-- Correct answer will be displayed here -->
-                    </div>
-                    
-                    <div class="buttons">
-                        <button class="check-btn" id="checkBtn">Check Correct Answer</button>
-                        <button class="next-btn" id="nextBtn">Next Turn</button>
-                    </div>
-                    
-                    <div class="feedback" id="feedback">
-                        <p id="feedbackText"></p>
-                    </div>
-                </div>
+                <div class="or-divider">OR</div>
+                
+                <button class="btn speak-btn" id="speakBtn"><i class="fas fa-microphone"></i> Click & Speak Answer</button>
+            </div>
+
+            <div class="feedback-msg" id="feedbackMsg"></div>
+
+            <div class="correct-answer" id="correctAnswerBox">
+                <button class="audio-btn" id="audioBtn" title="Listen to Answer"><i class="fas fa-volume-up"></i></button>
+                <div class="ans-chinese" id="ansChinese"></div>
+                <div class="ans-pinyin" id="ansPinyin"></div>
+                <div class="ans-english" id="ansEnglish"></div>
+                <div class="ans-rule" id="ansRule"></div>
+            </div>
+
+            <div class="game-controls">
+                <button class="control-btn show-ans-btn" id="showAnsBtn">Show Answer</button>
+                <button class="control-btn manual-score-btn" id="manualScoreBtn">I Was Right! (+1)</button>
+                <button class="control-btn next-turn-btn" id="nextTurnBtn">Next Turn <i class="fas fa-arrow-right"></i></button>
             </div>
         </div>
         
-        <div class="rules-section">
-            <h3 class="rules-title">Game Rules</h3>
-            <div class="rule-item">1. Click "Spin the Wheel" button, the wheel will randomly select a challenge</div>
-            <div class="rule-item">2. Say the correct sentence based on the wheel prompt</div>
-            <div class="rule-item">3. If correct, click "+1 Point" button to add score</div>
-            <div class="rule-item">4. If unsure, click "Check Correct Answer" button</div>
-            <div class="rule-item">5. Click "Next Turn" button to switch to the other player</div>
-            <div class="rule-item">6. The game ends after 6 rounds, the player with higher score wins</div>
-        </div>
+        <button class="btn" id="restartBtn">Play Again</button>
+
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Get elements
-            const wheel = document.getElementById('wheel');
-            const spinBtn = document.getElementById('spinBtn');
-            const challenge = document.getElementById('challenge');
-            const correctAnswerEl = document.getElementById('correctAnswer');
-            const checkBtn = document.getElementById('checkBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const feedback = document.getElementById('feedback');
-            const feedbackText = document.getElementById('feedbackText');
-            const player1 = document.getElementById('player1');
-            const player2 = document.getElementById('player2');
-            const addScoreBtns = document.querySelectorAll('.add-score-btn');
+            // UI Elements
+            const lanternContainer = document.getElementById('lanternContainer');
+            const instructionText = document.getElementById('instructionText');
             
-            // Player scores
-            const playerScores = [0, 0]; // Index 0 for player 1, index 1 for player 2
-            let currentPlayer = 0; // 0 for player 1, 1 for player 2
+            const actionArea = document.getElementById('actionArea');
+            const togglePinyinBtn = document.getElementById('togglePinyinBtn');
+            const displayCategory = document.getElementById('displayCategory');
+            const displayPrompt = document.getElementById('displayPrompt');
+            const displayPromptPinyin = document.getElementById('displayPromptPinyin');
+            
+            const typeInput = document.getElementById('typeInput');
+            const submitTypeBtn = document.getElementById('submitTypeBtn');
+            const speakBtn = document.getElementById('speakBtn');
+            const feedbackMsg = document.getElementById('feedbackMsg');
+            
+            const correctAnswerBox = document.getElementById('correctAnswerBox');
+            const showAnsBtn = document.getElementById('showAnsBtn');
+            const manualScoreBtn = document.getElementById('manualScoreBtn');
+            const nextTurnBtn = document.getElementById('nextTurnBtn');
+            const restartBtn = document.getElementById('restartBtn');
+            const audioBtn = document.getElementById('audioBtn');
+            
+            // State variables
+            let playerScores = [0, 0];
+            let currentPlayer = 0; 
             let currentChallenge = null;
+            let currentActiveLantern = null;
             let turns = 0;
-            
-            // 6 fixed challenges
-            const challenges = [
-                {
-                    prompt: "前天晚上+去+哪儿",
-                    answer: "前天晚上你去哪儿了？",
-                    english: "Where did you go the night before last?"
-                },
-                {
-                    prompt: "昨天中午+吃饺子+affirmative sentence",
-                    answer: "昨天中午我吃饺子了。",
-                    english: "I ate dumplings yesterday at noon."
-                },
-                {
-                    prompt: "上周末+参观博物馆+Yes/No question with 了吗",
-                    answer: "上周末你参观博物馆了吗？",
-                    english: "Did you visit the museum last weekend?"
-                },
-                {
-                    prompt: "前天下午+看电影+Yes/No question with 了没有",
-                    answer: "前天下午你看电影了没有？",
-                    english: "Did you watch a movie the afternoon before last?"
-                },
-                {
-                    prompt: "昨天早上+买面包+Yes/No question with V没V",
-                    answer: "昨天早上你买没买面包？",
-                    english: "Did you buy bread yesterday morning?"
-                },
-                {
-                    prompt: "昨天下午+上中文课+negative sentence",
-                    answer: "昨天下午我没上中文课。",
-                    english: "I didn't attend Chinese class yesterday afternoon."
-                }
+            const MAX_TURNS = 6;
+            let pinyinVisible = false;
+            let lanternOrder =[]; // To randomize categories
+
+            const categories =[
+                "Affirmative Sentence", "Negative Sentence", "Yes/No Question (了吗)", 
+                "Yes/No Question (了没有)", "Yes/No Question (V没V)", "Wh- Question"
             ];
-            
-            // Spin the wheel
-            function spinWheel() {
-                // Random rotation (at least 5 full circles)
-                const degrees = 1800 + Math.floor(Math.random() * 360);
-                wheel.style.transform = `rotate(${degrees}deg)`;
+
+            const questionBank = {
+                0:[ 
+                    { prompt: "昨天中午 + 吃面条", promptPinyin: "Zuótiān zhōngwǔ + chī miàntiáo", time: "昨天中午", predicate: "吃面条了", answer: "昨天中午我吃面条了。", pinyin: "Zuótiān zhōngwǔ wǒ chī miàntiáo le.", english: "I ate noodles yesterday at noon." },
+                    { prompt: "上个月 + 买手机", promptPinyin: "Shàng ge yuè + mǎi shǒujī", time: "上个月", predicate: "买手机了", answer: "上个月我买手机了。", pinyin: "Shàng ge yuè wǒ mǎi shǒujī le.", english: "I bought a mobile phone last month." },
+                    { prompt: "前天晚上 + 看电视", promptPinyin: "Qiántiān wǎnshang + kàn diànshì", time: "前天晚上", predicate: "看电视了", answer: "前天晚上我看电视了。", pinyin: "Qiántiān wǎnshang wǒ kàn diànshì le.", english: "I watched TV the night before last." }
+                ],
+                1:[ 
+                    { prompt: "昨天 + 学习汉语", promptPinyin: "Zuótiān + xuéxí Hànyǔ", time: "昨天", predicate: "没学习汉语", answer: "昨天我没学习汉语。", pinyin: "Zuótiān wǒ méi xuéxí Hànyǔ.", english: "I didn't study Chinese yesterday." },
+                    { prompt: "前天下午 + 游泳", promptPinyin: "Qiántiān xiàwǔ + yóuyǒng", time: "前天下午", predicate: "没游泳", answer: "前天下午我没游泳。", pinyin: "Qiántiān xiàwǔ wǒ méi yóuyǒng.", english: "I didn't swim the afternoon before last." },
+                    { prompt: "昨天早上 + 喝咖啡", promptPinyin: "Zuótiān zǎoshang + hē kāfēi", time: "昨天早上", predicate: "没喝咖啡", answer: "昨天早上我没喝咖啡。", pinyin: "Zuótiān zǎoshang wǒ méi hē kāfēi.", english: "I didn't drink coffee yesterday morning." }
+                ],
+                2:[ 
+                    { prompt: "去年 + 去中国", promptPinyin: "Qùnián + qù Zhōngguó", time: "去年", predicate: "去中国了吗", answer: "去年你去中国了吗？", pinyin: "Qùnián nǐ qù Zhōngguó le ma?", english: "Did you go to China last year?" },
+                    { prompt: "昨天中午 + 休息", promptPinyin: "Zuótiān zhōngwǔ + xiūxi", time: "昨天中午", predicate: "休息了吗", answer: "昨天中午你休息了吗？", pinyin: "Zuótiān zhōngwǔ nǐ xiūxi le ma?", english: "Did you rest yesterday at noon?" },
+                    { prompt: "前天晚上 + 跑步", promptPinyin: "Qiántiān wǎnshang + pǎobù", time: "前天晚上", predicate: "跑步了吗", answer: "前天晚上你跑步了吗？", pinyin: "Qiántiān wǎnshang nǐ pǎobù le ma?", english: "Did you run the night before last?" }
+                ],
+                3:[ 
+                    { prompt: "昨天晚上 + 看电影", promptPinyin: "Zuótiān wǎnshang + kàn diànyǐng", time: "昨天晚上", predicate: "看电影了没有", answer: "昨天晚上你看电影了没有？", pinyin: "Zuótiān wǎnshang nǐ kàn diànyǐng le méiyǒu?", english: "Did you watch a movie last night?" },
+                    { prompt: "上周末 + 准备考试", promptPinyin: "Shàng zhōumò + zhǔnbèi kǎoshì", time: "上周末", predicate: "准备考试了没有", answer: "上周末你准备考试了没有？", pinyin: "Shàng zhōumò nǐ zhǔnbèi kǎoshì le méiyǒu?", english: "Did you prepare for the exam last weekend?" },
+                    { prompt: "前天中午 + 吃米饭", promptPinyin: "Qiántiān zhōngwǔ + chī mǐfàn", time: "前天中午", predicate: "吃米饭了没有", answer: "前天中午你吃米饭了没有？", pinyin: "Qiántiān zhōngwǔ nǐ chī mǐfàn le méiyǒu?", english: "Did you eat rice the noon before last?" }
+                ],
+                4:[ 
+                    { prompt: "昨天下午 + 买苹果", promptPinyin: "Zuótiān xiàwǔ + mǎi píngguǒ", time: "昨天下午", predicate: "买没买苹果", answer: "昨天下午你买没买苹果？", pinyin: "Zuótiān xiàwǔ nǐ mǎi méi mǎi píngguǒ?", english: "Did you buy apples yesterday afternoon?" },
+                    { prompt: "昨天晚上 + 看书", promptPinyin: "Zuótiān wǎnshang + kàn shū", time: "昨天晚上", predicate: "看没看书", answer: "昨天晚上你看没看书？", pinyin: "Zuótiān wǎnshang nǐ kàn méi kàn shū?", english: "Did you read a book last night?" },
+                    { prompt: "前天早上 + 喝茶", promptPinyin: "Qiántiān zǎoshang + hē chá", time: "前天早上", predicate: "喝没喝茶", answer: "前天早上你喝没喝茶？", pinyin: "Qiántiān zǎoshang nǐ hē méi hē chá?", english: "Did you drink tea the morning before last?" }
+                ],
+                5:[ 
+                    { prompt: "前天晚上 + 去 + 哪儿", promptPinyin: "Qiántiān wǎnshang + qù + nǎr", time: "前天晚上", predicate: "去哪儿了", answer: "前天晚上你去哪儿了？", pinyin: "Qiántiān wǎnshang nǐ qù nǎr le?", english: "Where did you go the night before last?" },
+                    { prompt: "昨天中午 + 买 + 什么", promptPinyin: "Zuótiān zhōngwǔ + mǎi + shénme", time: "昨天中午", predicate: "买什么了", answer: "昨天中午你买什么了？", pinyin: "Zuótiān zhōngwǔ nǐ mǎi shénme le?", english: "What did you buy yesterday at noon?" },
+                    { prompt: "上周末 + 见 + 谁", promptPinyin: "Shàng zhōumò + jiàn + shéi", time: "上周末", predicate: "见谁了", answer: "上周末你见谁了？", pinyin: "Shàng zhōumò nǐ jiàn shéi le?", english: "Who did you see last weekend?" }
+                ]
+            };
+
+            // Speech Recognition Setup
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            let recognition = null;
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'zh-CN';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+            } else {
+                speakBtn.innerHTML = "<i class='fas fa-microphone-slash'></i> Speech API Not Supported";
+                speakBtn.disabled = true;
+            }
+
+            function cleanChineseString(str) {
+                return str.replace(/[.,!?。，！？\s]/g, '').trim();
+            }
+
+            // Initialize Lanterns
+            function initLanterns() {
+                lanternContainer.innerHTML = '';
+                // Create an array [0,1,2,3,4,5] and shuffle it
+                lanternOrder =[0, 1, 2, 3, 4, 5].sort(() => Math.random() - 0.5);
                 
-                // Disable spin button
-                spinBtn.disabled = true;
+                const characters =["谜", "春", "福", "吉", "祥", "乐"];
+
+                for(let i=0; i<6; i++) {
+                    const lantern = document.createElement('div');
+                    lantern.className = 'lantern-wrapper';
+                    lantern.dataset.category = lanternOrder[i];
+                    
+                    lantern.innerHTML = `
+                        <div class="lantern-string"></div>
+                        <div class="lantern-cap-top"></div>
+                        <div class="lantern-body">
+                            <div class="lantern-text">${characters[i]}</div>
+                        </div>
+                        <div class="lantern-cap-bottom"></div>
+                        <div class="lantern-tassel"></div>
+                    `;
+
+                    lantern.addEventListener('click', function() {
+                        if(this.classList.contains('solved')) return;
+                        openLantern(this);
+                    });
+
+                    lanternContainer.appendChild(lantern);
+                }
+            }
+
+            function openLantern(lanternEl) {
+                // Dim other unplayed lanterns slightly during play (optional visual effect)
+                currentActiveLantern = lanternEl;
+                lanternEl.classList.add('solved');
                 
-                // After spinning, select a challenge
+                instructionText.style.display = 'none';
+
+                const catIndex = parseInt(lanternEl.dataset.category);
+                const bank = questionBank[catIndex];
+                currentChallenge = bank[Math.floor(Math.random() * bank.length)];
+
+                // Add dynamic rule depending on category
+                if(catIndex === 0) currentChallenge.rule = "Rule: Action completed in the past uses 了 at the end.";
+                else if(catIndex === 1) currentChallenge.rule = "Rule: When negating past actions with 没 (méi), we must DROP the 了.";
+                else if(catIndex === 2) currentChallenge.rule = "Rule: Standard yes/no question about a past action uses 了吗.";
+                else if(catIndex === 3) currentChallenge.rule = "Rule: '了没有' is an alternative to '了吗' at the end of the sentence.";
+                else if(catIndex === 4) currentChallenge.rule = "Rule: V-没-V format. Notice we DROP the 了 in this specific question structure.";
+                else if(catIndex === 5) currentChallenge.rule = "Rule: Question word (什么, 哪儿, 谁) replaces the object, 了 stays at the end.";
+
+                // Setup Action Area
+                displayCategory.textContent = `Category: ${categories[catIndex]}`;
+                displayPrompt.textContent = currentChallenge.prompt;
+                displayPromptPinyin.textContent = currentChallenge.promptPinyin;
+                
+                // Reset inputs & UI
+                pinyinVisible = false;
+                displayPromptPinyin.style.display = 'none';
+                typeInput.value = '';
+                typeInput.disabled = false;
+                submitTypeBtn.disabled = false;
+                speakBtn.disabled = false;
+                feedbackMsg.innerHTML = '';
+                correctAnswerBox.style.display = 'none';
+                showAnsBtn.style.display = 'block';
+                manualScoreBtn.style.display = 'block';
+                manualScoreBtn.disabled = false;
+                nextTurnBtn.style.display = 'none';
+
+                actionArea.style.display = 'block';
+                typeInput.focus();
+                
+                // Scroll to action area
                 setTimeout(() => {
-                    // Calculate selected challenge index (0-5)
-                    const normalizedDegrees = degrees % 360;
-                    const sectionIndex = Math.floor(normalizedDegrees / 60) % 6;
-                    
-                    currentChallenge = challenges[sectionIndex];
-                    
-                    // Display challenge
-                    challenge.innerHTML = currentChallenge.prompt;
-                    
-                    // Reset correct answer display
-                    correctAnswerEl.style.display = 'none';
-                    feedback.style.display = 'none';
-                    
-                    // Enable check answer button
-                    checkBtn.disabled = false;
-                    
-                    // Show current player
-                    updatePlayerDisplay();
-                    
-                    // Enable add score buttons
-                    addScoreBtns.forEach(btn => btn.disabled = false);
-                }, 4000);
+                    actionArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
             }
-            
-            // Update player display
-            function updatePlayerDisplay() {
-                // Remove all active states
-                player1.classList.remove('active');
-                player2.classList.remove('active');
-                
-                // Add active state to current player
-                if (currentPlayer === 0) {
-                    player1.classList.add('active');
-                } else {
-                    player2.classList.add('active');
+
+            togglePinyinBtn.addEventListener('click', () => {
+                pinyinVisible = !pinyinVisible;
+                displayPromptPinyin.style.display = pinyinVisible ? 'block' : 'none';
+            });
+
+            submitTypeBtn.addEventListener('click', handleTypingSubmit);
+            typeInput.addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') handleTypingSubmit();
+            });
+
+            function handleTypingSubmit() {
+                const userVal = typeInput.value;
+                if (!userVal) {
+                    feedbackMsg.innerHTML = '<span style="color:#e67e22;">Please type an answer first!</span>';
+                    return;
                 }
-                
-                // Update score display
-                document.querySelector('#player1 .player-score').textContent = playerScores[0];
-                document.querySelector('#player2 .player-score').textContent = playerScores[1];
+                checkAnswer(userVal, false);
             }
-            
-            // Show correct answer
-            function showAnswer() {
-                correctAnswerEl.innerHTML = `<strong>Correct Answer:</strong> ${currentChallenge.answer}<br>
-                                            <strong>English:</strong> ${currentChallenge.english}`;
-                correctAnswerEl.style.display = 'block';
-                checkBtn.disabled = true;
+
+            if (recognition) {
+                speakBtn.addEventListener('click', () => {
+                    feedbackMsg.innerHTML = '<span style="color:#e67e22;">Listening... Speak now!</span>';
+                    speakBtn.classList.add('listening');
+                    speakBtn.innerHTML = '<i class="fas fa-microphone"></i> Listening...';
+                    recognition.start();
+                });
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    typeInput.value = transcript; 
+                    checkAnswer(transcript, true);
+                };
+
+                recognition.onend = () => {
+                    speakBtn.classList.remove('listening');
+                    speakBtn.innerHTML = '<i class="fas fa-microphone"></i> Click & Speak Answer';
+                };
+
+                recognition.onerror = (event) => {
+                    feedbackMsg.innerHTML = '<span style="color:#e74c3c;">Microphone error. Try typing instead.</span>';
+                };
             }
-            
-            // Next turn
-            function nextTurn() {
-                // Switch to next player
-                currentPlayer = (currentPlayer + 1) % 2;
-                
-                // Increase turn count
-                turns++;
-                
-                // Reset interface
-                correctAnswerEl.style.display = 'none';
-                feedback.style.display = 'none';
-                challenge.innerHTML = 'Click "Spin the Wheel" to start';
-                spinBtn.disabled = false;
-                
-                // Update player display
-                updatePlayerDisplay();
-                
-                // Check if game is over
-                if (turns >= 6) { // 6 rounds total
-                    if (playerScores[0] > playerScores[1]) {
-                        feedbackText.textContent = 'Game Over! Player One Wins!';
-                    } else if (playerScores[1] > playerScores[0]) {
-                        feedbackText.textContent = 'Game Over! Player Two Wins!';
-                    } else {
-                        feedbackText.textContent = 'Game Over! It\'s a Tie!';
+
+            function checkAnswer(inputVal, isVoice) {
+                const cleanedInput = cleanChineseString(inputVal);
+                const time = currentChallenge.time;
+                const predicate = currentChallenge.predicate;
+
+                let isCorrect = false;
+
+                if (cleanedInput.endsWith(predicate)) {
+                    const prefix = cleanedInput.substring(0, cleanedInput.length - predicate.length);
+                    
+                    if (prefix.includes(time)) {
+                        const subject = prefix.replace(time, '').trim();
+                        if (subject.length <= 6) {
+                            isCorrect = true;
+                        }
                     }
-                    
-                    feedback.className = 'feedback correct';
-                    feedback.style.display = 'block';
-                    
-                    // Disable buttons
-                    spinBtn.disabled = true;
-                    checkBtn.disabled = true;
-                    nextBtn.disabled = true;
-                    addScoreBtns.forEach(btn => btn.disabled = true);
+                }
+
+                if (isCorrect) {
+                    feedbackMsg.innerHTML = `You ${isVoice?'said':'typed'}: <strong>${inputVal}</strong> <i class="fas fa-check-circle" style="color:#2ecc71;"></i> Perfect!`;
+                    addScore(currentPlayer);
+                    revealAnswer();
+                } else {
+                    feedbackMsg.innerHTML = `You ${isVoice?'said':'typed'}: <strong>${inputVal}</strong> <i class="fas fa-times-circle" style="color:#e74c3c;"></i> Not quite right.`;
                 }
             }
-            
-            // Add score
+
+            showAnsBtn.addEventListener('click', revealAnswer);
+
+            manualScoreBtn.addEventListener('click', () => {
+                addScore(currentPlayer);
+                revealAnswer();
+            });
+
+            function revealAnswer() {
+                document.getElementById('ansChinese').textContent = currentChallenge.answer;
+                document.getElementById('ansPinyin').textContent = currentChallenge.pinyin;
+                document.getElementById('ansEnglish').textContent = currentChallenge.english;
+                document.getElementById('ansRule').innerHTML = currentChallenge.rule;
+                
+                correctAnswerBox.style.display = 'block';
+                
+                typeInput.disabled = true;
+                submitTypeBtn.disabled = true;
+                speakBtn.disabled = true;
+                showAnsBtn.style.display = 'none';
+                manualScoreBtn.style.display = 'none';
+                
+                nextTurnBtn.style.display = 'block';
+            }
+
             function addScore(playerIndex) {
                 playerScores[playerIndex]++;
-                updatePlayerDisplay();
-                
-                // Show feedback
-                feedbackText.textContent = `Player ${playerIndex + 1} scores! Current score: ${playerScores[playerIndex]}`;
-                feedback.className = 'feedback correct';
-                feedback.style.display = 'block';
-                
-                // Disable add score buttons
-                addScoreBtns.forEach(btn => btn.disabled = true);
+                document.getElementById(`score${playerIndex + 1}`).textContent = playerScores[playerIndex];
             }
-            
-            // Event listeners
-            spinBtn.addEventListener('click', spinWheel);
-            checkBtn.addEventListener('click', showAnswer);
-            nextBtn.addEventListener('click', nextTurn);
-            
-            // Add event listeners to add score buttons
-            addScoreBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const playerIndex = parseInt(this.getAttribute('data-player')) - 1;
-                    addScore(playerIndex);
-                });
+
+            audioBtn.addEventListener('click', () => {
+                const utterance = new SpeechSynthesisUtterance(currentChallenge.answer);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.85; 
+                window.speechSynthesis.speak(utterance);
             });
-            
-            // Initialize player display
-            updatePlayerDisplay();
+
+            nextTurnBtn.addEventListener('click', () => {
+                turns++;
+                
+                if (turns >= MAX_TURNS) {
+                    endGame();
+                    return;
+                }
+
+                currentPlayer = (currentPlayer + 1) % 2;
+                document.getElementById('player1').classList.toggle('active');
+                document.getElementById('player2').classList.toggle('active');
+
+                actionArea.style.display = 'none';
+                instructionText.style.display = 'block';
+                
+                // Scroll back up to lanterns
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            function endGame() {
+                actionArea.innerHTML = ''; 
+                lanternContainer.style.display = 'none';
+                instructionText.style.display = 'none';
+                
+                let resultText = '';
+                if (playerScores[0] > playerScores[1]) {
+                    resultText = '🏆 Game Over! Player One Wins!';
+                } else if (playerScores[1] > playerScores[0]) {
+                    resultText = '🏆 Game Over! Player Two Wins!';
+                } else {
+                    resultText = '🤝 Game Over! It\'s a Tie!';
+                }
+                
+                const finalMsg = document.createElement('h2');
+                finalMsg.textContent = resultText;
+                finalMsg.style.textAlign = 'center';
+                finalMsg.style.color = '#c62828';
+                finalMsg.style.marginTop = '20px';
+                
+                actionArea.appendChild(finalMsg);
+                actionArea.appendChild(restartBtn);
+                
+                actionArea.style.display = 'block';
+                restartBtn.style.display = 'block';
+            }
+
+            restartBtn.addEventListener('click', () => {
+                window.location.reload();
+            });
+
+            // Start game
+            initLanterns();
         });
     </script>
 </body>
