@@ -1,0 +1,3250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="preload" as="image" href="assets/generated-art/exterior-with-locker.jpg" fetchpriority="high">
+  <title>外卖员送外卖：把字句动作游戏</title>
+  <style>
+    :root {
+      --ink: #1f2937;
+      --muted: #667085;
+      --line: #d8dee8;
+      --paper: #fffdf8;
+      --brand: #f97316;
+      --brand-dark: #c2410c;
+      --blue: #2563eb;
+      --green: #16a34a;
+      --red: #dc2626;
+      --shadow: 0 18px 40px rgba(31, 41, 55, 0.16);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100dvh;
+      min-height: 0;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--ink);
+      background: #dff2ff;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      overscroll-behavior: none;
+    }
+
+    input,
+    textarea {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    button {
+      font: inherit;
+      border: 0;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: default;
+      background: #aab3c2;
+      box-shadow: none;
+    }
+
+    .app {
+      /*
+       * Fit by both viewport width and height while preserving the
+       * 1672:941 game ratio. 58px is reserved for the top status bar.
+       */
+      width: min(1200px, calc(100vw - 24px), calc(177.78dvh - 146px));
+      height: auto;
+      margin: 0 auto;
+      display: block;
+      overflow: hidden;
+      border: 1px solid rgba(31, 41, 55, 0.14);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow);
+    }
+
+    .side {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      z-index: 130;
+      width: min(390px, calc(100vw - 32px));
+      max-height: min(760px, calc(100vh - 28px));
+      padding: 34px 17px 22px;
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+      overflow: auto;
+      background: linear-gradient(#f8fbff, #eef6ff);
+      border: 10px solid #111827;
+      border-radius: 38px;
+      box-shadow: 0 28px 70px rgba(15, 23, 42, 0.28);
+      transform: translate(-50%, -50%);
+    }
+
+    .side.open { display: flex; }
+
+    .side::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      width: 96px;
+      height: 16px;
+      border-radius: 999px;
+      background: #111827;
+      transform: translateX(-50%);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: none;
+      background: rgba(15, 23, 42, 0.38);
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-backdrop.show { display: block; }
+
+    .modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .close-btn {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 25px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .intro {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .card {
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .orders {
+      display: grid;
+      gap: 10px;
+    }
+
+    .order {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fff;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .order.active {
+      border-color: #fb923c;
+      background: #fff7ed;
+    }
+
+    .order.done {
+      border-color: #86efac;
+      background: #f0fdf4;
+      cursor: default;
+    }
+
+    .order:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+
+    .room {
+      font-size: 30px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .order small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .primary-btn,
+    .ghost-btn,
+    .touch-btn {
+      min-height: 38px;
+      border-radius: 8px;
+      font-weight: 850;
+    }
+
+    .primary-btn {
+      padding: 0 14px;
+      color: #fff;
+      background: var(--brand);
+      box-shadow: 0 8px 18px rgba(194, 65, 12, 0.22);
+    }
+
+    .ghost-btn,
+    .touch-btn {
+      padding: 0 12px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--line);
+    }
+
+    .dialogue { display: none; }
+
+    .progress {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+    }
+
+    .step {
+      height: 9px;
+      border-radius: 99px;
+      background: #e5e7eb;
+    }
+
+    .step.done { background: var(--green); }
+    .step.active { background: var(--brand); }
+
+    .main {
+      height: 100%;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: #e8f4ff;
+    }
+
+    .status {
+      min-height: 58px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .top-feedback-btn {
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid #fed7aa;
+      border-radius: 999px;
+      color: #9a3412;
+      background: #fff7ed;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .status > div:first-child { display: none; }
+
+    .status-title {
+      font-size: 18px;
+      line-height: 1.35;
+      font-weight: 900;
+    }
+
+    .status-hint {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .current-pill {
+      flex: 0 0 auto;
+      padding: 9px 12px;
+      border-radius: 8px;
+      color: #fff;
+      background: #111827;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .stage {
+      position: relative;
+      flex: 0 0 auto;
+      width: 100%;
+      aspect-ratio: 1672 / 941;
+      min-height: 0;
+      overflow: hidden;
+      background: #dbeafe;
+    }
+
+    .scene-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .game-hud button { pointer-events: auto; }
+
+    .pixel-scene {
+      overflow: hidden;
+      image-rendering: pixelated;
+      background: #87ceeb;
+    }
+
+    .art-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .pixel-scene,
+    .pixel-item {
+      position: absolute;
+    }
+
+    .pixel-scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+      background-size: 18px 18px;
+      opacity: 0.35;
+    }
+
+    .game-hud {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      top: 16px;
+      z-index: 58;
+      display: grid;
+      grid-template-columns: 150px 1fr 210px;
+      align-items: start;
+      gap: 16px;
+      pointer-events: none;
+    }
+
+    .pause-badge,
+    .mission-title,
+    .coin-row {
+      color: #fff7d6;
+      font-family: "Courier New", monospace;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-shadow:
+        3px 0 #2f241d,
+        -3px 0 #2f241d,
+        0 3px #2f241d,
+        0 -3px #2f241d,
+        3px 3px #2f241d;
+    }
+
+    .pause-badge {
+      width: 130px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      color: #203040;
+      text-shadow: none;
+      background: linear-gradient(#a8d6ef, #6ea7cf);
+      border: 5px solid #203040;
+      border-radius: 8px;
+      box-shadow: inset -5px -5px 0 rgba(0, 0, 0, 0.16), 5px 5px 0 rgba(15, 23, 42, 0.18);
+      font-size: 24px;
+    }
+
+    .pause-badge.attention {
+      animation: orderPulse 0.9s ease-in-out infinite;
+    }
+
+    @keyframes orderPulse {
+      0%, 100% { transform: translateY(0); filter: brightness(1); }
+      50% { transform: translateY(-2px); filter: brightness(1.18); box-shadow: inset -5px -5px 0 rgba(0, 0, 0, 0.16), 0 0 0 6px rgba(249, 115, 22, 0.34), 5px 5px 0 rgba(15, 23, 42, 0.18); }
+    }
+
+    .mission-title {
+      padding-top: 12px;
+      text-align: center;
+      font-size: 28px;
+      line-height: 1.15;
+    }
+
+    .coin-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding-top: 8px;
+    }
+
+    .coin {
+      width: 34px;
+      height: 46px;
+      border: 4px solid #7c3f00;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #f59e0b 0 18%, #fde047 18% 68%, #f59e0b 68% 100%);
+      box-shadow: inset -4px -5px 0 rgba(146, 64, 14, 0.35), 3px 3px 0 rgba(15, 23, 42, 0.18);
+    }
+
+    .sky-gradient {
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 330px;
+      background: linear-gradient(#45bcef 0%, #a8e3ff 62%, #eef8ff 100%);
+    }
+
+    .cloud {
+      width: 118px;
+      height: 38px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 999px;
+      box-shadow:
+        28px -16px 0 10px rgba(255, 255, 255, 0.92),
+        62px -6px 0 5px rgba(255, 255, 255, 0.86),
+        18px 12px 0 rgba(255, 255, 255, 0.7);
+      opacity: 0.85;
+    }
+
+    .distant-city {
+      left: 0;
+      top: 238px;
+      width: 100%;
+      height: 90px;
+      background:
+        linear-gradient(90deg, transparent 0 36px, rgba(65, 105, 130, 0.34) 36px 88px, transparent 88px 130px),
+        linear-gradient(90deg, rgba(38, 90, 120, 0.22) 0 64px, transparent 64px 108px),
+        #b8dfef;
+      background-size: 170px 90px, 240px 90px, auto;
+      clip-path: polygon(0 44%, 8% 22%, 15% 42%, 23% 18%, 30% 45%, 39% 26%, 50% 48%, 58% 20%, 66% 44%, 74% 26%, 84% 50%, 92% 24%, 100% 42%, 100% 100%, 0 100%);
+    }
+
+    .pixel-wall {
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 310px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.18) 1px, transparent 1px),
+        linear-gradient(#dbeafe, #c7dded);
+      background-size: 56px 56px, auto;
+      border-bottom: 8px solid #395a6f;
+    }
+
+    .pixel-floor {
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 190px;
+      background:
+        linear-gradient(90deg, rgba(58, 80, 107, 0.18) 1px, transparent 1px),
+        linear-gradient(rgba(58, 80, 107, 0.18) 1px, transparent 1px),
+        #d6e3d5;
+      background-size: 46px 46px;
+      border-top: 6px solid #6f8b7c;
+    }
+
+    .pixel-road {
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 170px;
+      background:
+        linear-gradient(90deg, transparent 0 42px, rgba(255, 255, 255, 0.55) 42px 76px, transparent 76px 118px),
+        #59616f;
+      background-size: 118px 12px;
+      border-top: 8px solid #334155;
+    }
+
+    .sidewalk {
+      left: 0;
+      top: 318px;
+      width: 100%;
+      height: 78px;
+      background:
+        linear-gradient(90deg, rgba(51, 65, 85, 0.18) 2px, transparent 2px),
+        #c8d8d8;
+      background-size: 64px 64px;
+      border-top: 5px solid #f8fafc;
+      border-bottom: 6px solid #78909c;
+    }
+
+    .fence {
+      left: 0;
+      top: 285px;
+      width: 100%;
+      height: 64px;
+      background:
+        linear-gradient(90deg, transparent 0 32px, #f8fafc 32px 42px, transparent 42px 74px),
+        linear-gradient(#f8fafc 0 9px, transparent 9px 29px, #f8fafc 29px 38px, transparent 38px);
+      background-size: 74px 64px, 100% 64px;
+      filter: drop-shadow(0 4px 0 rgba(51, 65, 85, 0.22));
+    }
+
+    .pixel-building {
+      left: 535px;
+      top: 28px;
+      width: 330px;
+      height: 385px;
+      background:
+        repeating-linear-gradient(0deg, transparent 0 34px, rgba(255,255,255,0.18) 34px 39px),
+        linear-gradient(90deg, #e7f1f5 0 62%, #ffe084 62% 70%, #2c8ed6 70% 80%, #ef4444 80% 88%, #22c55e 88% 100%);
+      border: 7px solid #314155;
+      box-shadow: 16px 16px 0 rgba(48, 72, 88, 0.35);
+    }
+
+    .pixel-window {
+      width: 54px;
+      height: 42px;
+      background: #c7e7ff;
+      border: 5px solid #314155;
+      box-shadow: inset 0 -10px 0 rgba(37, 99, 235, 0.18);
+    }
+
+    .pixel-door,
+    .pixel-room-door {
+      background: #a8552a;
+      border: 6px solid #2f241d;
+      box-shadow: inset 10px 0 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .pixel-door {
+      left: 650px;
+      top: 258px;
+      width: 104px;
+      height: 150px;
+    }
+
+    .entry-awning {
+      left: 620px;
+      top: 228px;
+      width: 160px;
+      height: 38px;
+      background: #1d4ed8;
+      border: 5px solid #1f2937;
+      border-radius: 34px 34px 0 0;
+      box-shadow: inset 0 -10px 0 rgba(255,255,255,0.2);
+    }
+
+    .pixel-door::after,
+    .pixel-room-door::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      top: 52%;
+      width: 10px;
+      height: 10px;
+      background: #facc15;
+      border: 2px solid #1f2937;
+    }
+
+    .pixel-sign {
+      display: grid;
+      place-items: center;
+      color: #111827;
+      background: #fef3c7;
+      border: 4px solid #314155;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .pixel-tree {
+      width: 70px;
+      height: 108px;
+    }
+
+    .pixel-tree::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      bottom: 0;
+      width: 30px;
+      height: 54px;
+      background: #8b5a2b;
+      border: 4px solid #3f2a18;
+    }
+
+    .pixel-tree::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 70px;
+      height: 66px;
+      background: #35a852;
+      border: 5px solid #14532d;
+      box-shadow: 12px 16px 0 #22c55e;
+    }
+
+    .pixel-elevator {
+      left: 370px;
+      top: 142px;
+      width: 160px;
+      height: 210px;
+      background: #64748b;
+      border: 7px solid #1f2937;
+      box-shadow: inset 0 0 0 8px #94a3b8;
+    }
+
+    .pixel-elevator::before {
+      content: "电梯";
+      position: absolute;
+      left: 38px;
+      top: -43px;
+      width: 72px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      color: #f8fafc;
+      background: #1f2937;
+      border: 4px solid #475569;
+      font-weight: 900;
+    }
+
+    .pixel-locker {
+      left: 600px;
+      top: 260px;
+      width: 150px;
+      height: 110px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: #f59e0b;
+      border: 6px solid #78350f;
+    }
+
+    .pixel-locker span {
+      border: 2px solid #78350f;
+      box-shadow: inset 0 -8px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .pixel-room-door {
+      top: 158px;
+      width: 116px;
+      height: 188px;
+    }
+
+    .pixel-room-door .number {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      width: 70px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      color: #111827;
+      background: #fef3c7;
+      border: 4px solid #2f241d;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .pixel-shoe-cabinet {
+      left: 230px;
+      top: 356px;
+      width: 88px;
+      height: 66px;
+      background: #a16207;
+      border: 6px solid #422006;
+      box-shadow: inset 0 16px 0 rgba(254, 243, 199, 0.22);
+    }
+
+    .pixel-shoe-cabinet::before {
+      content: "鞋柜";
+      position: absolute;
+      left: 10px;
+      top: -34px;
+      width: 58px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      color: #111827;
+      background: #fef3c7;
+      border: 3px solid #422006;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .pixel-hook {
+      width: 18px;
+      height: 18px;
+      border: 4px solid #facc15;
+      border-left: 0;
+      border-top: 0;
+      transform: rotate(45deg);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .obstacle-debug {
+      position: absolute;
+      display: none;
+      border: 2px solid rgba(220, 38, 38, 0.55);
+      background: rgba(220, 38, 38, 0.12);
+    }
+
+    .hotspot-debug {
+      position: absolute;
+      display: none;
+      border: 2px dashed rgba(37, 99, 235, 0.65);
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    .game.debug .obstacle-debug,
+    .game.debug .hotspot-debug { display: block; }
+
+    .actor {
+      position: absolute;
+      left: 13.333%;
+      top: 94.862%;
+      width: 104px;
+      height: 165px;
+      z-index: 30;
+      transform: translate(-50%, -100%) scaleX(var(--dir, 1));
+      transform-origin: 50% 100%;
+      pointer-events: none;
+      filter: drop-shadow(8px 10px 0 rgba(15, 23, 42, 0.16));
+      --sprite-row: 0px;
+      background-image: url("assets/generated-art/courier-c-walk-8frame-clean.png");
+      background-repeat: no-repeat;
+      background-size: 832px 165px;
+      background-position: 0 0;
+      image-rendering: pixelated;
+    }
+
+    .actor.hidden { opacity: 0; }
+
+    .actor > div { display: none; }
+
+    .actor.carrying { --sprite-row: 0px; }
+
+    .actor.walking {
+      animation: courierWalk 0.8s steps(8) infinite;
+    }
+
+    @keyframes courierWalk {
+      from { background-position: 0 0; }
+      to { background-position: -832px 0; }
+    }
+
+    .carried-bag {
+      position: absolute;
+      width: 30px;
+      height: 34px;
+      z-index: 42;
+      display: none;
+      transform: translate(-50%, -50%);
+      border: 3px solid var(--bag-stroke, #92400e);
+      border-radius: 8px 8px 7px 7px;
+      background: var(--bag-main, #fff7ed);
+      box-shadow: inset 0 -11px 0 var(--bag-shadow, rgba(251, 191, 36, 0.48)), 0 6px 10px rgba(15, 23, 42, 0.18);
+      pointer-events: none;
+      touch-action: none;
+    }
+
+    .carried-bag.show { display: block; }
+
+    .carried-bag::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: -13px;
+      width: 11px;
+      height: 12px;
+      border: 3px solid var(--bag-stroke, #92400e);
+      border-bottom: 0;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .carried-bag::after,
+    .placed-bag::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .carried-bag[data-bag="201"],
+    .placed-bag[data-bag="201"] {
+      width: 34px;
+      height: 36px;
+      border-radius: 5px 5px 7px 7px;
+      background:
+        linear-gradient(90deg, rgba(120, 53, 15, 0.2), transparent 17% 74%, rgba(120, 53, 15, 0.27)),
+        linear-gradient(135deg, transparent 0 79%, rgba(120, 53, 15, 0.24) 80% 100%),
+        linear-gradient(#eab76c, #c47a2c);
+      clip-path: polygon(8% 0, 84% 0, 100% 100%, 0 100%);
+    }
+
+    .carried-bag[data-bag="201"]::before,
+    .placed-bag[data-bag="201"]::before {
+      left: 7px;
+      top: -14px;
+      width: 17px;
+      height: 14px;
+      border: 4px solid #8a4b16;
+      border-bottom: 0;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .carried-bag[data-bag="201"]::after,
+    .placed-bag[data-bag="201"]::after {
+      left: 8px;
+      top: 15px;
+      width: 16px;
+      height: 8px;
+      border-radius: 2px;
+      background: #fff7ed;
+      box-shadow: inset 0 -2px 0 rgba(146, 64, 14, 0.18);
+    }
+
+    .carried-bag[data-bag="301"],
+    .placed-bag[data-bag="301"] {
+      width: 36px;
+      height: 32px;
+      border-radius: 4px 4px 8px 8px;
+      background:
+        linear-gradient(180deg, #fff7ed 0 18%, #ef4444 18% 29%, #fff7ed 29% 78%, #dc2626 78%),
+        linear-gradient(135deg, transparent 0 78%, rgba(153, 27, 27, 0.17) 79%),
+        #fff7ed;
+      clip-path: polygon(5% 10%, 82% 0, 100% 100%, 0 100%);
+    }
+
+    .carried-bag[data-bag="301"]::before,
+    .placed-bag[data-bag="301"]::before {
+      left: 17px;
+      top: -5px;
+      width: 8px;
+      height: 30px;
+      border: 0;
+      border-radius: 5px;
+      background: #ef4444;
+      box-shadow: 0 1px 0 #991b1b;
+    }
+
+    .carried-bag[data-bag="301"]::after,
+    .placed-bag[data-bag="301"]::after {
+      left: 12px;
+      top: 15px;
+      width: 12px;
+      height: 8px;
+      border: 2px solid #ef4444;
+      border-radius: 2px;
+      background: #fffaf0;
+    }
+
+    .carried-bag[data-bag="302"],
+    .placed-bag[data-bag="302"] {
+      width: 38px;
+      height: 34px;
+      border-color: #94a3b8;
+      border-radius: 46% 46% 38% 38%;
+      background:
+        radial-gradient(circle at 35% 63%, rgba(226, 232, 240, 0.9) 0 16%, transparent 18%),
+        radial-gradient(circle at 62% 61%, rgba(226, 232, 240, 0.82) 0 15%, transparent 17%),
+        linear-gradient(90deg, rgba(203, 213, 225, 0.58), rgba(248, 250, 252, 0.95), rgba(203, 213, 225, 0.62));
+      box-shadow: inset 0 -8px 0 rgba(148, 163, 184, 0.38), 0 6px 10px rgba(15, 23, 42, 0.18);
+    }
+
+    .carried-bag[data-bag="302"]::before,
+    .placed-bag[data-bag="302"]::before {
+      left: 9px;
+      top: -14px;
+      width: 13px;
+      height: 16px;
+      border: 0;
+      border-radius: 50% 50% 12px 12px;
+      background:
+        linear-gradient(45deg, transparent 0 39%, #f8fafc 40% 62%, transparent 63%),
+        linear-gradient(-45deg, transparent 0 39%, #e2e8f0 40% 62%, transparent 63%);
+      box-shadow: 0 8px 0 -3px #cbd5e1;
+    }
+
+    .carried-bag[data-bag="302"]::after,
+    .placed-bag[data-bag="302"]::after {
+      left: 13px;
+      top: -3px;
+      width: 6px;
+      height: 5px;
+      border-radius: 999px;
+      background: #cbd5e1;
+    }
+
+    .carried-bag[data-bag="402"],
+    .placed-bag[data-bag="402"] {
+      width: 30px;
+      height: 48px;
+      border-radius: 6px;
+      background:
+        linear-gradient(90deg, rgba(120, 53, 15, 0.18), transparent 18% 75%, rgba(120, 53, 15, 0.24)),
+        linear-gradient(#fbbf24, #d97706);
+      box-shadow: inset 0 -10px 0 rgba(146, 64, 14, 0.24), 0 6px 10px rgba(15, 23, 42, 0.18);
+      clip-path: polygon(14% 0, 86% 0, 100% 100%, 0 100%);
+    }
+
+    .carried-bag[data-bag="402"]::before,
+    .placed-bag[data-bag="402"]::before {
+      left: 7px;
+      top: 4px;
+      width: 11px;
+      height: 6px;
+      border: 3px solid #92400e;
+      border-radius: 3px;
+      background: #fff7ed;
+    }
+
+    .carried-bag[data-bag="402"]::after,
+    .placed-bag[data-bag="402"]::after {
+      left: 7px;
+      top: 17px;
+      width: 13px;
+      height: 20px;
+      border: 2px solid #78350f;
+      border-radius: 6px 6px 4px 4px;
+      background:
+        radial-gradient(circle at 35% 86%, #422006 0 2px, transparent 3px),
+        radial-gradient(circle at 66% 86%, #422006 0 2px, transparent 3px),
+        linear-gradient(#fef3c7 0 28%, #d6a15b 29% 100%);
+    }
+
+    .carried-bag.ready {
+      cursor: grab;
+      pointer-events: auto;
+      animation: none;
+    }
+
+    .carried-bag.dragging {
+      cursor: grabbing;
+      animation: none;
+      pointer-events: auto;
+      box-shadow: inset 0 -11px 0 var(--bag-shadow, rgba(251, 191, 36, 0.48)), 0 12px 18px rgba(15, 23, 42, 0.26);
+    }
+
+    @keyframes bagReady {
+      0%, 100% { filter: drop-shadow(0 0 0 rgba(249, 115, 22, 0)); }
+      50% { filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.95)); }
+    }
+
+    .actor .head {
+      position: absolute;
+      left: 50%;
+      top: 4%;
+      width: 34%;
+      aspect-ratio: 1;
+      transform: translateX(-50%);
+      border: 3px solid #263241;
+      border-radius: 50%;
+      background: #ffd6b2;
+      z-index: 6;
+    }
+
+    .actor .helmet {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 45%;
+      height: 18%;
+      transform: translateX(-50%);
+      border: 3px solid #263241;
+      border-radius: 50% 50% 18% 18%;
+      background: #f97316;
+      z-index: 7;
+    }
+
+    .actor .helmet::after {
+      content: "";
+      position: absolute;
+      right: -18%;
+      top: 45%;
+      width: 32%;
+      height: 18%;
+      border: 3px solid #263241;
+      border-radius: 999px;
+      background: #f97316;
+    }
+
+    .actor .face {
+      position: absolute;
+      left: 28%;
+      top: 42%;
+      width: 8%;
+      height: 8%;
+      border-radius: 50%;
+      background: #263241;
+      box-shadow: 28px 0 0 #263241;
+    }
+
+    .actor .smile {
+      position: absolute;
+      left: 41%;
+      top: 60%;
+      width: 22%;
+      height: 12%;
+      border-bottom: 3px solid #9a3412;
+      border-radius: 0 0 999px 999px;
+    }
+
+    .actor .backpack {
+      position: absolute;
+      right: 10%;
+      top: 31%;
+      width: 24%;
+      height: 33%;
+      border: 3px solid #263241;
+      border-radius: 12%;
+      background: #f97316;
+      box-shadow: inset 0 0 0 5px rgba(255, 255, 255, 0.18);
+      z-index: 2;
+    }
+
+    .actor .torso {
+      position: absolute;
+      left: 50%;
+      top: 27%;
+      width: 48%;
+      height: 36%;
+      transform: translateX(-50%);
+      border: 3px solid #263241;
+      border-radius: 20% 20% 14% 14%;
+      background: linear-gradient(90deg, #f97316 0 48%, #fb923c 48% 100%);
+      z-index: 4;
+    }
+
+    .actor .strap {
+      position: absolute;
+      left: 48%;
+      top: 25%;
+      width: 10%;
+      height: 44%;
+      transform: rotate(-28deg);
+      border-radius: 999px;
+      background: #334155;
+      z-index: 5;
+    }
+
+    .actor .arm {
+      position: absolute;
+      top: 33%;
+      width: 14%;
+      height: 33%;
+      border: 3px solid #263241;
+      border-radius: 999px;
+      background: #ffd6b2;
+      transform-origin: 50% 12%;
+      z-index: 3;
+    }
+
+    .actor .arm.left {
+      left: 14%;
+      transform: rotate(14deg);
+    }
+
+    .actor .arm.right {
+      right: 12%;
+      transform: rotate(-12deg);
+    }
+
+    .actor.carrying .arm.right::after {
+      content: "";
+      position: absolute;
+      left: -8px;
+      top: 66%;
+      width: 38px;
+      height: 34px;
+      border: 3px solid #92400e;
+      border-radius: 12px 12px 8px 8px;
+      background: #fff7ed;
+      box-shadow: inset 0 -10px 0 rgba(251, 191, 36, 0.42);
+    }
+
+    .actor.carrying .arm.right::before {
+      content: "";
+      position: absolute;
+      left: 1px;
+      top: 56%;
+      width: 19px;
+      height: 14px;
+      border: 3px solid #92400e;
+      border-bottom: 0;
+      border-radius: 12px 12px 0 0;
+      z-index: 1;
+    }
+
+    .actor .hip {
+      position: absolute;
+      left: 50%;
+      top: 62%;
+      width: 42%;
+      height: 13%;
+      transform: translateX(-50%);
+      border-radius: 10px;
+      background: #1f2937;
+      z-index: 4;
+    }
+
+    .actor .leg {
+      position: absolute;
+      top: 69%;
+      width: 15%;
+      height: 28%;
+      border-radius: 999px;
+      background: #1f2937;
+      transform-origin: 50% 8%;
+      z-index: 3;
+      box-shadow: 0 0 0 2px rgba(38, 50, 65, 0.7);
+    }
+
+    .actor .leg.left { left: 35%; }
+    .actor .leg.right { right: 34%; }
+
+    .actor .shoe {
+      position: absolute;
+      left: -25%;
+      bottom: -6%;
+      width: 170%;
+      height: 24%;
+      border: 3px solid #263241;
+      border-radius: 999px;
+      background: #fb923c;
+    }
+
+    .actor.walking .leg.left { animation: legA 0.42s ease-in-out infinite; }
+    .actor.walking .leg.right { animation: legB 0.42s ease-in-out infinite; }
+    .actor.walking .arm.left { animation: armA 0.42s ease-in-out infinite; }
+    .actor.walking .arm.right { animation: armB 0.42s ease-in-out infinite; }
+    .actor.walking .torso,
+    .actor.walking .head,
+    .actor.walking .helmet { animation: bodyBob 0.42s ease-in-out infinite; }
+    .actor.placing .arm.right { animation: placeArm 0.65s ease-in-out; }
+
+    @keyframes legA {
+      0%, 100% { transform: rotate(24deg); }
+      50% { transform: rotate(-26deg); }
+    }
+
+    @keyframes legB {
+      0%, 100% { transform: rotate(-24deg); }
+      50% { transform: rotate(24deg); }
+    }
+
+    @keyframes armA {
+      0%, 100% { transform: rotate(-18deg); }
+      50% { transform: rotate(24deg); }
+    }
+
+    @keyframes armB {
+      0%, 100% { transform: rotate(20deg); }
+      50% { transform: rotate(-22deg); }
+    }
+
+    @keyframes bodyBob {
+      0%, 100% { margin-top: 0; }
+      50% { margin-top: -4px; }
+    }
+
+    @keyframes placeArm {
+      0%, 100% { transform: rotate(-12deg); }
+      45% { transform: rotate(-72deg) translateY(8px); }
+    }
+
+    .placed-bag {
+      position: absolute;
+      width: 42px;
+      height: 36px;
+      z-index: 28;
+      display: none;
+      transform: translate(-50%, -50%);
+      border: 3px solid var(--bag-stroke, #92400e);
+      border-radius: 12px 12px 8px 8px;
+      background: var(--bag-main, #fff7ed);
+      box-shadow: inset 0 -12px 0 var(--bag-shadow, rgba(251, 191, 36, 0.42)), 0 8px 14px rgba(15, 23, 42, 0.18);
+    }
+
+    .placed-bag.show {
+      display: block;
+    }
+
+    .placed-bag::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: -14px;
+      width: 19px;
+      height: 15px;
+      border: 4px solid var(--bag-stroke, #92400e);
+      border-bottom: 0;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .door-visitor {
+      position: absolute;
+      width: 96px;
+      height: 150px;
+      display: none;
+      transform: translate(-50%, -100%);
+      z-index: 24;
+      pointer-events: none;
+      filter: drop-shadow(7px 8px 0 rgba(15, 23, 42, 0.22));
+    }
+
+    .door-visitor.show {
+      display: block;
+      animation: visitorAppear 0.34s ease-out both;
+    }
+
+    .door-visitor .door-shadow {
+      position: absolute;
+      left: 5px;
+      bottom: 0;
+      width: 58px;
+      height: 136px;
+      border: 4px solid #4a2c1c;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #2b1b14 0 22%, #5b3522 22% 100%);
+      transform: skewY(-2deg);
+    }
+
+    .door-visitor .person {
+      position: absolute;
+      left: 30px;
+      bottom: 10px;
+      width: 54px;
+      height: 118px;
+    }
+
+    .door-visitor .head {
+      position: absolute;
+      left: 15px;
+      top: 2px;
+      width: 34px;
+      height: 38px;
+      border: 3px solid #253244;
+      border-radius: 48% 48% 46% 46%;
+      background: #f2bd91;
+    }
+
+    .door-visitor .hair {
+      position: absolute;
+      left: 11px;
+      top: -2px;
+      width: 42px;
+      height: 18px;
+      border: 3px solid #253244;
+      border-bottom: 0;
+      border-radius: 22px 22px 8px 8px;
+      background: #1f2937;
+      z-index: 2;
+    }
+
+    .door-visitor .eye {
+      position: absolute;
+      top: 21px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #111827;
+      z-index: 3;
+    }
+
+    .door-visitor .eye.left { left: 25px; }
+    .door-visitor .eye.right { left: 39px; }
+
+    .door-visitor .mouth {
+      position: absolute;
+      left: 31px;
+      top: 32px;
+      width: 10px;
+      height: 5px;
+      border-bottom: 3px solid #7f1d1d;
+      border-radius: 0 0 10px 10px;
+      z-index: 3;
+    }
+
+    .door-visitor .shirt {
+      position: absolute;
+      left: 7px;
+      top: 45px;
+      width: 48px;
+      height: 66px;
+      border: 3px solid #253244;
+      border-radius: 14px 14px 8px 8px;
+      background: linear-gradient(#60a5fa, #2563eb);
+    }
+
+    .door-visitor .hand {
+      position: absolute;
+      left: 45px;
+      top: 70px;
+      width: 56px;
+      height: 17px;
+      border: 3px solid #253244;
+      border-radius: 999px;
+      background: #f2bd91;
+      transform-origin: left center;
+      transform: rotate(-7deg);
+      animation: handReach 0.7s ease-out both;
+      z-index: 4;
+    }
+
+    .door-visitor .hand::after {
+      content: "";
+      position: absolute;
+      right: -9px;
+      top: -4px;
+      width: 17px;
+      height: 19px;
+      border: 3px solid #253244;
+      border-radius: 50%;
+      background: #f2bd91;
+    }
+
+    @keyframes visitorAppear {
+      from { opacity: 0; transform: translate(-58%, -100%); }
+      to { opacity: 1; transform: translate(-50%, -100%); }
+    }
+
+    @keyframes handReach {
+      from { transform: rotate(-7deg) scaleX(0.3); opacity: 0; }
+      to { transform: rotate(-7deg) scaleX(1); opacity: 1; }
+    }
+
+    .floor-panel {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(430px, 88%);
+      padding: 24px;
+      display: none;
+      transform: translate(-50%, -50%);
+      border: 4px solid #64748b;
+      border-radius: 14px;
+      background: rgba(238, 242, 247, 0.96);
+      box-shadow: var(--shadow);
+      z-index: 60;
+    }
+
+    .floor-panel.show { display: block; }
+
+    .floor-title {
+      margin-bottom: 8px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .floor-message {
+      min-height: 26px;
+      margin-bottom: 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .floor-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .floor-btn {
+      height: 74px;
+      border: 2px solid #94a3b8;
+      border-radius: 10px;
+      color: #0f172a;
+      background: #fff;
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .floor-btn:hover { border-color: var(--blue); }
+
+    .elevator-doors {
+      position: absolute;
+      left: 506px;
+      top: 174px;
+      width: 120px;
+      height: 190px;
+      z-index: 50;
+      opacity: 0;
+      display: none;
+      pointer-events: none;
+      background-repeat: no-repeat;
+      background-size: 360px 190px;
+      background-position: 0 0;
+      image-rendering: pixelated;
+    }
+
+    .elevator-doors.active { opacity: 1; }
+    .elevator-doors.open {
+      animation: elevatorOpen 0.45s steps(2) forwards;
+    }
+
+    @keyframes elevatorOpen {
+      from { background-position: 0 0; }
+      to { background-position: -240px 0; }
+    }
+
+    .door-panel {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(226, 232, 240, 0.94), rgba(148, 163, 184, 0.96));
+      border: 2px solid rgba(71, 85, 105, 0.55);
+      transition: transform 0.75s ease-in-out;
+    }
+
+    .door-panel.left { left: 0; transform-origin: left center; }
+    .door-panel.right { right: 0; transform-origin: right center; }
+    .elevator-doors.open .door-panel.left { transform: translateX(-85%) scaleX(0.22); }
+    .elevator-doors.open .door-panel.right { transform: translateX(85%) scaleX(0.22); }
+    .elevator-doors .door-panel { display: none; }
+
+    .interaction {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      z-index: 70;
+      display: none;
+      gap: 10px;
+      align-items: center;
+      transform: translateX(-50%);
+      padding: 10px;
+      border: 1px solid rgba(216, 222, 232, 0.95);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+    }
+
+    .interaction.show { display: flex; }
+
+    .interaction span {
+      display: none;
+      color: var(--muted);
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      top: 18px;
+      z-index: 85;
+      max-width: min(680px, calc(100% - 36px));
+      padding: 12px 16px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      color: #fff;
+      background: #111827;
+      font-weight: 850;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 8px);
+    }
+
+    .touch-controls {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      z-index: 65;
+      width: 132px;
+      height: 132px;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(255, 255, 255, 0.72);
+      border-radius: 50%;
+      background: rgba(17, 24, 39, 0.28);
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.2);
+      backdrop-filter: blur(5px);
+      touch-action: none;
+      -webkit-touch-callout: none;
+    }
+
+    .joystick-knob {
+      width: 62px;
+      height: 62px;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(255, 255, 255, 0.86);
+      border-radius: 50%;
+      color: #fff;
+      background: rgba(249, 115, 22, 0.92);
+      box-shadow: 0 7px 16px rgba(15, 23, 42, 0.28);
+      font-size: 23px;
+      font-weight: 900;
+      pointer-events: none;
+      transform: translate(0, 0);
+      transition: transform 80ms ease-out;
+    }
+
+    .touch-controls.active .joystick-knob { transition: none; }
+
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: #172033;
+      transition: opacity 220ms ease;
+    }
+
+    .loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .instruction-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 250;
+      display: grid;
+      place-items: center;
+      padding:
+        max(18px, env(safe-area-inset-top))
+        18px
+        max(18px, env(safe-area-inset-bottom));
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(7px);
+    }
+
+    .instruction-screen.hidden { display: none; }
+
+    .instruction-panel {
+      width: min(620px, 100%);
+      max-height: calc(100dvh - 36px);
+      padding: clamp(22px, 4vw, 36px);
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 28px 80px rgba(15, 23, 42, 0.38);
+    }
+
+    .instruction-panel h2 {
+      margin: 0 0 14px;
+      font-size: clamp(28px, 5vw, 38px);
+    }
+
+    .instruction-panel p,
+    .instruction-panel li {
+      color: #475467;
+      font-size: clamp(15px, 2.5vw, 17px);
+      line-height: 1.65;
+    }
+
+    .instruction-panel ul {
+      margin: 16px 0 22px;
+      padding-left: 24px;
+    }
+
+    .instruction-panel li + li { margin-top: 9px; }
+
+    .loading-card {
+      width: min(320px, calc(100% - 40px));
+      text-align: center;
+    }
+
+    .loading-bar {
+      height: 8px;
+      margin-top: 14px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .loading-bar span {
+      display: block;
+      width: 36%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--brand);
+      animation: loadingSlide 1s ease-in-out infinite alternate;
+    }
+
+    @keyframes loadingSlide {
+      to { transform: translateX(178%); }
+    }
+
+    .finish {
+      position: absolute;
+      inset: 0;
+      z-index: 95;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      text-align: center;
+      background: rgba(248, 250, 252, 0.96);
+    }
+
+    .finish.show { display: grid; }
+
+    .finish-panel {
+      width: min(460px, 92%);
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .finish-panel h2 {
+      margin: 0 0 10px;
+      font-size: 34px;
+    }
+
+    .finish-panel p {
+      margin: 0 0 20px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .finish-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .feedback-panel {
+      width: min(520px, 94%);
+      text-align: left;
+    }
+
+    .feedback-panel h2,
+    .feedback-panel > p {
+      text-align: center;
+    }
+
+    .feedback-form {
+      display: grid;
+      gap: 15px;
+    }
+
+    .feedback-field {
+      display: grid;
+      gap: 7px;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .feedback-field input,
+    .feedback-field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px 12px;
+      color: var(--ink);
+      background: #fff;
+      font: inherit;
+      font-weight: 500;
+    }
+
+    .feedback-field textarea {
+      min-height: 118px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .feedback-field input:focus,
+    .feedback-field textarea:focus {
+      outline: 3px solid rgba(249, 115, 22, 0.2);
+      border-color: var(--brand);
+    }
+
+    .rating-options {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+    }
+
+    .rating-options label {
+      display: grid;
+      place-items: center;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff7ed;
+      cursor: pointer;
+    }
+
+    .rating-options label:has(input:checked) {
+      color: #fff;
+      border-color: var(--brand);
+      background: var(--brand);
+    }
+
+    .rating-options input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .feedback-note {
+      margin: -3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.45;
+    }
+
+    .feedback-error {
+      display: none;
+      margin: 0;
+      color: #b91c1c;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .feedback-error.show { display: block; }
+    .feedback-error.success { color: #15803d; }
+
+    @media (max-width: 900px) {
+      html,
+      body {
+        width: 100%;
+        height: 100dvh;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .app {
+        width: min(100vw, calc(177.78dvh - 98px));
+        height: auto;
+        min-height: 0;
+        margin: auto;
+        border: 0;
+        border-radius: 0;
+      }
+
+      .main { min-height: 0; }
+      .stage {
+        width: 100%;
+        max-height: none;
+      }
+
+      .actor {
+        width: clamp(48px, 13vw, 88px);
+        height: clamp(76px, 20.6vw, 140px);
+      }
+
+      .touch-controls {
+        right: max(8px, env(safe-area-inset-right));
+        bottom: max(8px, env(safe-area-inset-bottom));
+        width: clamp(86px, 25vw, 112px);
+        height: clamp(86px, 25vw, 112px);
+      }
+
+      .joystick-knob {
+        width: clamp(44px, 12vw, 58px);
+        height: clamp(44px, 12vw, 58px);
+      }
+
+      .interaction { max-width: calc(100% - 24px); }
+      .status {
+        min-height: 55px;
+        padding: max(7px, env(safe-area-inset-top)) 8px 7px;
+        gap: 6px;
+      }
+
+      .current-pill { font-size: 12px; }
+      .top-feedback-btn { padding: 0 11px; font-size: 12px; }
+      .game-hud {
+        left: 8px;
+        right: 8px;
+        top: 7px;
+        grid-template-columns: 82px 1fr 70px;
+        gap: 5px;
+      }
+
+      .pause-badge {
+        width: 76px;
+        height: 38px;
+        font-size: 12px;
+      }
+
+      .mission-title { font-size: clamp(17px, 5vw, 25px); }
+      .coin-row { gap: 3px; }
+      .coin { width: 14px; height: 14px; }
+
+      #feedback-screen {
+        position: fixed;
+        z-index: 220;
+        min-height: 100dvh;
+        overflow-y: auto;
+        padding:
+          max(12px, env(safe-area-inset-top))
+          12px
+          max(12px, env(safe-area-inset-bottom));
+      }
+
+      .feedback-panel {
+        width: min(100%, 480px);
+        padding: 18px;
+        margin: auto;
+      }
+
+      .feedback-panel h2 { font-size: 27px; }
+      .feedback-form { gap: 11px; }
+      .feedback-field input,
+      .feedback-field textarea { font-size: 16px; }
+      .feedback-field textarea { min-height: 88px; }
+    }
+
+    @media (orientation: landscape) and (max-height: 600px) {
+      .app {
+        width: min(100vw, calc(177.78dvh - 78px));
+      }
+
+      .status {
+        min-height: 44px;
+        padding:
+          max(4px, env(safe-area-inset-top))
+          max(7px, env(safe-area-inset-right))
+          4px
+          max(7px, env(safe-area-inset-left));
+      }
+
+      .current-pill {
+        padding: 6px 9px;
+        border-radius: 6px;
+        font-size: 11px;
+      }
+
+      .top-feedback-btn {
+        min-height: 32px;
+        padding: 0 10px;
+        font-size: 11px;
+      }
+
+      .actor {
+        width: clamp(42px, 8vw, 70px);
+        height: clamp(67px, 12.7vw, 111px);
+      }
+
+      .touch-controls {
+        width: clamp(72px, 18vh, 88px);
+        height: clamp(72px, 18vh, 88px);
+      }
+
+      .joystick-knob {
+        width: clamp(38px, 9vh, 46px);
+        height: clamp(38px, 9vh, 46px);
+        font-size: 17px;
+      }
+
+      .game-hud {
+        top: 5px;
+        grid-template-columns: 68px 1fr 58px;
+      }
+
+      .pause-badge {
+        width: 64px;
+        height: 30px;
+        font-size: 10px;
+      }
+
+      .mission-title {
+        font-size: clamp(14px, 4vh, 19px);
+        text-shadow:
+          2px 0 #2f241d,
+          -2px 0 #2f241d,
+          0 2px #2f241d,
+          0 -2px #2f241d;
+      }
+
+      .coin { width: 11px; height: 11px; }
+      .interaction { bottom: 7px; }
+      .interaction .primary-btn { min-height: 32px; font-size: 11px; }
+
+      .instruction-panel {
+        width: min(680px, calc(100% - 24px));
+        max-height: calc(100dvh - 16px);
+        padding: 14px 18px;
+      }
+
+      .instruction-panel h2 {
+        margin-bottom: 7px;
+        font-size: 23px;
+      }
+
+      .instruction-panel p,
+      .instruction-panel li {
+        margin-top: 7px;
+        margin-bottom: 7px;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .instruction-panel ul { margin: 8px 0 10px; }
+      .instruction-panel li + li { margin-top: 4px; }
+      .instruction-panel .primary-btn { min-height: 32px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-screen" id="loading-screen" role="status" aria-label="Loading game">
+    <div class="loading-card">
+      <strong>Loading game…</strong>
+      <div class="loading-bar"><span></span></div>
+    </div>
+  </div>
+  <section class="instruction-screen" id="instruction-screen" role="dialog" aria-modal="true" aria-labelledby="instruction-title">
+    <div class="instruction-panel">
+      <h2 id="instruction-title">Instructions</h2>
+      <p>
+        This is a listening activity designed to help you practise Chinese <strong>把 sentences</strong>.
+        You are a delivery driver. First, open the order list and call each customer. Listen carefully—the
+        customers will tell you where they would like you to put their food. Then enter the apartment
+        building and deliver each order according to the customer’s instructions.
+      </p>
+      <ul>
+        <li>On a computer, use the arrow keys or <strong>WASD</strong> to move the delivery driver.</li>
+        <li>On a phone or tablet, use the joystick in the bottom-right corner. We recommend playing in landscape mode for easier controls.</li>
+      </ul>
+      <p>When you are ready, begin the listening activity and see if you can complete every delivery correctly!</p>
+      <button class="primary-btn" id="instruction-start" type="button">Start the activity</button>
+    </div>
+  </section>
+  <div class="modal-backdrop" id="order-backdrop"></div>
+  <main class="app">
+    <aside class="side" id="order-modal" aria-label="订单弹窗">
+      <section class="modal-head">
+        <div>
+          <h1>外卖员送外卖</h1>
+          <p class="intro">用方向键或 WASD 控制外卖员。靠近入口、电梯和门口时会出现按钮；根据顾客要求拖动手里的外卖。</p>
+        </div>
+        <button class="close-btn" id="order-close" type="button" aria-label="关闭订单">×</button>
+      </section>
+
+      <div class="progress" aria-label="配送进度">
+        <div class="step active" data-step="call"></div>
+        <div class="step" data-step="travel"></div>
+        <div class="step" data-step="deliver"></div>
+      </div>
+
+      <section class="card">
+        <h2>订单</h2>
+        <div class="orders" id="orders"></div>
+      </section>
+
+    </aside>
+
+    <section class="main">
+      <header class="status">
+        <div>
+          <div class="status-title" id="status-title">请先查看订单</div>
+          <div class="status-hint" id="status-hint">点击左上角订单按钮，选择订单后出发。</div>
+        </div>
+        <div class="current-pill" id="current-pill">当前订单：无</div>
+        <button class="top-feedback-btn" id="top-feedback-btn" type="button">Leave comments</button>
+      </header>
+
+      <div class="stage game" id="stage">
+        <div class="scene-bg pixel-scene" id="scene-art" aria-hidden="true"></div>
+        <div class="game-hud">
+          <button class="pause-badge attention" id="order-toggle" type="button">订单</button>
+          <div class="mission-title" id="mission-title">Delivery<br>Quest</div>
+          <div class="coin-row">
+            <span class="coin"></span>
+            <span class="coin"></span>
+            <span class="coin"></span>
+            <span class="coin"></span>
+          </div>
+        </div>
+        <div class="overlay" id="debug-layer" aria-hidden="true"></div>
+
+        <div class="actor" id="actor" aria-hidden="true">
+          <div class="backpack"></div>
+          <div class="helmet"></div>
+          <div class="head"><div class="face"></div><div class="smile"></div></div>
+          <div class="strap"></div>
+          <div class="torso"></div>
+          <div class="arm left"></div>
+          <div class="arm right"></div>
+          <div class="hip"></div>
+          <div class="leg left"><div class="shoe"></div></div>
+          <div class="leg right"><div class="shoe"></div></div>
+        </div>
+
+        <div class="carried-bag" id="carried-bag" aria-label="手中的外卖"></div>
+        <div class="placed-bag" id="placed-bag" aria-hidden="true"></div>
+        <div class="door-visitor" id="door-visitor" aria-hidden="true">
+          <div class="door-shadow"></div>
+          <div class="person">
+            <div class="hair"></div>
+            <div class="head"></div>
+            <div class="eye left"></div>
+            <div class="eye right"></div>
+            <div class="mouth"></div>
+            <div class="shirt"></div>
+            <div class="hand"></div>
+          </div>
+        </div>
+
+        <div class="elevator-doors" id="elevator-doors" aria-hidden="true">
+          <div class="door-panel left"></div>
+          <div class="door-panel right"></div>
+        </div>
+
+        <section class="floor-panel" id="floor-panel" aria-label="电梯楼层">
+          <div class="floor-title">电梯</div>
+          <div class="floor-message" id="floor-message">请选择楼层。</div>
+          <div class="floor-buttons">
+            <button class="floor-btn" data-floor="4" type="button">4</button>
+            <button class="floor-btn" data-floor="3" type="button">3</button>
+            <button class="floor-btn" data-floor="2" type="button">2</button>
+            <button class="floor-btn" data-floor="1" type="button">1</button>
+          </div>
+        </section>
+
+        <div class="interaction" id="interaction">
+          <span id="interaction-label">靠近可互动对象</span>
+          <button class="primary-btn" id="interaction-btn" type="button">互动</button>
+        </div>
+
+        <div class="touch-controls" id="joystick" role="group" aria-label="Movement joystick">
+          <div class="joystick-knob" id="joystick-knob" aria-hidden="true">✥</div>
+        </div>
+
+        <div class="toast" id="toast" role="status"></div>
+
+        <section class="finish" id="finish-screen" aria-label="完成">
+          <div class="finish-panel">
+            <h2>全部配送成功！</h2>
+            <p>所有订单都已经送达，今天的配送任务完成了。</p>
+            <div class="finish-actions">
+              <button class="primary-btn" id="leave-feedback-btn" type="button">Leave comments</button>
+              <button class="ghost-btn" type="button" onclick="location.reload()">再玩一次</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="finish" id="feedback-screen" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
+          <div class="finish-panel feedback-panel">
+            <h2 id="feedback-title">Leave comments</h2>
+            <p>Your feedback will help improve this activity.</p>
+            <form class="feedback-form" id="feedback-form">
+              <label class="feedback-field">
+                Name or nickname (optional)
+                <input id="feedback-name" name="name" maxlength="60" autocomplete="name" />
+              </label>
+              <fieldset class="feedback-field" style="border: 0; padding: 0; margin: 0;">
+                <legend style="margin-bottom: 7px;">Are you a teacher or a student?</legend>
+                <div class="rating-options" style="grid-template-columns: repeat(2, 1fr);">
+                  <label><input type="radio" name="role" value="Teacher" required />Teacher</label>
+                  <label><input type="radio" name="role" value="Student" />Student</label>
+                </div>
+              </fieldset>
+              <fieldset class="feedback-field" style="border: 0; padding: 0; margin: 0;">
+                <legend style="margin-bottom: 7px;">How was this activity?</legend>
+                <div class="rating-options">
+                  <label><input type="radio" name="rating" value="1" required />1</label>
+                  <label><input type="radio" name="rating" value="2" />2</label>
+                  <label><input type="radio" name="rating" value="3" />3</label>
+                  <label><input type="radio" name="rating" value="4" />4</label>
+                  <label><input type="radio" name="rating" value="5" />5</label>
+                </div>
+              </fieldset>
+              <label class="feedback-field">
+                Your comments
+                <textarea id="feedback-comments" name="comments" maxlength="1200" required placeholder="What was helpful, confusing, or difficult? How could this activity be improved?"></textarea>
+              </label>
+              <p class="feedback-error" id="feedback-error" role="alert"></p>
+              <div class="finish-actions">
+                <button class="primary-btn" type="submit">Submit feedback</button>
+                <button class="ghost-btn" id="feedback-cancel" type="button">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const FEEDBACK_ENDPOINT = "https://formspree.io/f/xeeyngaa";
+
+    const orders = {
+      201: {
+        room: "201",
+        floor: 2,
+        dish: "炒饭",
+        status: "未联系",
+        called: false,
+        completed: false,
+        enabled: true,
+        dialogue: ["你好，你的外卖到了。", "我在家里，你可以敲门。"],
+        target: "customer",
+        actionLabel: "把外卖递给顾客"
+      },
+      301: {
+        room: "301",
+        floor: 3,
+        dish: "牛肉面",
+        status: "未联系",
+        called: false,
+        completed: false,
+        enabled: true,
+        dialogue: ["你好，你的外卖到了。", "请你帮我把外卖放在鞋柜上。"],
+        target: "shoeCabinet",
+        actionLabel: "把外卖放在鞋柜上"
+      },
+      302: {
+        room: "302",
+        floor: 3,
+        dish: "饺子",
+        status: "未联系",
+        called: false,
+        completed: false,
+        enabled: true,
+        dialogue: ["你好，你的外卖到了。", "不好意思，我不在家，你把外卖放在外卖柜里吧。"],
+        target: "locker",
+        actionLabel: "把外卖放进外卖柜"
+      },
+      402: {
+        room: "402",
+        floor: 4,
+        dish: "奶茶",
+        status: "未联系",
+        called: false,
+        completed: false,
+        enabled: true,
+        dialogue: ["你好，你的外卖到了。", "你把外卖挂在门上吧。"],
+        target: "doorHook",
+        actionLabel: "把外卖挂在门上"
+      }
+    };
+
+    const sceneData = {
+      outside: {
+        name: "居民楼外",
+        art: "outside",
+        spawn: { x: 120, y: 480 },
+        walk: { x: 8, y: 305, w: 884, h: 199 },
+        obstacles: [
+          { x: 0, y: 0, w: 900, h: 292 },
+          { x: 840, y: 318, w: 50, h: 72 }
+        ],
+        interactions: [
+          {
+            id: "enterBuilding",
+            label: "进入大楼",
+            rects: [
+              { x: 575, y: 330, w: 175, h: 28 },
+              { x: 560, y: 358, w: 285, h: 42 }
+            ],
+            requiresOrder: false
+          }
+        ],
+        lockerDrop: { x: 430, y: 265, w: 225, h: 188 },
+        bagTarget: { x: 540, y: 354 }
+      },
+      lobby: {
+        name: "一楼大厅",
+        art: "lobby",
+        spawn: { x: 150, y: 438 },
+        walk: { x: 70, y: 305, w: 760, h: 180 },
+        obstacles: [
+          { x: 0, y: 0, w: 900, h: 285 },
+          { x: 0, y: 485, w: 900, h: 80 },
+          { x: 480, y: 250, w: 150, h: 78 }
+        ],
+        interactions: [
+          { id: "exitBuilding", label: "走出大楼", rect: { x: 72, y: 330, w: 140, h: 145 }, requiresOrder: false },
+          { id: "enterElevator", label: "进入电梯", rect: { x: 485, y: 310, w: 145, h: 92 }, requiresOrder: true }
+        ]
+      },
+      hall2: {
+        name: "二楼走廊",
+        art: "hall2",
+        spawn: { x: 535, y: 430 },
+        walk: { x: 55, y: 330, w: 790, h: 150 },
+        obstacles: [
+          { x: 0, y: 0, w: 900, h: 310 },
+          { x: 0, y: 480, w: 900, h: 80 },
+          { x: 438, y: 305, w: 185, h: 48 }
+        ],
+        interactions: [
+          { id: "enterElevator", label: "进入电梯", rect: { x: 465, y: 300, w: 140, h: 125 }, requiresOrder: false },
+          { id: "knock201Door", label: "敲门", rect: { x: 132, y: 292, w: 190, h: 154 }, requiresOrder: true, order: "201" }
+        ],
+        visitorPoint: { x: 238, y: 346 },
+        customerHandDrop: { x: 178, y: 250, w: 86, h: 82 },
+        bagTarget: { x: 220, y: 292 }
+      },
+      hall3: {
+        name: "三楼走廊",
+        art: "hall3",
+        spawn: { x: 535, y: 430 },
+        walk: { x: 55, y: 330, w: 790, h: 150 },
+        obstacles: [
+          { x: 0, y: 0, w: 900, h: 310 },
+          { x: 0, y: 480, w: 900, h: 80 },
+          { x: 438, y: 305, w: 185, h: 48 },
+          { x: 240, y: 350, w: 152, h: 58 }
+        ],
+        interactions: [
+          { id: "enterElevator", label: "进入电梯", rect: { x: 465, y: 300, w: 140, h: 125 }, requiresOrder: false }
+        ],
+        shoeCabinetDrop: { x: 232, y: 268, w: 180, h: 72 },
+        bagTarget: { x: 318, y: 286 }
+      },
+      hall4: {
+        name: "四楼走廊",
+        art: "hall4",
+        spawn: { x: 535, y: 430 },
+        walk: { x: 55, y: 330, w: 790, h: 150 },
+        obstacles: [
+          { x: 0, y: 0, w: 900, h: 310 },
+          { x: 0, y: 480, w: 900, h: 80 },
+          { x: 438, y: 305, w: 185, h: 48 }
+        ],
+        interactions: [
+          { id: "enterElevator", label: "进入电梯", rect: { x: 465, y: 300, w: 140, h: 125 }, requiresOrder: false }
+        ],
+        doorHandleDrop: { x: 746, y: 246, w: 82, h: 122 },
+        bagTarget: { x: 786, y: 284 }
+      }
+    };
+
+    const state = {
+      sceneId: "outside",
+      currentOrder: null,
+      carrying: false,
+      busy: false,
+      player: { x: 120, y: 480, speed: 210, dir: 1 },
+      keys: new Set(),
+      activeInteraction: null,
+      elevatorOpenScene: false,
+      bagReady: false,
+      bagDragging: false,
+      bagDragOffsetX: 0,
+      bagDragOffsetY: 0,
+      door201Open: false,
+      lastFrame: performance.now()
+    };
+
+    const stage = document.getElementById("stage");
+    const sceneArt = document.getElementById("scene-art");
+    const debugLayer = document.getElementById("debug-layer");
+    const actor = document.getElementById("actor");
+    const carriedBag = document.getElementById("carried-bag");
+    const placedBag = document.getElementById("placed-bag");
+    const doorVisitor = document.getElementById("door-visitor");
+    const orderModal = document.getElementById("order-modal");
+    const orderBackdrop = document.getElementById("order-backdrop");
+    const orderToggle = document.getElementById("order-toggle");
+    const orderClose = document.getElementById("order-close");
+    const ordersEl = document.getElementById("orders");
+    const statusTitle = document.getElementById("status-title");
+    const statusHint = document.getElementById("status-hint");
+    const currentPill = document.getElementById("current-pill");
+    const missionTitle = document.getElementById("mission-title");
+    const interaction = document.getElementById("interaction");
+    const interactionLabel = document.getElementById("interaction-label");
+    const interactionBtn = document.getElementById("interaction-btn");
+    const floorPanel = document.getElementById("floor-panel");
+    const floorMessage = document.getElementById("floor-message");
+    const elevatorDoors = document.getElementById("elevator-doors");
+    const toast = document.getElementById("toast");
+    const finishScreen = document.getElementById("finish-screen");
+    const feedbackScreen = document.getElementById("feedback-screen");
+    const leaveFeedbackBtn = document.getElementById("leave-feedback-btn");
+    const feedbackForm = document.getElementById("feedback-form");
+    const feedbackComments = document.getElementById("feedback-comments");
+    const feedbackError = document.getElementById("feedback-error");
+    const feedbackCancel = document.getElementById("feedback-cancel");
+    const topFeedbackBtn = document.getElementById("top-feedback-btn");
+    const joystick = document.getElementById("joystick");
+    const joystickKnob = document.getElementById("joystick-knob");
+    const loadingScreen = document.getElementById("loading-screen");
+    const instructionScreen = document.getElementById("instruction-screen");
+    const instructionStart = document.getElementById("instruction-start");
+
+    let toastTimer = null;
+
+    const WORLD = { w: 900, h: 506 };
+    const BAG_STYLES = {
+      201: { main: "#fef3c7", stroke: "#92400e", shadow: "rgba(245, 158, 11, 0.55)" },
+      301: { main: "#fee2e2", stroke: "#991b1b", shadow: "rgba(248, 113, 113, 0.5)" },
+      302: { main: "#dcfce7", stroke: "#166534", shadow: "rgba(34, 197, 94, 0.45)" },
+      402: { main: "#e0f2fe", stroke: "#075985", shadow: "rgba(14, 165, 233, 0.42)" }
+    };
+
+    function scaleX(value) {
+      return value * stage.clientWidth / WORLD.w;
+    }
+
+    function scaleY(value) {
+      return value * stage.clientHeight / WORLD.h;
+    }
+
+    function worldRect(rect) {
+      return {
+        x: scaleX(rect.x),
+        y: scaleY(rect.y),
+        w: scaleX(rect.w),
+        h: scaleY(rect.h)
+      };
+    }
+
+    function worldPoint(point) {
+      return { x: scaleX(point.x), y: scaleY(point.y) };
+    }
+
+    function renderOrders() {
+      ordersEl.innerHTML = "";
+      Object.values(orders).forEach(order => {
+        const card = document.createElement("article");
+        card.className = "order";
+        card.classList.toggle("active", state.currentOrder === order.room);
+        card.classList.toggle("done", order.completed);
+        card.dataset.order = order.room;
+        card.tabIndex = order.enabled && !order.completed ? 0 : -1;
+        card.setAttribute("role", "button");
+        card.setAttribute("aria-disabled", order.enabled && !order.completed ? "false" : "true");
+        card.innerHTML = `
+          <div class="room">${order.room}</div>
+          <div>
+            <strong>${order.status}</strong>
+            <small>${order.dish}${order.enabled ? "" : " · 后续阶段开放"}</small>
+          </div>
+        `;
+        ordersEl.appendChild(card);
+      });
+    }
+
+    function openOrderModal() {
+      orderToggle.classList.remove("attention");
+      orderModal.classList.add("open");
+      orderBackdrop.classList.add("show");
+    }
+
+    function closeOrderModal() {
+      orderModal.classList.remove("open");
+      orderBackdrop.classList.remove("show");
+    }
+
+    function callOrder(room) {
+      const order = orders[room];
+      if (!order.enabled || order.completed) return;
+      order.called = true;
+      order.status = "已联系";
+      updateStatus("通话完成", `听到要求：${order.dialogue[1]}`);
+      missionTitle.innerHTML = "Call<br>Done";
+      speakPhoneDialogue(room);
+      startOrder(room);
+    }
+
+    function startOrder(room) {
+      const order = orders[room];
+      if (!order.called || !order.enabled || order.completed) return;
+      state.currentOrder = room;
+      state.carrying = true;
+      order.status = "配送中";
+      actor.classList.add("carrying");
+      placedBag.classList.remove("show");
+      applyBagStyle(carriedBag, room);
+      currentPill.textContent = `当前订单：${room}`;
+      missionTitle.innerHTML = `Order<br>${room}`;
+      updateStatus(`${room} 配送中`, "走到大楼入口附近，会出现“进入大楼”按钮。");
+      updateSteps("travel");
+      showToast("外卖已经在外卖员手中。");
+      if (room === "302") {
+        updateStatus("302 配送中", "顾客不在家，把外卖拖到楼外的外卖柜。");
+      }
+      renderOrders();
+      updateCarriedBagPosition();
+      evaluateInteractions();
+    }
+
+    function renderPixelScene(sceneId) {
+      const art = {
+        outside: "assets/generated-art/exterior-with-locker.jpg",
+        lobby: "assets/generated-art/lobby-no-locker.jpg",
+        lobbyOpen: "assets/generated-art/lobby-no-locker-elevator-open.jpg",
+        hall2: "assets/generated-art/hall-floor-2-redesign.jpg",
+        hall2Open: "assets/generated-art/hall-floor-2-201-open-resident-v5.jpg",
+        hall2ElevatorOpen: "assets/generated-art/hall-floor-2-redesign-elevator-open.jpg",
+        hall3: "assets/generated-art/hall-floor-3-redesign.jpg",
+        hall3Open: "assets/generated-art/hall-floor-3-redesign-elevator-open.jpg",
+        hall4: "assets/generated-art/hall-floor-4-redesign.jpg",
+        hall4Open: "assets/generated-art/hall-floor-4-redesign-elevator-open.jpg"
+      };
+
+      const hallFloor = sceneId.startsWith("hall") ? sceneId.replace("hall", "") : "";
+      const hallDoors = {
+        hall2: [{ room: "201", left: 170 }, { room: "202", left: 610 }],
+        hall3: [{ room: "301", left: 160 }, { room: "302", left: 615 }],
+        hall4: [{ room: "401", left: 160 }, { room: "402", left: 615 }]
+      };
+
+      const windows = `
+        <div class="pixel-item pixel-window" style="left:320px;top:92px;"></div>
+        <div class="pixel-item pixel-window" style="left:420px;top:92px;"></div>
+        <div class="pixel-item pixel-window" style="left:520px;top:92px;"></div>
+        <div class="pixel-item pixel-window" style="left:320px;top:164px;"></div>
+        <div class="pixel-item pixel-window" style="left:520px;top:164px;"></div>
+      `;
+
+      const elevator = `<div class="pixel-item pixel-elevator"></div>`;
+      const locker = `
+        <div class="pixel-item pixel-locker">
+          <span></span><span></span><span></span>
+          <span></span><span></span><span></span>
+        </div>
+      `;
+
+      if (sceneId === "outside") {
+        sceneArt.innerHTML = `
+          <img class="art-bg" src="${art.outside}" alt="">
+        `;
+        return;
+      }
+
+      if (sceneId === "lobby") {
+        sceneArt.innerHTML = `
+          <img class="art-bg" src="${state.elevatorOpenScene ? art.lobbyOpen : art.lobby}" alt="">
+        `;
+        return;
+      }
+
+      if (sceneId === "hall2" || sceneId === "hall3" || sceneId === "hall4") {
+        let hallImage = art[sceneId];
+        if (sceneId === "hall2" && state.door201Open && !orders[201].completed) hallImage = art.hall2Open;
+        if (state.elevatorOpenScene && sceneId === "hall2") hallImage = art.hall2ElevatorOpen;
+        if (state.elevatorOpenScene && sceneId === "hall3") hallImage = art.hall3Open;
+        if (state.elevatorOpenScene && sceneId === "hall4") hallImage = art.hall4Open;
+        sceneArt.innerHTML = `
+          <img class="art-bg" src="${hallImage}" alt="">
+        `;
+        return;
+      }
+
+      const doors = hallDoors[sceneId].map(door => `
+        <div class="pixel-item pixel-room-door" style="left:${door.left}px;">
+          <div class="number">${door.room}</div>
+          ${door.room === "402" ? '<div class="pixel-item pixel-hook" style="left:74px;top:96px;"></div>' : ""}
+        </div>
+      `).join("");
+
+      sceneArt.innerHTML = `
+        <div class="pixel-item pixel-wall" style="background:#e6edf7;"></div>
+        <div class="pixel-item pixel-floor"></div>
+        ${elevator}
+        ${doors}
+        <div class="pixel-item pixel-sign" style="left:390px;top:70px;width:120px;height:36px;">${hallFloor} 楼</div>
+      `;
+    }
+
+    function setScene(sceneId) {
+      const scene = sceneData[sceneId];
+      state.sceneId = sceneId;
+      state.activeInteraction = null;
+      state.elevatorOpenScene = false;
+      renderPixelScene(scene.art);
+      floorPanel.classList.remove("show");
+      elevatorDoors.classList.remove("active", "open");
+      actor.classList.remove("hidden");
+      setPlayer(scene.spawn.x, scene.spawn.y);
+      const completedPlacement = getCompletedPlacementForScene(sceneId);
+      placedBag.classList.toggle("show", Boolean(completedPlacement));
+      if (completedPlacement) {
+        applyBagStyle(placedBag, completedPlacement.room);
+        positionPlacedBag(completedPlacement.point);
+      }
+      updateDoorVisitor();
+      renderDebug(scene);
+      updateStatus(scene.name, sceneId === "outside" ? "选择订单后，靠近大楼入口。" : "用方向键或 WASD 移动。");
+      evaluateInteractions();
+    }
+
+    function setPlayer(x, y) {
+      state.player.x = x;
+      state.player.y = y;
+      updateActorPosition();
+    }
+
+    function updateActorPosition() {
+      actor.style.left = `${scaleX(state.player.x)}px`;
+      actor.style.top = `${scaleY(state.player.y)}px`;
+      actor.style.setProperty("--dir", state.player.dir);
+      updateCarriedBagPosition();
+    }
+
+    function updateCarriedBagPosition() {
+      if (!state.carrying || actor.classList.contains("hidden")) {
+        carriedBag.classList.remove("show", "ready");
+        return;
+      }
+      if (state.bagDragging) return;
+      const side = state.player.dir >= 0 ? 1 : -1;
+      applyBagStyle(carriedBag, state.currentOrder);
+      carriedBag.style.left = `${scaleX(state.player.x + side * 28)}px`;
+      carriedBag.style.top = `${scaleY(state.player.y - 42)}px`;
+      carriedBag.classList.add("show");
+      carriedBag.classList.toggle("ready", Boolean(getActiveDropConfig()) && !state.busy);
+    }
+
+    function gameLoop(now) {
+      const dt = Math.min(0.04, (now - state.lastFrame) / 1000);
+      state.lastFrame = now;
+      if (!state.busy && !floorPanel.classList.contains("show")) movePlayer(dt);
+      requestAnimationFrame(gameLoop);
+    }
+
+    function movePlayer(dt) {
+      let dx = 0;
+      let dy = 0;
+      if (state.keys.has("ArrowLeft") || state.keys.has("a")) dx -= 1;
+      if (state.keys.has("ArrowRight") || state.keys.has("d")) dx += 1;
+      if (state.keys.has("ArrowUp") || state.keys.has("w")) dy -= 1;
+      if (state.keys.has("ArrowDown") || state.keys.has("s")) dy += 1;
+      if (dx === 0 && dy === 0) {
+        actor.classList.remove("walking");
+        return;
+      }
+
+      const length = Math.hypot(dx, dy) || 1;
+      dx /= length;
+      dy /= length;
+      if (dx < 0) state.player.dir = -1;
+      if (dx > 0) state.player.dir = 1;
+
+      const next = {
+        x: state.player.x + dx * state.player.speed * dt,
+        y: state.player.y + dy * state.player.speed * dt
+      };
+
+      if (canStandAt(next.x, next.y)) {
+        state.player.x = next.x;
+        state.player.y = next.y;
+      } else if (canStandAt(next.x, state.player.y)) {
+        state.player.x = next.x;
+      } else if (canStandAt(state.player.x, next.y)) {
+        state.player.y = next.y;
+      }
+
+      actor.classList.add("walking");
+      updateActorPosition();
+      evaluateInteractions();
+    }
+
+    function canStandAt(x, y) {
+      const scene = sceneData[state.sceneId];
+      const foot = { x: x - 18, y: y - 12, w: 36, h: 24 };
+      if (!rectContains(scene.walk, foot)) return false;
+      return !scene.obstacles.some(obstacle => rectsIntersect(foot, obstacle));
+    }
+
+    function evaluateInteractions() {
+      if (state.busy) return;
+      const scene = sceneData[state.sceneId];
+      const footPoint = { x: state.player.x, y: state.player.y };
+      const found = scene.interactions.find(item => {
+        if (item.requiresOrder && !state.currentOrder) return false;
+        if (item.order && state.currentOrder !== item.order) return false;
+        if (item.id === "knock201Door" && state.door201Open) return false;
+        return pointInInteraction(footPoint, item);
+      });
+
+      state.activeInteraction = found || null;
+      if (!found) {
+        updateCarriedBagPosition();
+        interaction.classList.remove("show");
+        return;
+      }
+
+      updateCarriedBagPosition();
+      interactionLabel.textContent = found.label;
+      interactionBtn.textContent = found.label;
+      interaction.classList.add("show");
+    }
+
+    async function handleInteraction() {
+      const item = state.activeInteraction;
+      if (!item || state.busy) return;
+      const handlers = {
+        enterBuilding,
+        enterElevator,
+        exitBuilding,
+        knock201Door,
+        deliver301
+      };
+      await handlers[item.id]();
+      evaluateInteractions();
+    }
+
+    async function enterBuilding() {
+      state.busy = true;
+      interaction.classList.remove("show");
+      updateStatus("进入大楼", "外卖员走进一楼大厅。");
+      await autoWalkTo(755, 382, 760);
+      actor.classList.add("hidden");
+      await wait(180);
+      setScene("lobby");
+      showToast("一楼大厅到了。");
+      state.busy = false;
+    }
+
+    async function knock201Door() {
+      if (state.currentOrder !== "201" || !state.carrying) {
+        showToast("这里需要 201 的外卖。");
+        return;
+      }
+
+      state.busy = true;
+      interaction.classList.remove("show");
+      updateStatus("201 门口", "外卖员敲了敲门。");
+      await playKnockSound();
+      await wait(260);
+      state.door201Open = true;
+      renderPixelScene(state.sceneId);
+      updateDoorVisitor();
+      updateStatus("201 门开了", "男生伸出手，请把外卖递给他。");
+      showToast("把外卖拖到男生手上。");
+      await playAudioFile("assets/audio/door-201-hand-request.mp3");
+      state.busy = false;
+      updateCarriedBagPosition();
+      evaluateInteractions();
+    }
+
+    async function exitBuilding() {
+      state.busy = true;
+      interaction.classList.remove("show");
+      updateStatus("走出大楼", "外卖员从一楼大厅走到楼外。");
+      await autoWalkTo(120, 438, 620);
+      actor.classList.add("hidden");
+      await wait(160);
+      setScene("outside");
+      setPlayer(760, 430);
+      showToast("已经回到楼外。");
+      state.busy = false;
+    }
+
+    async function enterElevator() {
+      state.busy = true;
+      interaction.classList.remove("show");
+      updateStatus("进入电梯", "电梯门打开，外卖员进入电梯。");
+      state.elevatorOpenScene = true;
+      renderPixelScene(state.sceneId);
+      await wait(420);
+      await autoWalkIntoElevator(550, 340, 620);
+      actor.classList.add("hidden");
+      await wait(200);
+      floorPanel.classList.add("show");
+      floorMessage.textContent = "请选择楼层。";
+      state.busy = false;
+    }
+
+    async function chooseFloor(floor) {
+      if (state.busy) return;
+      state.busy = true;
+      floorMessage.textContent = `电梯正在前往 ${floor} 楼...`;
+      await wait(750);
+      await wait(500);
+      floorMessage.textContent = `${floor} 楼到了。`;
+      const nextScene = floor === 1 ? "lobby" : `hall${floor}`;
+      setScene(nextScene);
+      state.elevatorOpenScene = true;
+      renderPixelScene(nextScene);
+      await wait(500);
+      state.elevatorOpenScene = false;
+      renderPixelScene(nextScene);
+      if (floor === 3) {
+        missionTitle.innerHTML = "Floor<br>3";
+        updateStatus("3 楼走廊", getFloorHint(floor));
+      } else if (floor === 1) {
+        updateStatus("一楼大厅", state.currentOrder ? `订单 ${state.currentOrder} 在 ${orders[state.currentOrder].floor} 楼，可以回到电梯选择楼层。` : "可以从左边门口出楼，也可以进入电梯。");
+      } else {
+        updateStatus(`${floor} 楼走廊`, getFloorHint(floor));
+      }
+      state.busy = false;
+    }
+
+    async function deliver301() {
+      await deliverCurrentOrder(getDeliveryConfig("301"));
+    }
+
+    async function deliverCurrentOrder(config) {
+      if (!config || state.currentOrder !== config.room || !state.carrying) {
+        showToast("现在的外卖不能放在这里。");
+        return;
+      }
+
+      const order = orders[config.room];
+      state.busy = true;
+      interaction.classList.remove("show");
+      state.bagReady = false;
+      updateStatus("正在配送", config.progressText);
+      actor.classList.remove("carrying");
+      applyBagStyle(placedBag, config.room);
+      positionPlacedBag(config.point);
+      placedBag.classList.add("show");
+      carriedBag.classList.remove("show", "ready", "dragging");
+      await wait(280);
+
+      order.completed = true;
+      order.status = "已完成";
+      state.carrying = false;
+      state.currentOrder = null;
+      if (config.room === "201") updateDoorVisitor();
+      currentPill.textContent = "当前订单：无";
+      updateStatus(`${config.room} 已完成`, config.doneText);
+      missionTitle.innerHTML = "Quest<br>Clear";
+      updateSteps("deliver");
+      renderOrders();
+      showToast(`${config.room}配送成功！`);
+      speak(`${config.room}配送成功。`);
+      await wait(700);
+
+      if (!areAllPlayableOrdersCompleted()) {
+        const remaining = getRemainingPlayableOrders();
+        missionTitle.innerHTML = "Next<br>Order";
+        updateSteps("call");
+        updateStatus("继续配送", `还剩 ${remaining.length} 个订单，点击左上角订单按钮选择下一单。`);
+        orderToggle.classList.add("attention");
+        state.busy = false;
+        evaluateInteractions();
+        return;
+      }
+
+      const finishTitle = finishScreen.querySelector("h2");
+      const finishText = finishScreen.querySelector("p");
+      finishTitle.textContent = "全部配送成功！";
+      finishText.textContent = "所有订单都已经送达，今天的配送任务完成了。";
+      finishScreen.classList.add("show");
+      state.busy = false;
+      window.setTimeout(openFeedback, 450);
+    }
+
+    function getRemainingPlayableOrders() {
+      return Object.values(orders).filter(order => order.enabled && !order.completed);
+    }
+
+    function areAllPlayableOrdersCompleted() {
+      return getRemainingPlayableOrders().length === 0;
+    }
+
+    async function autoWalkTo(x, y, ms) {
+      const startX = state.player.x;
+      const startY = state.player.y;
+      const startTime = performance.now();
+      actor.classList.add("walking");
+      state.player.dir = x < startX ? -1 : 1;
+      while (performance.now() - startTime < ms) {
+        const t = (performance.now() - startTime) / ms;
+        state.player.x = startX + (x - startX) * t;
+        state.player.y = startY + (y - startY) * t;
+        updateActorPosition();
+        await wait(16);
+      }
+      state.player.x = x;
+      state.player.y = y;
+      updateActorPosition();
+      actor.classList.remove("walking");
+    }
+
+    async function autoWalkIntoElevator(x, y, ms) {
+      const startX = state.player.x;
+      const startY = state.player.y;
+      const startTime = performance.now();
+      actor.classList.add("walking");
+      state.player.dir = 1;
+      while (performance.now() - startTime < ms) {
+        const t = (performance.now() - startTime) / ms;
+        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        state.player.x = startX + (x - startX) * eased;
+        state.player.y = startY + (y - startY) * eased;
+        updateActorPosition();
+        await wait(16);
+      }
+      state.player.x = x;
+      state.player.y = y;
+      updateActorPosition();
+      actor.classList.remove("walking");
+    }
+
+    function positionPlacedBag(point) {
+      const actual = worldPoint(point);
+      placedBag.style.left = `${actual.x}px`;
+      placedBag.style.top = `${actual.y}px`;
+    }
+
+    function applyBagStyle(element, room) {
+      const style = BAG_STYLES[room] || BAG_STYLES[201];
+      element.dataset.bag = room || "201";
+      element.style.setProperty("--bag-main", style.main);
+      element.style.setProperty("--bag-stroke", style.stroke);
+      element.style.setProperty("--bag-shadow", style.shadow);
+    }
+
+    function positionDoorVisitor(point) {
+      const actual = worldPoint(point);
+      doorVisitor.style.left = `${actual.x}px`;
+      doorVisitor.style.top = `${actual.y}px`;
+    }
+
+    function updateDoorVisitor() {
+      doorVisitor.classList.remove("show");
+    }
+
+    function startBagDrag(event) {
+      if (state.busy || !state.carrying || !getActiveDropConfig()) return;
+      event.preventDefault();
+      const rect = carriedBag.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
+      state.bagDragging = true;
+      state.bagDragOffsetX = event.clientX - rect.left;
+      state.bagDragOffsetY = event.clientY - rect.top;
+      carriedBag.classList.add("dragging");
+      carriedBag.style.left = `${rect.left - stageRect.left + rect.width / 2}px`;
+      carriedBag.style.top = `${rect.top - stageRect.top + rect.height / 2}px`;
+      carriedBag.setPointerCapture(event.pointerId);
+    }
+
+    function moveBagDrag(event) {
+      if (!state.bagDragging) return;
+      const stageRect = stage.getBoundingClientRect();
+      const x = event.clientX - stageRect.left - state.bagDragOffsetX + carriedBag.offsetWidth / 2;
+      const y = event.clientY - stageRect.top - state.bagDragOffsetY + carriedBag.offsetHeight / 2;
+      carriedBag.style.left = `${Math.max(18, Math.min(stageRect.width - 18, x))}px`;
+      carriedBag.style.top = `${Math.max(24, Math.min(stageRect.height - 24, y))}px`;
+    }
+
+    async function endBagDrag(event) {
+      if (!state.bagDragging) return;
+      carriedBag.releasePointerCapture(event.pointerId);
+      state.bagDragging = false;
+      carriedBag.classList.remove("dragging");
+
+      const config = getActiveDropConfig();
+      if (isCarriedBagOnDropTarget(config)) {
+        await deliverCurrentOrder(config);
+        return;
+      }
+
+      showToast(config ? config.errorText : "位置不对。请先确认顾客要求。");
+      updateCarriedBagPosition();
+    }
+
+    function isCarriedBagOnShoeCabinet() {
+      return isCarriedBagOnDropTarget(getDeliveryConfig("301"));
+    }
+
+    function isCarriedBagOnDropTarget(config) {
+      if (!config) return false;
+      const scene = sceneData.hall3;
+      const bagRect = carriedBag.getBoundingClientRect();
+      const stageRect = stage.getBoundingClientRect();
+      const center = {
+        x: bagRect.left - stageRect.left + bagRect.width / 2,
+        y: bagRect.top - stageRect.top + bagRect.height / 2
+      };
+      return pointInRect(center, worldRect(config.rect));
+    }
+
+    function getDeliveryConfig(room) {
+      const configs = {
+        301: {
+          room: "301",
+          sceneId: "hall3",
+          rect: sceneData.hall3.shoeCabinetDrop,
+          point: sceneData.hall3.bagTarget,
+          progressText: "外卖员把外卖放在鞋柜上。",
+          doneText: "301配送成功：外卖已经放在鞋柜上。",
+          finishText: "外卖员把外卖放在 301 门口的鞋柜上了。",
+          errorText: "位置不对。301 顾客说要放在鞋柜上。"
+        },
+        201: {
+          room: "201",
+          sceneId: "hall2",
+          rect: sceneData.hall2.customerHandDrop,
+          point: sceneData.hall2.bagTarget,
+          progressText: "外卖员把外卖递到男生手上。",
+          doneText: "201配送成功：外卖已经递给顾客。",
+          finishText: "外卖员在 201 门口敲门后，把外卖递给顾客了。",
+          errorText: "位置不对。201 顾客说要递到他的手上。"
+        },
+        302: {
+          room: "302",
+          sceneId: "outside",
+          rect: sceneData.outside.lockerDrop,
+          point: sceneData.outside.bagTarget,
+          progressText: "外卖员把外卖放进外卖柜。",
+          doneText: "302配送成功：外卖已经放进外卖柜。",
+          finishText: "外卖员把外卖放进楼外的外卖柜里了。",
+          errorText: "位置不对。302 顾客说要放进外卖柜。"
+        },
+        402: {
+          room: "402",
+          sceneId: "hall4",
+          rect: sceneData.hall4.doorHandleDrop,
+          point: sceneData.hall4.bagTarget,
+          progressText: "外卖员把外卖挂在门把手上。",
+          doneText: "402配送成功：外卖已经挂在门把手上。",
+          finishText: "外卖员把外卖挂在 402 门口的门把手上了。",
+          errorText: "位置不对。402 顾客说要挂在门把手上。"
+        }
+      };
+      return configs[room] || null;
+    }
+
+    function getActiveDropConfig() {
+      const config = getDeliveryConfig(state.currentOrder);
+      if (config && config.room === "201" && !state.door201Open) return null;
+      return config && config.sceneId === state.sceneId ? config : null;
+    }
+
+    function getCompletedPlacementForScene(sceneId) {
+      const completed = Object.values(orders)
+        .map(order => getDeliveryConfig(order.room))
+        .find(config => config && config.sceneId === sceneId && orders[config.room].completed);
+      return completed ? { room: completed.room, point: completed.point } : null;
+    }
+
+    function getFloorHint(floor) {
+      if (!state.currentOrder) return "靠近电梯可以重新选择楼层。";
+      const order = orders[state.currentOrder];
+      if (floor !== order.floor) return `订单 ${order.room} 在 ${order.floor} 楼，可以靠近电梯重新选择。`;
+      if (order.room === "201") return state.door201Open ? "把外卖拖到男生伸出的手上。" : "走到 201 门口，点击“敲门”。";
+      if (order.room === "301") return "找到 301 门口的鞋柜，想一想外卖应该放在哪里。";
+      if (order.room === "302") return "顾客不在家，需要回到楼外，把外卖放进外卖柜。";
+      if (order.room === "402") return "找到 402 的门把手，把外卖挂在门上。";
+      return "根据电话里的要求完成配送。";
+    }
+
+    function updateStatus(title, hint) {
+      statusTitle.textContent = title;
+      statusHint.textContent = hint;
+    }
+
+    function updateSteps(activeStep) {
+      const order = ["call", "travel", "deliver"];
+      const activeIndex = order.indexOf(activeStep);
+      document.querySelectorAll(".step").forEach(step => {
+        const index = order.indexOf(step.dataset.step);
+        step.classList.toggle("done", index < activeIndex || (activeStep === "deliver" && index <= activeIndex));
+        step.classList.toggle("active", index === activeIndex && activeStep !== "deliver");
+      });
+    }
+
+    function renderDebug(scene) {
+      debugLayer.innerHTML = "";
+      scene.obstacles.forEach(rect => {
+      const el = document.createElement("div");
+      el.className = "obstacle-debug";
+        placeRect(el, worldRect(rect));
+        debugLayer.appendChild(el);
+      });
+      scene.interactions.forEach(item => {
+        getInteractionRects(item).forEach(rect => {
+          const el = document.createElement("div");
+          el.className = "hotspot-debug";
+          placeRect(el, worldRect(rect));
+          debugLayer.appendChild(el);
+        });
+      });
+    }
+
+    function placeRect(el, rect) {
+      el.style.left = `${rect.x}px`;
+      el.style.top = `${rect.y}px`;
+      el.style.width = `${rect.w}px`;
+      el.style.height = `${rect.h}px`;
+    }
+
+    function rectContains(container, rect) {
+      return rect.x >= container.x &&
+        rect.y >= container.y &&
+        rect.x + rect.w <= container.x + container.w &&
+        rect.y + rect.h <= container.y + container.h;
+    }
+
+    function rectsIntersect(a, b) {
+      return a.x < b.x + b.w &&
+        a.x + a.w > b.x &&
+        a.y < b.y + b.h &&
+        a.y + a.h > b.y;
+    }
+
+    function pointInRect(point, rect) {
+      return point.x >= rect.x &&
+        point.x <= rect.x + rect.w &&
+        point.y >= rect.y &&
+        point.y <= rect.y + rect.h;
+    }
+
+    function getInteractionRects(item) {
+      return item.rects || (item.rect ? [item.rect] : []);
+    }
+
+    function pointInInteraction(point, item) {
+      return getInteractionRects(item).some(rect => pointInRect(point, rect));
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1700);
+    }
+
+    function speak(text) {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "zh-CN";
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function playAudioFile(src) {
+      return new Promise(resolve => {
+        const audio = new Audio(src);
+        audio.onended = resolve;
+        audio.onerror = resolve;
+        audio.play().catch(resolve);
+      });
+    }
+
+    function playKnockSound() {
+      return playAudioFile("assets/audio/knock-door.mp3");
+    }
+
+    async function speakPhoneDialogue(room) {
+      const customerAudio = {
+        "201": "assets/audio/phone-302-B-customer-final.mp3",
+        "301": "assets/audio/phone-301-B-customer-final.mp3",
+        "302": "assets/audio/phone-201-B-customer-final.mp3",
+        "402": "assets/audio/phone-402-B-customer-final.mp3"
+      };
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      await playAudioFile("assets/audio/phone-301-A-courier-final.wav");
+      await wait(1000);
+      await playAudioFile(customerAudio[room] || customerAudio["301"]);
+    }
+
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function openFeedback() {
+      const submitButton = feedbackForm.querySelector('[type="submit"]');
+      submitButton.disabled = false;
+      submitButton.textContent = "Submit feedback";
+      feedbackError.classList.remove("show", "success");
+      feedbackScreen.classList.add("show");
+      window.setTimeout(() => feedbackComments.focus(), 0);
+    }
+
+    function closeFeedback() {
+      feedbackScreen.classList.remove("show");
+    }
+
+    async function submitFeedback(event) {
+      event.preventDefault();
+      feedbackError.classList.remove("show", "success");
+
+      const formData = new FormData(feedbackForm);
+      const rating = formData.get("rating");
+      const comments = String(formData.get("comments") || "").trim();
+      const studentName = String(formData.get("name") || "").trim() || "Anonymous student";
+      if (!rating || !comments) {
+        feedbackError.textContent = "Please select a rating and write a comment.";
+        feedbackError.classList.add("show");
+        return;
+      }
+
+      const submitButton = feedbackForm.querySelector('[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.textContent = "Sending…";
+      formData.set("name", studentName);
+      formData.set("comments", comments);
+      formData.append("activity", "Delivery Game");
+      formData.append("submitted_at", new Date().toISOString());
+      formData.append("game_completed", areAllPlayableOrdersCompleted() ? "Yes" : "No");
+
+      try {
+        const response = await fetch(FEEDBACK_ENDPOINT, {
+          method: "POST",
+          body: formData,
+          headers: { Accept: "application/json" }
+        });
+        if (!response.ok) throw new Error("Submission failed");
+        feedbackForm.reset();
+        feedbackError.textContent = "Thank you! Your feedback has been sent.";
+        feedbackError.classList.add("show", "success");
+        localStorage.setItem("delivery-feedback-sent", "true");
+        submitButton.textContent = "Sent";
+        window.setTimeout(closeFeedback, 1300);
+      } catch (error) {
+        feedbackError.textContent = "We could not send your feedback. Please check your connection and try again.";
+        feedbackError.classList.add("show");
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit feedback";
+      }
+    }
+
+    document.addEventListener("keydown", event => {
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "a", "d", "w", "s"].includes(key)) {
+        event.preventDefault();
+        state.keys.add(key);
+      }
+      if (key === "Tab") stage.classList.toggle("debug");
+    });
+
+    document.addEventListener("keyup", event => {
+      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+      state.keys.delete(key);
+    });
+
+    const joystickKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
+
+    function resetJoystick() {
+      joystickKeys.forEach(key => state.keys.delete(key));
+      joystick.classList.remove("active");
+      joystickKnob.style.transform = "translate(0, 0)";
+    }
+
+    function moveJoystick(event) {
+      event.preventDefault();
+      const rect = joystick.getBoundingClientRect();
+      const x = event.clientX - (rect.left + rect.width / 2);
+      const y = event.clientY - (rect.top + rect.height / 2);
+      const distance = Math.hypot(x, y);
+      const maxDistance = rect.width * 0.28;
+      const scale = distance > maxDistance ? maxDistance / distance : 1;
+      const knobX = x * scale;
+      const knobY = y * scale;
+      joystickKnob.style.transform = `translate(${knobX}px, ${knobY}px)`;
+      joystickKeys.forEach(key => state.keys.delete(key));
+      const threshold = 12;
+      if (x < -threshold) state.keys.add("ArrowLeft");
+      if (x > threshold) state.keys.add("ArrowRight");
+      if (y < -threshold) state.keys.add("ArrowUp");
+      if (y > threshold) state.keys.add("ArrowDown");
+    }
+
+    joystick.addEventListener("pointerdown", event => {
+      joystick.setPointerCapture(event.pointerId);
+      joystick.classList.add("active");
+      moveJoystick(event);
+    });
+    joystick.addEventListener("pointermove", event => {
+      if (joystick.hasPointerCapture(event.pointerId)) moveJoystick(event);
+    });
+    joystick.addEventListener("pointerup", resetJoystick);
+    joystick.addEventListener("pointercancel", resetJoystick);
+    joystick.addEventListener("contextmenu", event => event.preventDefault());
+
+    ordersEl.addEventListener("click", event => {
+      const orderCard = event.target.closest("[data-order]");
+      if (orderCard) callOrder(orderCard.dataset.order);
+    });
+
+    ordersEl.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const orderCard = event.target.closest("[data-order]");
+      if (!orderCard) return;
+      event.preventDefault();
+      callOrder(orderCard.dataset.order);
+    });
+
+    orderToggle.addEventListener("click", openOrderModal);
+    orderClose.addEventListener("click", closeOrderModal);
+    orderBackdrop.addEventListener("click", closeOrderModal);
+    interactionBtn.addEventListener("click", handleInteraction);
+    leaveFeedbackBtn.addEventListener("click", openFeedback);
+    topFeedbackBtn.addEventListener("click", openFeedback);
+    instructionStart.addEventListener("click", () => {
+      instructionScreen.classList.add("hidden");
+      orderToggle.focus();
+    });
+    feedbackCancel.addEventListener("click", closeFeedback);
+    feedbackForm.addEventListener("submit", submitFeedback);
+    carriedBag.addEventListener("pointerdown", startBagDrag);
+    carriedBag.addEventListener("pointermove", moveBagDrag);
+    carriedBag.addEventListener("pointerup", endBagDrag);
+    carriedBag.addEventListener("pointercancel", event => {
+      if (!state.bagDragging) return;
+      state.bagDragging = false;
+      carriedBag.classList.remove("dragging");
+      updateCarriedBagPosition();
+    });
+
+    document.querySelectorAll(".floor-btn").forEach(button => {
+      button.addEventListener("click", () => chooseFloor(Number(button.dataset.floor)));
+    });
+
+    renderOrders();
+    setScene("outside");
+    const initialBackground = new Image();
+    initialBackground.onload = initialBackground.onerror = () => {
+      loadingScreen.classList.add("hidden");
+      window.setTimeout(() => loadingScreen.remove(), 260);
+    };
+    initialBackground.src = "assets/generated-art/exterior-with-locker.jpg";
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>
